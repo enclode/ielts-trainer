@@ -216,7 +216,7 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
       </div>
     </div>
     <div id="testList" class="tests"></div>
-    <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+    <input type="file" id="importFile" accept=".json,application/json" class="hidden" multiple>
   </div>
 
   <div id="resumeBox" class="card hidden"></div>
@@ -825,7 +825,8 @@ function expandOptional(s){
   const m = s.match(/\(([^()]*)\)/);
   if(!m) return [s];
   const pre = s.slice(0, m.index), post = s.slice(m.index + m[0].length);
-  return [...expandOptional(pre + m[1] + post), ...expandOptional(pre + ' ' + post)];
+  // без скобок склеиваем как есть: «travel(l)ing» → «traveling», «(the) park» → « park» (лишний пробел уберётся)
+  return [...expandOptional(pre + m[1] + post), ...expandOptional(pre + post)];
 }
 /* приведение ответа к единому виду для сравнения */
 function normAns(s){
@@ -2088,7 +2089,11 @@ async function importTest(file){
 function bindUI(){
   $('#btnNew').onclick = () => openEditor(null);
   $('#btnImport').onclick = () => $('#importFile').click();
-  $('#importFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if(f) importTest(f); };
+  // можно выбрать сразу несколько файлов тестов — загружаются по очереди
+  $('#importFile').onchange = async e => {
+    const fs = Array.from(e.target.files); e.target.value = '';
+    for(const f of fs) await importTest(f);
+  };
   $('#btnCsv').onclick = historyCsv;
   $('#btnClearHist').onclick = async () => { if(await confirmBox(tr('clearHistQ'), tr('clearHistText'), tr('btnClear'))){ Hist.clear(); renderHistory(); } };
   ['#cL', '#cR', '#cW', '#cS'].forEach(s => $(s).oninput = calcOverall);
