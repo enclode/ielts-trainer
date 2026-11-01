@@ -233,7 +233,7 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
       </div>
     </div>
     <div id="testList" class="tests"></div>
-    <input type="file" id="importFile" accept=".json,application/json" class="hidden" multiple>
+    <input type="file" id="importFile" accept=".json,.zip,application/json,application/zip,application/x-zip-compressed" class="hidden" multiple>
   </div>
 
   <div id="resumeBox" class="card hidden"></div>
@@ -558,9 +558,9 @@ const TR = {
   how4: ['Listening uchun audiofayllarni (mp3) qismlar tartibida qo‘shing.',
          'For Listening, add the audio files (mp3) in the order of the parts.',
          'Для Listening добавьте аудиофайлы (mp3) по порядку частей.'],
-  how5: ['Testni saqlang — u shu kompyuterdagi kutubxonada qoladi. «Faylga» tugmasi bilan uni boshqa kompyuterga ko‘chirish mumkin.',
-         'Save the test — it stays in the library on this computer. Use “To file” to move it to another computer.',
-         'Сохраните тест — он останется в библиотеке на этом компьютере. Кнопкой «В файл» его можно перенести на другой компьютер.'],
+  how5: ['Testni saqlang — u shu kompyuterdagi kutubxonada qoladi. «Faylga» tugmasi bilan uni boshqa kompyuterga ko‘chirish mumkin. Tayyor testlarni (.json yoki .zip arxiv) «Testni fayldan yuklash» tugmasi bilan yuklang.',
+         'Save the test — it stays in the library on this computer. Use “To file” to move it to another computer. Ready tests (.json or a .zip archive) are loaded with “Load test from file”.',
+         'Сохраните тест — он останется в библиотеке на этом компьютере. Кнопкой «В файл» его можно перенести на другой компьютер. Готовые тесты (.json или архив .zip) загружаются кнопкой «Загрузить тест из файла».'],
   how6: ['O‘quvchi «Boshlash» tugmasini bosadi, ismini yozadi va yechadi. Topshirgandan keyin — ball, band va xatolar tahlili.',
          'The student clicks “Start”, enters a name and takes the test. After submitting — score, band and a review of mistakes.',
          'Ученик нажимает «Начать», вводит имя и решает. После сдачи — балл, band и разбор ошибок.'],
@@ -799,6 +799,21 @@ const TR = {
   addCopy: ['Nusxa sifatida qo‘shish', 'Add as a copy', 'Добавить копией'],
   copySuffix: [' (nusxa)', ' (copy)', ' (копия)'],
   added: ['«{0}» testi qo‘shildi', 'Test “{0}” added', 'Тест «{0}» добавлен'],
+  importing: ['Testlar yuklanmoqda… {0} / {1}', 'Loading tests… {0} / {1}', 'Загрузка тестов… {0} / {1}'],
+  importDone: ['Yuklandi: {0} ta test', 'Tests loaded: {0}', 'Загружено тестов: {0}'],
+  importSkipped: ['O‘tkazib yuborildi (kutubxonada bor edi): {0}', 'Skipped (already in the library): {0}', 'Пропущено (уже были в библиотеке): {0}'],
+  importFailed: ['Yuklab bo‘lmadi: {0}', 'Could not load: {0}', 'Не удалось загрузить: {0}'],
+  dupManyQ: ['Ba’zi testlar allaqachon bor', 'Some tests already exist', 'Некоторые тесты уже есть'],
+  dupManyText: ['«{0}» testi (va ehtimol boshqalari) kutubxonada allaqachon bor. Ularni fayldagi versiya bilan almashtirasizmi?',
+                'The test “{0}” (and maybe others) is already in the library. Replace them with the versions from the file?',
+                'Тест «{0}» (и, возможно, другие) уже есть в библиотеке. Заменить их версиями из файла?'],
+  replaceAll: ['Hammasini almashtirish', 'Replace all', 'Заменить все'],
+  skipThem: ['Ularni o‘tkazib yuborish', 'Skip them', 'Пропустить их'],
+  zipNoTests: ['Tanlangan fayllarda testlar topilmadi.', 'No tests found in the selected files.', 'В выбранных файлах не найдено тестов.'],
+  zipUnsupported: ['Bu brauzer arxivni ocha olmaydi. Chrome yoki Edge ning yangi versiyasini ishlating yoki arxivni oldin oching.',
+                   'This browser cannot open archives. Use a recent Chrome or Edge, or unzip the archive first.',
+                   'Этот браузер не умеет открывать архивы. Используйте свежий Chrome или Edge или сначала распакуйте архив.'],
+  zipBad: ['Arxiv buzilgan yoki noma’lum formatda', 'The archive is damaged or in an unknown format', 'Архив повреждён или в неизвестном формате'],
   loadFail: ['Yuklab bo‘lmadi', 'Could not load', 'Не удалось загрузить']
 };
 function tr(key, ...args){
@@ -2175,24 +2190,106 @@ async function exportTest(id){
   const json = JSON.stringify({format: 'ielts-cd-trainer', version: 1, test: out});
   download((t.title || 'ielts-test').replace(/[\\/:*?"<>|]+/g, '_') + '.ielts.json', json, 'application/json');
 }
-async function importTest(file){
-  try{
-    const j = JSON.parse(await file.text());
-    if(j.format !== 'ielts-cd-trainer' || !j.test) throw new Error(tr('notOurFile'));
-    const t = j.test;
-    if(t.tasksPdf) t.tasksPdf = {name: t.tasksPdf.name, data: await fromDataURL(t.tasksPdf.data)};
-    if(t.answersPdf) t.answersPdf = {name: t.answersPdf.name, data: await fromDataURL(t.answersPdf.data)};
-    const au = [];
-    for(const a of (t.audio || [])){ const buf = await fromDataURL(a.data); au.push({name: a.name, blob: new Blob([buf], {type: (a.data.match(/^data:([^;,]+)/) || [])[1] || 'audio/mpeg'})}); }
-    t.audio = au;
-    if(await DB.get(t.id)){
+/* Чтение .zip прямо в браузере (без распаковки на компьютере).
+   Поддерживаются обычные архивы Windows / macOS: без сжатия и со сжатием deflate. */
+async function readZip(file){
+  if(typeof DecompressionStream === 'undefined') throw new Error(tr('zipUnsupported'));
+  const buf = await file.arrayBuffer(), dv = new DataView(buf), dec = new TextDecoder();
+  let eocd = -1;
+  for(let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 22 - 65535); i--)
+    if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
+  if(eocd < 0) throw new Error(tr('zipBad'));
+  let count = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true);
+  if((cdOff === 0xFFFFFFFF || count === 0xFFFF) && eocd >= 20 && dv.getUint32(eocd - 20, true) === 0x07064b50){   // zip64
+    const z = Number(dv.getBigUint64(eocd - 12, true));
+    count = Number(dv.getBigUint64(z + 32, true)); cdOff = Number(dv.getBigUint64(z + 48, true));
+  }
+  const entries = [];
+  let p = cdOff;
+  for(let k = 0; k < count && dv.getUint32(p, true) === 0x02014b50; k++){
+    const method = dv.getUint16(p + 10, true), nameLen = dv.getUint16(p + 28, true),
+          extraLen = dv.getUint16(p + 30, true), comLen = dv.getUint16(p + 32, true);
+    let csize = dv.getUint32(p + 20, true), usize = dv.getUint32(p + 24, true), lho = dv.getUint32(p + 42, true);
+    const name = dec.decode(new Uint8Array(buf, p + 46, nameLen));
+    for(let e = p + 46 + nameLen; e < p + 46 + nameLen + extraLen; ){          // zip64: большие размеры
+      const id = dv.getUint16(e, true), len = dv.getUint16(e + 2, true);
+      if(id === 1){ let q = e + 4;
+        if(usize === 0xFFFFFFFF){ usize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if(csize === 0xFFFFFFFF){ csize = Number(dv.getBigUint64(q, true)); q += 8; }
+        if(lho === 0xFFFFFFFF){ lho = Number(dv.getBigUint64(q, true)); } }
+      e += 4 + len;
+    }
+    entries.push({name, method, csize, lho});
+    p += 46 + nameLen + extraLen + comLen;
+  }
+  return entries.map(en => ({
+    name: en.name.split('/').pop(), path: en.name,
+    text: async () => {
+      const start = en.lho + 30 + dv.getUint16(en.lho + 26, true) + dv.getUint16(en.lho + 28, true);
+      const data = new Uint8Array(buf, start, en.csize);
+      if(en.method === 0) return dec.decode(data);
+      if(en.method === 8) return new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+      throw new Error(tr('zipBad'));
+    }
+  }));
+}
+
+/* один тест из текста файла .ielts.json → в библиотеку. Возвращает 'added' | 'skipped'. */
+async function importTestText(text, batch){
+  const j = JSON.parse(text);
+  if(j.format !== 'ielts-cd-trainer' || !j.test) throw new Error(tr('notOurFile'));
+  const t = j.test;
+  if(await DB.get(t.id)){
+    if(!batch){
       if(!(await confirmBox(tr('existsQ'), tr('existsText', esc(t.title)), tr('replace'), tr('addCopy'))))
         { t.id = uid(); t.title += tr('copySuffix'); }
+    } else {
+      if(batch.dup == null)                           // при загрузке многих тестов спрашиваем один раз
+        batch.dup = await modal(tr('dupManyQ'), '<p>' + tr('dupManyText', esc(t.title)) + '</p>',
+          [{text: tr('skipThem'), value: 'skip'}, {text: tr('replaceAll'), cls: 'primary', value: 'replace'}]);
+      if(batch.dup === 'skip') return 'skipped';
     }
-    await DB.put(t);
-    toast(tr('added', t.title));
-    renderHome();
-  }catch(e){ modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
+  }
+  if(t.tasksPdf) t.tasksPdf = {name: t.tasksPdf.name, data: await fromDataURL(t.tasksPdf.data)};
+  if(t.answersPdf) t.answersPdf = {name: t.answersPdf.name, data: await fromDataURL(t.answersPdf.data)};
+  const au = [];
+  for(const a of (t.audio || [])){ const buf = await fromDataURL(a.data); au.push({name: a.name, blob: new Blob([buf], {type: (a.data.match(/^data:([^;,]+)/) || [])[1] || 'audio/mpeg'})}); }
+  t.audio = au;
+  await DB.put(t);
+  return 'added';
+}
+
+/* загрузка выбранных файлов: тесты .json и архивы .zip с тестами внутри, сколько угодно сразу */
+async function importFiles(files){
+  const items = [];
+  try{
+    for(const f of files){
+      if(/\.zip$/i.test(f.name) || /zip/.test(f.type)){
+        (await readZip(f)).filter(e => /\.json$/i.test(e.name) && !/^__MACOSX\//.test(e.path) && !e.name.startsWith('.'))
+          .sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}))
+          .forEach(e => items.push({name: e.name, text: e.text}));
+      } else items.push({name: f.name, text: () => f.text()});
+    }
+  }catch(e){ return modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
+  if(!items.length) return modal(tr('loadFail'), '<p>' + tr('zipNoTests') + '</p>');
+  const batch = items.length > 1 ? {dup: null} : null;
+  const prog = h('div', {class: 'toast'}); document.body.append(prog);
+  let added = 0, skipped = 0; const failed = [], names = [];
+  for(let i = 0; i < items.length; i++){
+    prog.textContent = tr('importing', i + 1, items.length);
+    try{
+      const text = await items[i].text();
+      const r = await importTestText(text, batch);
+      if(r === 'added'){ added++; try{ names.push(JSON.parse(text).test.title); }catch(e){} } else skipped++;
+    }catch(e){ failed.push(items[i].name + ' — ' + e.message); }
+  }
+  prog.remove();
+  await renderHome();
+  if(!batch && added && !failed.length) return toast(tr('added', names[0] || ''));
+  let html = '<p><b>' + tr('importDone', added) + '</b></p>';
+  if(skipped) html += '<p>' + tr('importSkipped', skipped) + '</p>';
+  if(failed.length) html += '<p class="c-bad">' + tr('importFailed', failed.length) + '</p><ul>' + failed.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
+  modal(null, html);
 }
 
 /* =====================================================================
@@ -2201,10 +2298,10 @@ async function importTest(file){
 function bindUI(){
   $('#btnNew').onclick = () => openEditor(null);
   $('#btnImport').onclick = () => $('#importFile').click();
-  // можно выбрать сразу несколько файлов тестов — загружаются по очереди
+  // можно выбрать сразу несколько файлов тестов и архивов .zip — загружаются по очереди
   $('#importFile').onchange = async e => {
     const fs = Array.from(e.target.files); e.target.value = '';
-    for(const f of fs) await importTest(f);
+    if(fs.length) await importFiles(fs);
   };
   $('#btnCsv').onclick = historyCsv;
   $('#btnClearHist').onclick = async () => { if(await confirmBox(tr('clearHistQ'), tr('clearHistText'), tr('btnClear'))){ Hist.clear(); renderHistory(); } };
