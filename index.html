@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="ru">
+<html lang="uz">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>IELTS на компьютере — тренажёр</title>
+<title>IELTS</title>
 <style>
 /* ============ Общие цвета и шрифты ============ */
 :root{
@@ -77,6 +77,8 @@ table.t th{color:var(--muted);font-weight:600;font-size:13px}
 .c-ok{color:var(--ok);font-weight:700}.c-bad{color:var(--bad);font-weight:700}.c-empty{color:var(--muted)}
 tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 .calc input{width:70px}
+#langBar{display:flex;justify-content:flex-end;max-width:1100px;margin:0 auto;padding:12px 16px 0}
+#langBar .seg button{padding:6px 12px;font-size:14px}
 .toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:8px;
   z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:15px;max-width:90vw}
 
@@ -189,23 +191,26 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 </head>
 <body>
 
+<!-- переключатель языка интерфейса: узбекский → английский → русский -->
+<div id="langBar"><div class="seg"><button data-l="uz">O‘zbekcha</button><button data-l="en">English</button><button data-l="ru">Русский</button></div></div>
+
 <!-- ===================== ГЛАВНАЯ ===================== -->
 <div id="home" class="screen">
  <div class="wrap">
   <div class="topline">
     <span class="logo">IELTS</span>
-    <div><h1>Компьютерный IELTS — тренажёр</h1>
-      <div class="sub">Загрузите PDF с заданиями и ключ ответов — ученик решает как на настоящем экзамене, проверка сразу</div></div>
+    <div><h1 data-i18n="homeH1"></h1>
+      <div class="sub" data-i18n="homeSub"></div></div>
   </div>
 
   <div id="libWarn" class="note hidden" style="margin-bottom:16px"></div>
 
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:12px">
-      <h2 style="margin:0">Библиотека тестов</h2>
+      <h2 style="margin:0" data-i18n="libTitle"></h2>
       <div class="row">
-        <button class="btn" id="btnImport">Загрузить тест из файла</button>
-        <button class="btn primary" id="btnNew">+ Новый тест</button>
+        <button class="btn" id="btnImport" data-i18n="btnImport"></button>
+        <button class="btn primary" id="btnNew" data-i18n="btnNew"></button>
       </div>
     </div>
     <div id="testList" class="tests"></div>
@@ -216,10 +221,10 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 
   <div class="card">
     <div class="row" style="justify-content:space-between;margin-bottom:8px">
-      <h2 style="margin:0">История результатов</h2>
+      <h2 style="margin:0" data-i18n="histTitle"></h2>
       <div class="row">
-        <button class="btn small" id="btnCsv">Скачать таблицу (Excel)</button>
-        <button class="btn small danger" id="btnClearHist">Очистить</button>
+        <button class="btn small" id="btnCsv" data-i18n="btnCsv"></button>
+        <button class="btn small danger" id="btnClearHist" data-i18n="btnClear"></button>
       </div>
     </div>
     <div id="histBox"></div>
@@ -227,19 +232,19 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 
   <div class="grid2">
     <div class="card">
-      <h2>Как пользоваться</h2>
+      <h2 data-i18n="howTitle"></h2>
       <ol class="steps">
-        <li>Нажмите <b>«Новый тест»</b>, выберите модуль (Listening, Reading или Writing).</li>
-        <li>Загрузите PDF с заданиями и укажите страницы нужного теста.</li>
-        <li>Загрузите PDF с ответами — программа сама найдёт ответы. Проверьте ключ и при необходимости исправьте.</li>
-        <li>Для Listening добавьте аудиофайлы (mp3) по порядку частей.</li>
-        <li>Сохраните тест — он останется в библиотеке на этом компьютере. Кнопкой «В файл» его можно перенести на другой компьютер.</li>
-        <li>Ученик нажимает «Начать», вводит имя и решает. После сдачи — балл, band и разбор ошибок.</li>
+        <li data-i18n-html="how1"></li>
+        <li data-i18n-html="how2"></li>
+        <li data-i18n-html="how3"></li>
+        <li data-i18n-html="how4"></li>
+        <li data-i18n-html="how5"></li>
+        <li data-i18n-html="how6"></li>
       </ol>
-      <p class="sub">Выделять текст маркером можно, если PDF текстовый (не скан): выделите мышью фрагмент и нажмите «Highlight».</p>
+      <p class="sub" data-i18n="howNote"></p>
     </div>
     <div class="card calc">
-      <h2>Калькулятор общего балла</h2>
+      <h2 data-i18n="calcTitle"></h2>
       <div class="row">
         <label>Listening <input class="i" id="cL" type="number" min="0" max="9" step="0.5"></label>
         <label>Reading <input class="i" id="cR" type="number" min="0" max="9" step="0.5"></label>
@@ -247,7 +252,7 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
         <label>Speaking <input class="i" id="cS" type="number" min="0" max="9" step="0.5"></label>
       </div>
       <p style="margin:14px 0 0">Overall band: <b id="cOut" style="font-size:22px">—</b></p>
-      <p class="sub">Среднее четырёх модулей, округление по правилам IELTS: .25 вверх до .5, .75 вверх до целого.</p>
+      <p class="sub" data-i18n="calcNote"></p>
     </div>
   </div>
  </div>
@@ -257,98 +262,98 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 <div id="editor" class="screen hidden">
  <div class="wrap">
   <div class="topline">
-    <button class="btn" id="edBack">← Назад</button>
-    <h1 id="edTitle">Новый тест</h1>
+    <button class="btn" id="edBack" data-i18n="back"></button>
+    <h1 id="edTitle"></h1>
   </div>
 
   <div class="card">
-    <h2>1. Что за тест</h2>
-    <label class="f">Название (например: Cambridge 18, Test 2, Reading)</label>
+    <h2 data-i18n="edS1"></h2>
+    <label class="f" data-i18n="edNameL"></label>
     <input class="i" id="edName" placeholder="Cambridge 18 — Test 2 — Reading">
-    <label class="f">Модуль</label>
+    <label class="f" data-i18n="edModuleL"></label>
     <div class="seg" id="edModule">
       <button data-v="listening">Listening</button><button data-v="reading">Reading</button><button data-v="writing">Writing</button>
     </div>
     <div id="edRtypeBox">
-      <label class="f">Вид Reading (от этого зависит пересчёт в band)</label>
+      <label class="f" data-i18n="edRtypeL"></label>
       <div class="seg" id="edRtype"><button data-v="academic">Academic</button><button data-v="general">General Training</button></div>
     </div>
     <div class="row" style="margin-top:4px">
-      <div><label class="f">Время, минут</label><input class="i n" id="edMin" type="number" min="1" max="300"></div>
-      <div id="edPartsBox"><label class="f">Вопросов в частях (через запятую)</label><input class="i" id="edParts" style="width:160px"></div>
+      <div><label class="f" data-i18n="edMinL"></label><input class="i n" id="edMin" type="number" min="1" max="300"></div>
+      <div id="edPartsBox"><label class="f" data-i18n="edPartsL"></label><input class="i" id="edParts" style="width:160px"></div>
     </div>
     <p class="sub" id="edTimeHint"></p>
   </div>
 
   <div class="card">
-    <h2>2. PDF с заданиями</h2>
+    <h2 data-i18n="edS2"></h2>
     <div class="filebox">
       <div class="row">
         <input type="file" id="edTasksFile" accept="application/pdf,.pdf">
         <span id="edTasksInfo" class="sub"></span>
       </div>
       <div class="row" style="margin-top:8px">
-        <span>Показывать страницы с</span><input class="i n" id="edFrom" type="number" min="1">
-        <span>по</span><input class="i n" id="edTo" type="number" min="1">
-        <button class="btn small" id="edPreviewTasks">Посмотреть PDF</button>
+        <span data-i18n="pgShowFrom"></span><input class="i n" id="edFrom" type="number" min="1">
+        <span data-i18n="pgTo"></span><input class="i n" id="edTo" type="number" min="1">
+        <button class="btn small" id="edPreviewTasks" data-i18n="viewPdf"></button>
       </div>
       <div id="edPartPagesBox">
-        <label class="f">С какой страницы начинается каждая часть (необязательно, через запятую). Тогда при переходе на Part 2 PDF сам перелистнётся.</label>
-        <input class="i" id="edPartPages" placeholder="например: 1, 5, 9" style="max-width:260px">
+        <label class="f" id="edPartPagesL"></label>
+        <input class="i" id="edPartPages" data-i18n-ph="partPagesPh" style="max-width:260px">
       </div>
     </div>
     <div id="edAudioBox" style="margin-top:14px">
-      <h3>Аудио для Listening</h3>
+      <h3 data-i18n="audioH"></h3>
       <div class="filebox">
         <input type="file" id="edAudioFile" accept="audio/*" multiple>
         <div id="edAudioList" class="sub" style="margin-top:6px"></div>
-        <div class="sub" style="margin-top:6px">Можно выбрать сразу несколько файлов — они будут играть по порядку имён (Part 1, Part 2…). Без аудио учитель может включить запись сам.</div>
+        <div class="sub" style="margin-top:6px" data-i18n="audioNote"></div>
       </div>
     </div>
   </div>
 
   <div class="card">
-    <h2 id="edKeyTitle">3. Ответы (ключ)</h2>
+    <h2 id="edKeyTitle"></h2>
     <div class="filebox">
       <div class="row">
         <input type="file" id="edAnsFile" accept="application/pdf,.pdf">
         <span id="edAnsInfo" class="sub"></span>
       </div>
       <div class="row" style="margin-top:8px">
-        <span>Страницы с</span><input class="i n" id="edAFrom" type="number" min="1">
-        <span>по</span><input class="i n" id="edATo" type="number" min="1">
-        <button class="btn small" id="edPreviewAns">Посмотреть PDF</button>
-        <button class="btn small blue" id="edExtract">Найти ответы в PDF</button>
+        <span data-i18n="pgFrom"></span><input class="i n" id="edAFrom" type="number" min="1">
+        <span data-i18n="pgTo"></span><input class="i n" id="edATo" type="number" min="1">
+        <button class="btn small" id="edPreviewAns" data-i18n="viewPdf"></button>
+        <button class="btn small blue" id="edExtract" data-i18n="extract"></button>
       </div>
     </div>
     <div id="edKeyBox">
       <div id="edExtractMsg" style="margin-top:10px"></div>
       <div class="grid2" style="margin-top:10px">
         <div>
-          <label class="f">Ключ: одна строка — один вопрос. Можно исправлять руками.</label>
+          <label class="f" data-i18n="keyL"></label>
           <textarea class="i" id="edKey" rows="18" placeholder="1 TRUE&#10;2 NOT GIVEN&#10;3 library / the library&#10;4 (car) park&#10;14-15 B, D&#10;20 F [A-H]"></textarea>
-          <details class="sub" style="margin-top:6px"><summary>Как записывать ключ</summary>
+          <details class="sub" style="margin-top:6px"><summary data-i18n="keyHowSum"></summary>
             <ul style="padding-left:18px;margin:6px 0">
-              <li><code>3 library / the library</code> — несколько верных вариантов через «/».</li>
-              <li><code>4 (car) park</code> — слово в скобках можно писать, а можно нет.</li>
-              <li><code>14-15 B, D</code> — «выберите две буквы», порядок любой.</li>
-              <li><code>20 F [A-H]</code> — в [квадратных скобках] какие буквы показать ученику.</li>
-              <li>TRUE/FALSE/NOT GIVEN и YES/NO/NOT GIVEN ученик выбирает кнопками, буквы — тоже кнопками, остальное вписывает.</li>
+              <li data-i18n-html="keyHow1"></li>
+              <li data-i18n-html="keyHow2"></li>
+              <li data-i18n-html="keyHow3"></li>
+              <li data-i18n-html="keyHow4"></li>
+              <li data-i18n-html="keyHow5"></li>
             </ul></details>
         </div>
         <div>
-          <label class="f">Как программа поняла ключ</label>
+          <label class="f" data-i18n="keyPrevL"></label>
           <div id="edKeyPrev" class="keyprev"></div>
         </div>
       </div>
     </div>
-    <p id="edWritingNote" class="sub hidden">Для Writing ключа нет: этот PDF (образцы ответов, если есть) откроется ученику после сдачи, чтобы сравнить со своим текстом.</p>
+    <p id="edWritingNote" class="sub hidden" data-i18n="wNote"></p>
   </div>
 
   <div class="row" style="justify-content:flex-end">
     <span id="edSaveMsg" class="sub"></span>
-    <button class="btn" id="edCancel">Отмена</button>
-    <button class="btn primary" id="edSave">Сохранить тест</button>
+    <button class="btn" id="edCancel" data-i18n="cancel"></button>
+    <button class="btn primary" id="edSave" data-i18n="saveTest"></button>
   </div>
  </div>
 </div>
@@ -359,18 +364,18 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
   <div class="card" style="margin-top:40px">
     <div class="row" style="margin-bottom:12px"><span class="logo">IELTS</span><h1 id="inTitle"></h1></div>
     <div id="inInfo" class="sub" style="margin-bottom:12px"></div>
-    <label class="f">Имя ученика (Test taker)</label>
-    <input class="i" id="inName" placeholder="Фамилия Имя">
-    <label class="f">Режим</label>
-    <div class="seg" id="inMode"><button data-v="strict">Как на экзамене</button><button data-v="practice">Тренировка</button></div>
+    <label class="f" data-i18n="inNameL"></label>
+    <input class="i" id="inName" data-i18n-ph="inNamePh">
+    <label class="f" data-i18n="inModeL"></label>
+    <div class="seg" id="inMode"><button data-v="strict" data-i18n="modeStrict"></button><button data-v="practice" data-i18n="modePractice"></button></div>
     <p class="sub" id="inModeHint"></p>
     <div id="inSound" class="hidden">
-      <label class="f">Проверка звука в наушниках</label>
-      <div class="row"><button class="btn small" id="inBeep">▶ Проверить звук</button><span class="sub">Громкость можно менять и во время теста.</span></div>
+      <label class="f" data-i18n="soundL"></label>
+      <div class="row"><button class="btn small" id="inBeep" data-i18n="soundBtn"></button><span class="sub" data-i18n="soundNote"></span></div>
     </div>
     <div class="acts row" style="justify-content:space-between;margin-top:20px">
-      <button class="btn" id="inBack">← Назад</button>
-      <button class="btn primary" id="inStart" style="padding:10px 26px">Start test</button>
+      <button class="btn" id="inBack" data-i18n="back"></button>
+      <button class="btn primary" id="inStart" style="padding:10px 26px" data-i18n="startTest"></button>
     </div>
   </div>
  </div>
@@ -452,6 +457,7 @@ function toast(msg, ms){
 }
 function showScreen(id){
   ['home','editor','intro','exam','results'].forEach(s => $('#'+s).classList.toggle('hidden', s !== id));
+  $('#langBar').classList.toggle('hidden', id === 'exam');
   window.scrollTo(0,0);
 }
 /* модальное окно; buttons: [{text, cls, value}] → Promise(value) */
@@ -472,7 +478,7 @@ function modal(title, body, buttons, opts){
   });
 }
 const confirmBox = (title, text, yes, no) =>
-  modal(title, '<p>' + text + '</p>', [{text: no || 'Отмена', value:false}, {text: yes || 'Да', cls:'primary', value:true}]);
+  modal(title, '<p>' + text + '</p>', [{text: no || tr('cancel'), value:false}, {text: yes || tr('yes'), cls:'primary', value:true}]);
 function fmtClock(sec){
   sec = Math.max(0, Math.round(sec));
   const m = Math.floor(sec / 60), s = sec % 60;
@@ -480,7 +486,11 @@ function fmtClock(sec){
 }
 function fmtDate(ts){
   const d = new Date(ts);
-  return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+  if(LANG === 'uz'){   // в Узбекистане привычно 01.11.2026 14:05
+    const z = n => String(n).padStart(2, '0');
+    return z(d.getDate()) + '.' + z(d.getMonth() + 1) + '.' + d.getFullYear() + ' ' + z(d.getHours()) + ':' + z(d.getMinutes());
+  }
+  return d.toLocaleDateString(LOCALES[LANG]) + ' ' + d.toLocaleTimeString(LOCALES[LANG], {hour:'2-digit', minute:'2-digit'});
 }
 function download(name, data, type){
   const blob = data instanceof Blob ? data : new Blob([data], {type: type || 'text/plain'});
@@ -496,6 +506,284 @@ const LS = {
 };
 const MOD_NAME = {listening:'Listening', reading:'Reading', writing:'Writing'};
 const MOD_PILL = {listening:'l', reading:'r', writing:'w'};
+
+/* ---------- языки интерфейса: узбекский, английский, русский ----------
+   Каждая строка: [узбекский, английский, русский]. {0}, {1} — подставляемые значения.
+   Экран самого экзамена всегда на английском, как на настоящем IELTS. */
+const LANGS = ['uz', 'en', 'ru'];
+const LANG_NAMES = {uz: 'O‘zbekcha', en: 'English', ru: 'Русский'};
+const LOCALES = {uz: 'uz-UZ', en: 'en-GB', ru: 'ru-RU'};
+let LANG = 'uz';
+const TR = {
+  appTitle: ['IELTS kompyuterda — trenajyor', 'Computer-delivered IELTS — trainer', 'IELTS на компьютере — тренажёр'],
+  homeH1: ['Kompyuterda IELTS — trenajyor', 'Computer-delivered IELTS — trainer', 'Компьютерный IELTS — тренажёр'],
+  homeSub: ['Topshiriqlar PDF faylini va javoblar kalitini yuklang — o‘quvchi haqiqiy imtihondagidek yechadi, tekshiruv darhol',
+            'Upload a PDF with the tasks and the answer key — the student takes the test like the real exam and is checked instantly',
+            'Загрузите PDF с заданиями и ключ ответов — ученик решает как на настоящем экзамене, проверка сразу'],
+  libTitle: ['Testlar kutubxonasi', 'Test library', 'Библиотека тестов'],
+  btnImport: ['Testni fayldan yuklash', 'Load test from file', 'Загрузить тест из файла'],
+  btnNew: ['+ Yangi test', '+ New test', '+ Новый тест'],
+  histTitle: ['Natijalar tarixi', 'Results history', 'История результатов'],
+  btnCsv: ['Jadvalni yuklab olish (Excel)', 'Download table (Excel)', 'Скачать таблицу (Excel)'],
+  btnClear: ['Tozalash', 'Clear', 'Очистить'],
+  howTitle: ['Qanday foydalaniladi', 'How to use', 'Как пользоваться'],
+  how1: ['<b>«Yangi test»</b> tugmasini bosing va modulni tanlang (Listening, Reading yoki Writing).',
+         'Click <b>“New test”</b> and choose the module (Listening, Reading or Writing).',
+         'Нажмите <b>«Новый тест»</b>, выберите модуль (Listening, Reading или Writing).'],
+  how2: ['Topshiriqlar PDF faylini yuklang va kerakli test sahifalarini ko‘rsating.',
+         'Upload the PDF with the tasks and enter the pages of the test you need.',
+         'Загрузите PDF с заданиями и укажите страницы нужного теста.'],
+  how3: ['Javoblar PDF faylini yuklang — dastur javoblarni o‘zi topadi. Kalitni tekshiring, kerak bo‘lsa tuzating.',
+         'Upload the PDF with the answers — the program finds them itself. Check the key and correct it if needed.',
+         'Загрузите PDF с ответами — программа сама найдёт ответы. Проверьте ключ и при необходимости исправьте.'],
+  how4: ['Listening uchun audiofayllarni (mp3) qismlar tartibida qo‘shing.',
+         'For Listening, add the audio files (mp3) in the order of the parts.',
+         'Для Listening добавьте аудиофайлы (mp3) по порядку частей.'],
+  how5: ['Testni saqlang — u shu kompyuterdagi kutubxonada qoladi. «Faylga» tugmasi bilan uni boshqa kompyuterga ko‘chirish mumkin.',
+         'Save the test — it stays in the library on this computer. Use “To file” to move it to another computer.',
+         'Сохраните тест — он останется в библиотеке на этом компьютере. Кнопкой «В файл» его можно перенести на другой компьютер.'],
+  how6: ['O‘quvchi «Boshlash» tugmasini bosadi, ismini yozadi va yechadi. Topshirgandan keyin — ball, band va xatolar tahlili.',
+         'The student clicks “Start”, enters a name and takes the test. After submitting — score, band and a review of mistakes.',
+         'Ученик нажимает «Начать», вводит имя и решает. После сдачи — балл, band и разбор ошибок.'],
+  howNote: ['PDF matnli bo‘lsa (skan emas), matnni marker bilan belgilash mumkin: sichqoncha bilan bo‘lakni belgilang va «Highlight» tugmasini bosing.',
+            'Text can be highlighted if the PDF contains text (not a scan): select a fragment with the mouse and click “Highlight”.',
+            'Выделять текст маркером можно, если PDF текстовый (не скан): выделите мышью фрагмент и нажмите «Highlight».'],
+  calcTitle: ['Umumiy ball kalkulyatori', 'Overall band calculator', 'Калькулятор общего балла'],
+  calcNote: ['To‘rt modulning o‘rtachasi, IELTS qoidasi bo‘yicha yaxlitlanadi: .25 — .5 gacha, .75 — butun songacha yuqoriga.',
+             'Average of the four modules, rounded by IELTS rules: .25 up to .5, .75 up to the next whole band.',
+             'Среднее четырёх модулей, округление по правилам IELTS: .25 вверх до .5, .75 вверх до целого.'],
+
+  back: ['← Orqaga', '← Back', '← Назад'],
+  edNew: ['Yangi test', 'New test', 'Новый тест'],
+  edEdit: ['Testni tahrirlash', 'Edit test', 'Изменить тест'],
+  edS1: ['1. Qanday test', '1. About the test', '1. Что за тест'],
+  edNameL: ['Nomi (masalan: Cambridge 18, Test 2, Reading)', 'Name (e.g. Cambridge 18, Test 2, Reading)', 'Название (например: Cambridge 18, Test 2, Reading)'],
+  edModuleL: ['Modul', 'Module', 'Модуль'],
+  edRtypeL: ['Reading turi (band hisobi shunga bog‘liq)', 'Reading type (affects the band conversion)', 'Вид Reading (от этого зависит пересчёт в band)'],
+  edMinL: ['Vaqt, daqiqa', 'Time, minutes', 'Время, минут'],
+  edPartsL: ['Qismlardagi savollar soni (vergul bilan)', 'Questions per part (comma-separated)', 'Вопросов в частях (через запятую)'],
+  edS2: ['2. Topshiriqlar PDF fayli', '2. Tasks PDF', '2. PDF с заданиями'],
+  pgShowFrom: ['Ko‘rsatiladigan sahifalar:', 'Show pages', 'Показывать страницы с'],
+  pgFrom: ['Sahifalar:', 'Pages', 'Страницы с'],
+  pgTo: ['–', 'to', 'по'],
+  viewPdf: ['PDF ni ko‘rish', 'View PDF', 'Посмотреть PDF'],
+  partPagesL: ['Har bir qism qaysi sahifadan boshlanadi (ixtiyoriy, vergul bilan). Shunda Part 2 ga o‘tganda PDF o‘zi varaqlanadi.',
+               'Page where each part starts (optional, comma-separated). The PDF then turns to Part 2 by itself.',
+               'С какой страницы начинается каждая часть (необязательно, через запятую). Тогда при переходе на Part 2 PDF сам перелистнётся.'],
+  partPagesLW: ['Task 2 qaysi sahifadan boshlanadi (ixtiyoriy). Shunda Task 2 ga o‘tganda PDF o‘zi varaqlanadi.',
+                'Page where Task 2 starts (optional). The PDF then turns to Task 2 by itself.',
+                'С какой страницы начинается Task 2 (необязательно). Тогда при переходе на Task 2 PDF сам перелистнётся.'],
+  partPagesPh: ['masalan: 1, 5, 9', 'e.g. 1, 5, 9', 'например: 1, 5, 9'],
+  audioH: ['Listening uchun audio', 'Audio for Listening', 'Аудио для Listening'],
+  audioNote: ['Bir nechta faylni birdaniga tanlash mumkin — ular nomlari tartibida ijro etiladi (Part 1, Part 2…). Audio bo‘lmasa, o‘qituvchi yozuvni o‘zi qo‘yishi mumkin.',
+              'You can pick several files at once — they play in name order (Part 1, Part 2…). Without audio, the teacher can play the recording separately.',
+              'Можно выбрать сразу несколько файлов — они будут играть по порядку имён (Part 1, Part 2…). Без аудио учитель может включить запись сам.'],
+  edS3Key: ['3. Javoblar (kalit)', '3. Answers (key)', '3. Ответы (ключ)'],
+  edS3W: ['3. Namuna javoblar (ixtiyoriy)', '3. Model answers (optional)', '3. Образцы ответов (необязательно)'],
+  extract: ['PDF dan javoblarni topish', 'Find answers in PDF', 'Найти ответы в PDF'],
+  keyL: ['Kalit: bir qator — bir savol. Qo‘lda tuzatish mumkin.', 'Key: one line — one question. You can edit it by hand.', 'Ключ: одна строка — один вопрос. Можно исправлять руками.'],
+  keyHowSum: ['Kalitni qanday yozish kerak', 'How to write the key', 'Как записывать ключ'],
+  keyHow1: ['<code>3 library / the library</code> — bir nechta to‘g‘ri variant «/» orqali.',
+            '<code>3 library / the library</code> — several correct variants separated by “/”.',
+            '<code>3 library / the library</code> — несколько верных вариантов через «/».'],
+  keyHow2: ['<code>4 (car) park</code> — qavsdagi so‘zni yozish ham, yozmaslik ham mumkin.',
+            '<code>4 (car) park</code> — the word in brackets may be written or left out.',
+            '<code>4 (car) park</code> — слово в скобках можно писать, а можно нет.'],
+  keyHow3: ['<code>14-15 B, D</code> — «ikkita harf tanlang», tartib istalgancha.',
+            '<code>14-15 B, D</code> — “choose two letters”, in any order.',
+            '<code>14-15 B, D</code> — «выберите две буквы», порядок любой.'],
+  keyHow4: ['<code>20 F [A-H]</code> — [kvadrat qavsda] o‘quvchiga qaysi harflar ko‘rsatilishi.',
+            '<code>20 F [A-H]</code> — [square brackets] show which letters the student sees.',
+            '<code>20 F [A-H]</code> — в [квадратных скобках] какие буквы показать ученику.'],
+  keyHow5: ['TRUE/FALSE/NOT GIVEN va YES/NO/NOT GIVEN ni o‘quvchi tugmalar bilan tanlaydi, harflarni ham tugmalar bilan, qolganini yozadi.',
+            'TRUE/FALSE/NOT GIVEN and YES/NO/NOT GIVEN are chosen with buttons, letters too; everything else is typed in.',
+            'TRUE/FALSE/NOT GIVEN и YES/NO/NOT GIVEN ученик выбирает кнопками, буквы — тоже кнопками, остальное вписывает.'],
+  keyPrevL: ['Dastur kalitni qanday tushundi', 'How the program read the key', 'Как программа поняла ключ'],
+  wNote: ['Writing uchun kalit yo‘q: bu PDF (namuna javoblar bo‘lsa) topshirgandan keyin o‘quvchiga o‘z matni bilan solishtirish uchun ochiladi.',
+          'Writing has no key: this PDF (model answers, if any) opens for the student after submitting, to compare with their own text.',
+          'Для Writing ключа нет: этот PDF (образцы ответов, если есть) откроется ученику после сдачи, чтобы сравнить со своим текстом.'],
+  cancel: ['Bekor qilish', 'Cancel', 'Отмена'],
+  saveTest: ['Testni saqlash', 'Save test', 'Сохранить тест'],
+
+  inNameL: ['O‘quvchining ismi (Test taker)', 'Student name (Test taker)', 'Имя ученика (Test taker)'],
+  inNamePh: ['Familiya Ism', 'Surname Name', 'Фамилия Имя'],
+  inModeL: ['Rejim', 'Mode', 'Режим'],
+  modeStrict: ['Imtihondagidek', 'Like the real exam', 'Как на экзамене'],
+  modePractice: ['Mashq', 'Practice', 'Тренировка'],
+  soundL: ['Quloqchinlarda ovozni tekshirish', 'Headphone sound check', 'Проверка звука в наушниках'],
+  soundBtn: ['▶ Ovozni tekshirish', '▶ Test sound', '▶ Проверить звук'],
+  soundNote: ['Ovoz balandligini test davomida ham o‘zgartirish mumkin.', 'The volume can also be changed during the test.', 'Громкость можно менять и во время теста.'],
+  startTest: ['Testni boshlash', 'Start test', 'Начать тест'],
+  introW: ['Task 1 va Task 2', 'Task 1 and Task 2', 'Task 1 и Task 2'],
+  nMin: ['{0} daqiqa', '{0} min', '{0} мин'],
+  nQ: ['{0} ta savol', '{0} questions', 'вопросов: {0}'],
+  introAudio: ['audio: {0} ta fayl, so‘ng tekshirish uchun 2 daqiqa', 'audio: {0} file(s), then 2 minutes to check', 'аудио: файлов {0}, затем 2 минуты на проверку'],
+  hintStrict: ['Vaqt cheklangan, tugashi bilan test o‘zi topshiriladi.', 'Time is limited; when it runs out, the test is submitted automatically.', 'Время ограничено, когда оно кончается — тест сдаётся сам.'],
+  hintStrictL: [' Audio bir marta, pauza va orqaga qaytarishsiz ijro etiladi.', ' The audio plays once, without pause or rewind.', ' Аудио играет один раз, без паузы и перемотки.'],
+  hintPractice: ['Vaqt faqat hisoblanadi, test to‘xtatilmaydi.', 'Time is only counted; the test is not stopped.', 'Время только считается, тест не прерывается.'],
+  hintPracticeL: [' Audioni pauzaga qo‘yish va orqaga qaytarish mumkin.', ' The audio can be paused and rewound.', ' Аудио можно ставить на паузу и перематывать.'],
+  enterName: ['O‘quvchining ismini kiriting', 'Enter the student’s name', 'Введите имя ученика'],
+
+  libWarn: ['Brauzer bu kompyuterda testlarni saqlashga ruxsat bermayapti (maxfiy rejim?). Testlar ishlaydi, lekin tab yopilgach yo‘qoladi.',
+            'The browser does not allow saving tests on this computer (private mode?). Tests will work but will disappear when the tab is closed.',
+            'Браузер не даёт сохранять тесты на этом компьютере (частный режим?). Тесты будут работать, но пропадут после закрытия вкладки.'],
+  libEmpty: ['Hozircha testlar yo‘q. «+ Yangi test» tugmasini bosing va PDF yuklang.', 'No tests yet. Click “+ New test” and upload a PDF.', 'Тестов пока нет. Нажмите «+ Новый тест» и загрузите PDF.'],
+  keyN: ['kalit: {0} ta javob', 'key: {0} answers', 'ключ: {0} отв.'],
+  noKey: ['kalitsiz', 'no key', 'без ключа'],
+  audioN: ['audio: {0}', 'audio: {0}', 'аудио: {0}'],
+  noAudio: ['audiosiz', 'no audio', 'без аудио'],
+  untitled: ['Nomsiz', 'Untitled', 'Без названия'],
+  start: ['Boshlash', 'Start', 'Начать'],
+  edit: ['Tahrirlash', 'Edit', 'Изменить'],
+  toFile: ['Faylga', 'To file', 'В файл'],
+  del: ['O‘chirish', 'Delete', 'Удалить'],
+  delQ: ['Test o‘chirilsinmi?', 'Delete the test?', 'Удалить тест?'],
+  delText: ['«{0}» testi shu kompyuter kutubxonasidan o‘chiriladi. Tarixdagi natijalar qoladi.',
+            'The test “{0}” will be removed from this computer’s library. Results in the history will remain.',
+            'Тест «{0}» будет удалён из библиотеки этого компьютера. Результаты в истории останутся.'],
+  unfinished: ['Tugallanmagan test: ', 'Unfinished test: ', 'Незаконченный тест: '],
+  startedAt: ['Boshlangan: {0}', 'Started {0}', 'Начат {0}'],
+  resetQ: ['Urinish bekor qilinsinmi?', 'Reset the attempt?', 'Сбросить?'],
+  resetText: ['Bu urinishdagi javoblar yo‘qoladi.', 'The answers of this attempt will be lost.', 'Ответы этой попытки пропадут.'],
+  reset: ['Tashlab yuborish', 'Reset', 'Сбросить'],
+  continue: ['Davom ettirish', 'Continue', 'Продолжить'],
+  histEmpty: ['Birinchi testdan keyin bu yerda natijalar paydo bo‘ladi.', 'Results will appear here after the first test.', 'Здесь появятся результаты после первого теста.'],
+  hDate: ['Sana', 'Date', 'Дата'],
+  hStudent: ['O‘quvchi', 'Student', 'Ученик'],
+  hTest: ['Test', 'Test', 'Тест'],
+  hModule: ['Modul', 'Module', 'Модуль'],
+  hResult: ['Natija', 'Result', 'Результат'],
+  hErrors: ['Xatolar', 'Mistakes', 'Ошибки'],
+  hCorrect: ['To‘g‘ri', 'Correct', 'Верно'],
+  hTotal: ['Jami', 'Total', 'Всего'],
+  hErrWords: ['Xatolar / so‘zlar', 'Mistakes / words', 'Ошибки / слова'],
+  histMore: ['Oxirgi 100 tasi ko‘rsatilgan. To‘liq ro‘yxat — Excel jadvalida.', 'Showing the last 100. The full list is in the Excel table.', 'Показаны последние 100. Полный список — в таблице Excel.'],
+  clearHistQ: ['Tarix tozalansinmi?', 'Clear the history?', 'Очистить историю?'],
+  clearHistText: ['Shu kompyuterdagi barcha natijalar o‘chiriladi.', 'All results on this computer will be deleted.', 'Все результаты на этом компьютере будут удалены.'],
+  yes: ['Ha', 'Yes', 'Да'],
+
+  hintL: ['Listening: audio yuklangan bo‘lsa, «Imtihondagidek» rejimida yozuv bir marta ijro etiladi, so‘ng tekshirish uchun 2 daqiqa beriladi va test o‘zi topshiriladi. Quyidagi vaqt faqat audio bo‘lmaganda ishlatiladi.',
+          'Listening: if audio is uploaded, in “Like the real exam” mode the recording plays once, then there are 2 minutes to check and the test is submitted automatically. The time below is used only when there is no audio.',
+          'Listening: если загружено аудио, в режиме «как на экзамене» запись играет один раз, затем 2 минуты на проверку — и тест сдаётся сам. Время ниже — только когда аудио нет.'],
+  hintW: ['Writing: Task 1 va Task 2 birga, imtihonda 60 daqiqa.', 'Writing: Task 1 and Task 2 together, 60 minutes in the exam.', 'Writing: Task 1 и Task 2 вместе, на экзамене 60 минут.'],
+  hintR: ['Reading: imtihonda uchta matn uchun 60 daqiqa.', 'Reading: 60 minutes for three texts in the exam.', 'Reading: на экзамене 60 минут на три текста.'],
+  pagesN: [' — sahifalar: {0}', ' — pages: {0}', ' — страниц: {0}'],
+  noFile: ['fayl tanlanmagan', 'no file selected', 'файл не выбран'],
+  kindLetter: ['harflar', 'letters', 'буквы'],
+  kindText: ['yozish', 'type in', 'вписать'],
+  thAnswer: ['Javob', 'Answer', 'Ответ'],
+  thSees: ['O‘quvchi ko‘radi', 'Student sees', 'Ученик видит'],
+  anyOrder: [' (istalgan tartibda)', ' (any order)', ' (любой порядок)'],
+  noAnswer: ['javob yo‘q', 'no answer', 'нет ответа'],
+  msgMissing: ['Javobi yo‘q savollar: {0}', 'No answer for questions: {0}', 'Нет ответа на вопросы: {0}'],
+  msgOver: ['Kalitda {0}-savol bor, qismlarda esa jami {1} ta savol — «Qismlardagi savollar soni»ni tuzating.',
+            'The key has question {0}, but the parts have only {1} questions — fix “Questions per part”.',
+            'В ключе есть вопрос {0}, а в частях всего {1} вопросов — поправьте «Вопросов в частях».'],
+  msgDup: ['Savol ikki marta yozilgan: {0} (oxirgi qator olinadi).', 'Question written twice: {0} (the last line is used).', 'Вопрос записан дважды: {0} (берётся последняя строка).'],
+  msgBad: ['Tushunilmagan qatorlar: {0}', 'Lines not understood: {0}', 'Не понял строки: {0}'],
+  lessAnswers: ['  ← javoblar savollardan kam', '  ← fewer answers than questions', '  ← ответов меньше, чем вопросов'],
+  pickAnsPdf: ['Avval javoblar PDF faylini tanlang', 'First choose the answers PDF', 'Сначала выберите PDF с ответами'],
+  searching: ['Javoblar qidirilmoqda…', 'Searching for answers…', 'Ищу ответы…'],
+  scanned: ['PDF da matn yo‘q — bu skan (rasm)ga o‘xshaydi. Kalitni quyidagi maydonga qo‘lda yozing: har qatorda bitta savol, masalan «1 TRUE».',
+            'The PDF has no text — it looks like a scan (an image). Type the key into the field below by hand: one question per line, e.g. “1 TRUE”.',
+            'В PDF нет текста — похоже, это скан (картинка). Впишите ключ вручную в поле ниже: по одному вопросу в строке, например «1 TRUE».'],
+  notFound: ['{0}–{1} sahifalarda javoblar topilmadi. Sahifalarni tekshiring yoki kalitni qo‘lda yozing.',
+             'No answers found on pages {0}–{1}. Check the pages or type the key by hand.',
+             'Не нашёл ответов на страницах {0}–{1}. Проверьте страницы или впишите ключ вручную.'],
+  replaceKeyQ: ['Kalit almashtirilsinmi?', 'Replace the key?', 'Заменить ключ?'],
+  replaceKeyText: ['Maydonda allaqachon kalit bor. Uni PDF dan topilgani bilan almashtirasizmi?', 'There is already a key in the field. Replace it with the one found in the PDF?', 'В поле уже есть ключ. Заменить его найденным в PDF?'],
+  replace: ['Almashtirish', 'Replace', 'Заменить'],
+  foundN: ['Topilgan javoblar: <b>{0}</b> ({1}–{2} sahifalar). Kalitni o‘ngda albatta tekshiring.',
+           'Answers found: <b>{0}</b> (pages {1}–{2}). Be sure to check the key on the right.',
+           'Найдено ответов: <b>{0}</b> (страницы {1}–{2}). Обязательно проверьте ключ справа.'],
+  foundDup: ['Ba’zi raqamlar bir necha marta uchradi ({0}). Ehtimol, bu sahifalarda bir nechta testning javoblari bor — sahifalar oralig‘ini bitta testgacha toraytiring va yana bosing.',
+             'Some numbers appear several times ({0}). These pages probably hold answers for several tests — narrow the page range to one test and click again.',
+             'Некоторые номера встретились несколько раз ({0}). Скорее всего, на этих страницах ответы к нескольким тестам — сузьте диапазон страниц до одного теста и нажмите ещё раз.'],
+  pdfReadErr: ['PDF ni o‘qishda xato: {0}', 'Error reading the PDF: {0}', 'Ошибка чтения PDF: {0}'],
+  uploadTasks: ['Topshiriqlar PDF faylini yuklang', 'Upload the tasks PDF', 'Загрузите PDF с заданиями'],
+  keyOverToast: ['Kalitda {0}-savol bor, qismlarda esa jami {1} ta. «Qismlardagi savollar soni»ni tuzating.',
+                 'The key has question {0}, but the parts have only {1}. Fix “Questions per part”.',
+                 'В ключе вопрос {0}, а в частях всего {1}. Исправьте «Вопросов в частях».'],
+  noKeyQ: ['Kalitsiz saqlansinmi?', 'Save without a key?', 'Без ключа?'],
+  noKeyText: ['Javoblar kaliti bo‘sh. Testni yechish mumkin, lekin javoblarni tekshirib bo‘lmaydi. Shunday saqlansinmi?',
+              'The answer key is empty. The test can be taken, but the answers cannot be checked. Save anyway?',
+              'Ключ ответов пуст. Тест можно пройти, но проверить ответы не получится. Сохранить так?'],
+  save: ['Saqlash', 'Save', 'Сохранить'],
+  saveFail: ['Saqlab bo‘lmadi', 'Could not save', 'Не удалось сохранить'],
+  diskFull: ['Diskda joy kam bo‘lishi mumkin.', 'The disk may be low on space.', 'Возможно, на диске мало места.'],
+  saved: ['Test saqlandi', 'Test saved', 'Тест сохранён'],
+  pdfOpenFail: ['PDF ni ochib bo‘lmadi', 'Could not open the PDF', 'Не удалось открыть PDF'],
+  pickPdfFirst: ['Avval PDF faylni tanlang', 'Choose a PDF file first', 'Сначала выберите PDF-файл'],
+  close: ['Yopish', 'Close', 'Закрыть'],
+  pdfjsFailT: ['PDF o‘qish dasturi yuklanmadi', 'The PDF reader did not load', 'Не загрузилась программа чтения PDF'],
+  pdfjsFailB: ['<p>PDF ni ko‘rsatish uchun internet kerak. Ulanishni tekshiring va sahifani yangilang (F5).</p>',
+               '<p>An internet connection is needed to show PDFs. Check the connection and reload the page (F5).</p>',
+               '<p>Для показа PDF нужен интернет при открытии этого файла. Проверьте подключение и обновите страницу (F5).</p>'],
+  prevTasks: ['Topshiriqlar: {0}', 'Tasks: {0}', 'Задания: {0}'],
+  prevAns: ['Javoblar: {0}', 'Answers: {0}', 'Ответы: {0}'],
+  prevModel: ['Namunalar: {0}', 'Model answers: {0}', 'Образцы: {0}'],
+  fit: ['Kenglik bo‘yicha', 'Fit width', 'По ширине'],
+  pageAbbr: ['bet', 'p.', 'стр.'],
+
+  toHome: ['← Bosh sahifa', '← Home', '← На главную'],
+  print: ['Chop etish', 'Print', 'Печать'],
+  again: ['Qayta yechish', 'Try again', 'Пройти ещё раз'],
+  studentL: ['O‘quvchi: ', 'Student: ', 'Ученик: '],
+  spent: ['sarflangan vaqt {0}', 'time used {0}', 'затрачено {0}'],
+  practiceTag: ['mashq', 'practice', 'тренировка'],
+  noKeyH: ['Javoblar kaliti yo‘q', 'No answer key', 'Ключа ответов нет'],
+  noKeyP: ['O‘quvchining javoblari saqlandi. Kalitni qo‘ying (har qatorda bitta savol) — dastur tekshiradi.',
+           'The student’s answers are saved. Paste the key (one question per line) and the program will check them.',
+           'Ответы ученика сохранены. Вставьте ключ (по одному вопросу в строке) — и программа проверит.'],
+  saveKeyToTest: [' bu kalitni testga saqlash', ' save this key to the test', ' сохранить этот ключ в тест'],
+  check: ['Tekshirish', 'Check', 'Проверить'],
+  keyEmpty: ['Kalit bo‘sh yoki tushunilmadi', 'The key is empty or not recognised', 'Ключ пуст или не распознан'],
+  correct: ['To‘g‘ri', 'Correct', 'Верно'],
+  errors: ['Xatolar', 'Mistakes', 'Ошибок'],
+  blank: ['Javobsiz', 'Unanswered', 'Без ответа'],
+  thPart: ['Qism', 'Part', 'Часть'],
+  thType: ['Topshiriq turi', 'Task type', 'Тип задания'],
+  kLetter: ['Harf tanlash (A, B, C…)', 'Choosing a letter (A, B, C…)', 'Выбор буквы (A, B, C…)'],
+  kText: ['So‘z / son yozish', 'Typing a word / number', 'Вписать слово / число'],
+  bandNote: ['Band — rasmiy {0} jadvali bo‘yicha.', 'The band uses the official {0} conversion table.', 'Band — по официальной таблице пересчёта {0}.'],
+  not40: [' Savollar 40 ta emas, shuning uchun mutanosib qayta hisoblandi.', ' There are not 40 questions, so it was scaled proportionally.', ' Вопросов не 40, поэтому пересчитано пропорционально.'],
+  bandNote2: [' Jadvallar testdan testga biroz farq qiladi — bu taxminiy natija.', ' The tables vary slightly from test to test — treat it as a guide.', ' Таблицы немного меняются от теста к тесту — это ориентир.'],
+  reviewBtn: ['Javoblarni testda ko‘rish', 'See answers in the test', 'Посмотреть ответы в тесте'],
+  openAnsPdf: ['Javoblar PDF faylini ochish', 'Open the answers PDF', 'Открыть PDF с ответами'],
+  thStudentAns: ['O‘quvchi javobi', 'Student’s answer', 'Ответ ученика'],
+  thCorrectAns: ['To‘g‘ri javob', 'Correct answer', 'Правильный ответ'],
+  noKeyCell: ['kalit yo‘q', 'no key', 'нет ключа'],
+  emptyCell: ['bo‘sh', 'blank', 'пусто'],
+  allAnswers: ['Barcha javoblar', 'All answers', 'Все ответы'],
+  words: ['{0} ta so‘z', '{0} words', 'слов: {0}'],
+  lessWords: [' — {0} tadan kam, imtihonda buning uchun ball pasaytiriladi', ' — fewer than {0}; the exam lowers the score for this', ' — меньше {0}, на экзамене за это снижают балл'],
+  emptyText: ['(bo‘sh)', '(empty)', '(пусто)'],
+  needAll8: ['Barcha 8 ta bahoni qo‘ying — yakuniy band paydo bo‘ladi.', 'Give all 8 scores and the final band will appear.', 'Выставьте все 8 оценок — появится итоговый band.'],
+  crit: ['Mezon', 'Criterion', 'Критерий'],
+  teacherH: ['O‘qituvchi bahosi (yoki o‘z-o‘zini baholash)', 'Teacher’s assessment (or self-assessment)', 'Оценка учителя (или самооценка)'],
+  teacherP: ['Writing avtomatik tekshirilmaydi. IELTS ning to‘rt mezoni bo‘yicha baho qo‘ying. Task 2 Task 1 dan ikki baravar og‘irroq.',
+             'Writing is not checked automatically. Score it on the four IELTS criteria. Task 2 counts twice as much as Task 1.',
+             'Writing не проверяется автоматически. Поставьте оценки по четырём критериям IELTS. Task 2 весит вдвое больше Task 1.'],
+  openModels: ['Namuna javoblarni ochish (PDF)', 'Open model answers (PDF)', 'Открыть образцы ответов (PDF)'],
+  dlTexts: ['Matnlarni yuklab olish (.txt)', 'Download texts (.txt)', 'Скачать тексты (.txt)'],
+
+  preparing: ['Fayl tayyorlanmoqda…', 'Preparing the file…', 'Готовлю файл…'],
+  notOurFile: ['bu ushbu trenajyorning test fayli emas', 'this is not a test file from this trainer', 'это не файл теста из этого тренажёра'],
+  existsQ: ['Bunday test allaqachon bor', 'This test already exists', 'Такой тест уже есть'],
+  existsText: ['«{0}» testi kutubxonada allaqachon bor. Uni fayldagi versiya bilan almashtirasizmi?',
+               'The test “{0}” is already in the library. Replace it with the version from the file?',
+               'Тест «{0}» уже есть в библиотеке. Заменить его версией из файла?'],
+  addCopy: ['Nusxa sifatida qo‘shish', 'Add as a copy', 'Добавить копией'],
+  copySuffix: [' (nusxa)', ' (copy)', ' (копия)'],
+  added: ['«{0}» testi qo‘shildi', 'Test “{0}” added', 'Тест «{0}» добавлен'],
+  loadFail: ['Yuklab bo‘lmadi', 'Could not load', 'Не удалось загрузить']
+};
+function tr(key, ...args){
+  const row = TR[key];
+  if(!row) return key;
+  const s = row[LANGS.indexOf(LANG)] ?? row[2];
+  return s.replace(/\{(\d)\}/g, (m, i) => args[+i] ?? '');
+}
 
 /* ---------- хранилище тестов (IndexedDB) ---------- */
 const DB = {
@@ -577,7 +865,7 @@ function parseKey(text){
         items = body.replace(/\band\b/ig, ' ').split(/[\s,;/&]+/).filter(Boolean).map(x => x.toUpperCase());
       else items = body.split(/\s*[,;]\s*|\s+and\s+/i).filter(Boolean);
       const qs = []; for(let q = a; q <= b; q++) qs.push(q);
-      if(items.length < qs.length){ res.bad.push(line0.trim() + '  ← ответов меньше, чем вопросов'); return; }
+      if(items.length < qs.length){ res.bad.push(line0.trim() + tr('lessAnswers')); return; }
       const g = {qs, items: items.map(it => ({raw: it, alts: answerAlts(it)})), raw: items.join(', ')};
       res.groups.push(g);
       qs.forEach(q => {
@@ -695,8 +983,7 @@ const wordCount = s => (String(s || '').match(/[^\s]+/g) || []).length;
    ===================================================================== */
 function pdfReady(){
   if(!window.pdfjsLib){
-    modal('Не загрузилась программа чтения PDF',
-      '<p>Для показа PDF нужен интернет при открытии этого файла. Проверьте подключение и обновите страницу (F5).</p>');
+    modal(tr('pdfjsFailT'), tr('pdfjsFailB'));
     return false;
   }
   if(!pdfjsLib.GlobalWorkerOptions.workerSrc)
@@ -791,7 +1078,7 @@ class PdfView{
     this.root.append(this.bar, this.scroller); host.append(this.root);
     this.scale = 'fit'; this.pages = []; this.gen = 0;
     this.hl = this.opts.highlights || null;   // {pageNum:[{x,y,w,h}]} в долях страницы
-    const lab = this.opts.lang === 'ru' ? {fit:'По ширине', page:'стр.'} : {fit:'Fit', page:'Page'};
+    const lab = this.opts.ui ? {fit: tr('fit'), page: tr('pageAbbr')} : {fit:'Fit', page:'Page'};
     this.lab = lab;
     this.zoomLab = h('span', null, '');
     this.pageLab = h('span', null, '');
@@ -859,7 +1146,7 @@ class PdfView{
     if(gen !== this.gen) return;
     pg.div.querySelectorAll('canvas,.textLayer,.pno').forEach(e => e.remove());
     pg.div.prepend(canvas);
-    if(this.opts.showNums) pg.div.append(h('div', {class: 'pno'}, (this.opts.lang === 'ru' ? 'стр. ' : '') + pg.num));
+    if(this.opts.showNums) pg.div.append(h('div', {class: 'pno'}, (this.opts.ui ? tr('pageAbbr') + ' ' : '') + pg.num));
     try{
       const tc = await pg.page.getTextContent();
       if(gen !== this.gen) return;
@@ -944,15 +1231,15 @@ class PdfView{
 
 /* модальное окно с PDF (для учителя: найти нужные страницы) */
 async function previewPdf(buf, title){
-  if(!buf) return toast('Сначала выберите PDF-файл');
+  if(!buf) return toast(tr('pickPdfFirst'));
   let view;
   const box = h('div', {style: 'flex:1;min-height:0;display:flex;--x-panel:#f4f4f4;--x-line:#ccc;--x-bg:#fff;--x-ink:#000'});
-  const p = modal(title, box, [{text: 'Закрыть', value: true}], {big: true, onClose: () => view && view.destroy()});
+  const p = modal(title, box, [{text: tr('close'), value: true}], {big: true, onClose: () => view && view.destroy()});
   try{
     const doc = await openPdf(buf);
-    view = new PdfView(box, {lang: 'ru', showNums: true});
+    view = new PdfView(box, {ui: true, showNums: true});
     await view.open(doc, 1, doc.numPages);
-  }catch(e){ box.textContent = 'Не удалось открыть PDF: ' + e.message; }
+  }catch(e){ box.textContent = tr('pdfOpenFail') + ': ' + e.message; }
   return p;
 }
 document.addEventListener('mouseup', () => $$('.textLayer.selecting').forEach(t => t.classList.remove('selecting')));
@@ -972,28 +1259,28 @@ async function renderHome(){
   showScreen('home');
   if(!DB.ok){
     $('#libWarn').classList.remove('hidden');
-    $('#libWarn').textContent = 'Браузер не даёт сохранять тесты на этом компьютере (частный режим?). Тесты будут работать, но пропадут после закрытия вкладки.';
+    $('#libWarn').textContent = tr('libWarn');
   }
   const tests = (await DB.all()).sort((a, b) => (b.created || 0) - (a.created || 0));
   const box = $('#testList'); box.innerHTML = '';
-  if(!tests.length) box.append(h('div', {class: 'empty'}, 'Тестов пока нет. Нажмите «+ Новый тест» и загрузите PDF.'));
+  if(!tests.length) box.append(h('div', {class: 'empty'}, tr('libEmpty')));
   tests.forEach(t => {
     const nk = t.module === 'writing' ? null : Object.keys(parseKey(t.keyText).byQ).length;
     const info = [];
-    info.push(t.minutes + ' мин');
-    if(t.module !== 'writing') info.push(nk ? 'ключ: ' + nk + ' отв.' : 'без ключа');
-    if(t.module === 'listening') info.push((t.audio || []).length ? 'аудио: ' + t.audio.length : 'без аудио');
+    info.push(tr('nMin', t.minutes));
+    if(t.module !== 'writing') info.push(nk ? tr('keyN', nk) : tr('noKey'));
+    if(t.module === 'listening') info.push((t.audio || []).length ? tr('audioN', t.audio.length) : tr('noAudio'));
     if(t.module === 'reading') info.push(t.readingType === 'general' ? 'General' : 'Academic');
     box.append(h('div', {class: 'test'},
       h('span', {class: 'pill ' + MOD_PILL[t.module]}, MOD_NAME[t.module]),
-      h('div', {class: 'grow'}, h('div', {class: 'nm'}, t.title || 'Без названия'), h('div', {class: 'sub'}, info.join(' · '))),
-      h('button', {class: 'btn primary', onclick: () => openIntro(t.id)}, 'Начать'),
-      h('button', {class: 'btn small', onclick: () => openEditor(t.id)}, 'Изменить'),
-      h('button', {class: 'btn small', onclick: () => exportTest(t.id)}, 'В файл'),
+      h('div', {class: 'grow'}, h('div', {class: 'nm'}, t.title || tr('untitled')), h('div', {class: 'sub'}, info.join(' · '))),
+      h('button', {class: 'btn primary', onclick: () => openIntro(t.id)}, tr('start')),
+      h('button', {class: 'btn small', onclick: () => openEditor(t.id)}, tr('edit')),
+      h('button', {class: 'btn small', onclick: () => exportTest(t.id)}, tr('toFile')),
       h('button', {class: 'btn small danger', onclick: async () => {
-        if(await confirmBox('Удалить тест?', 'Тест «' + esc(t.title) + '» будет удалён из библиотеки этого компьютера. Результаты в истории останутся.', 'Удалить'))
+        if(await confirmBox(tr('delQ'), tr('delText', esc(t.title)), tr('del')))
           { await DB.del(t.id); renderHome(); }
-      }}, 'Удалить')
+      }}, tr('del'))
     ));
   });
   renderResume(tests);
@@ -1008,34 +1295,34 @@ function renderResume(tests){
   if(!t){ LS.del('ielts_attempt'); return; }
   box.classList.remove('hidden');
   box.append(h('div', {class: 'row', style: 'justify-content:space-between'},
-    h('div', null, h('b', null, 'Незаконченный тест: '), esc(a.name) + ' — ' + esc(t.title),
-      h('div', {class: 'sub'}, 'Начат ' + fmtDate(a.startedAt))),
+    h('div', null, h('b', null, tr('unfinished')), esc(a.name) + ' — ' + esc(t.title),
+      h('div', {class: 'sub'}, tr('startedAt', fmtDate(a.startedAt)))),
     h('div', {class: 'row'},
       h('button', {class: 'btn', onclick: async () => {
-        if(await confirmBox('Сбросить?', 'Ответы этой попытки пропадут.', 'Сбросить')){ LS.del('ielts_attempt'); renderHome(); }
-      }}, 'Сбросить'),
-      h('button', {class: 'btn primary', onclick: () => resumeAttempt(a, t)}, 'Продолжить'))));
+        if(await confirmBox(tr('resetQ'), tr('resetText'), tr('reset'))){ LS.del('ielts_attempt'); renderHome(); }
+      }}, tr('reset')),
+      h('button', {class: 'btn primary', onclick: () => resumeAttempt(a, t)}, tr('continue')))));
 }
 
 function renderHistory(){
   const all = Hist.all(), box = $('#histBox'); box.innerHTML = '';
-  if(!all.length){ box.append(h('div', {class: 'empty'}, 'Здесь появятся результаты после первого теста.')); return; }
+  if(!all.length){ box.append(h('div', {class: 'empty'}, tr('histEmpty'))); return; }
   const tb = h('table', {class: 't'});
-  tb.append(h('tr', null, ...['Дата', 'Ученик', 'Тест', 'Модуль', 'Результат', 'Band', 'Ошибки'].map(x => h('th', null, x))));
+  tb.append(h('tr', null, ...[tr('hDate'), tr('hStudent'), tr('hTest'), tr('hModule'), tr('hResult'), 'Band', tr('hErrors')].map(x => h('th', null, x))));
   all.slice(0, 100).forEach(r => tb.append(h('tr', null,
     h('td', null, fmtDate(r.date)), h('td', null, r.name), h('td', null, r.title),
     h('td', null, h('span', {class: 'pill ' + MOD_PILL[r.module]}, MOD_NAME[r.module])),
     h('td', null, r.module === 'writing' ? (r.words || '') : (r.total ? r.score + ' / ' + r.total : '—')),
     h('td', null, h('b', null, fmtBand(r.band))),
-    h('td', {class: 'sub'}, r.wrong || ''))));
+    h('td', {class: 'sub'}, r.module !== 'writing' && r.score == null ? tr('noKey') : (r.wrong || '')))));
   box.append(h('div', {style: 'overflow-x:auto'}, tb));
-  if(all.length > 100) box.append(h('p', {class: 'sub'}, 'Показаны последние 100. Полный список — в таблице Excel.'));
+  if(all.length > 100) box.append(h('p', {class: 'sub'}, tr('histMore')));
 }
 
 function historyCsv(){
-  const rows = [['Дата', 'Ученик', 'Тест', 'Модуль', 'Верно', 'Всего', 'Band', 'Ошибки / слова']];
+  const rows = [[tr('hDate'), tr('hStudent'), tr('hTest'), tr('hModule'), tr('hCorrect'), tr('hTotal'), 'Band', tr('hErrWords')]];
   Hist.all().forEach(r => rows.push([fmtDate(r.date), r.name, r.title, MOD_NAME[r.module], r.score ?? '', r.total ?? '',
-    r.band == null ? '' : String(r.band).replace('.', ','), r.module === 'writing' ? (r.words || '') : (r.wrong || '')]));
+    r.band == null ? '' : (LANG === 'en' ? String(r.band) : String(r.band).replace('.', ',')), r.module === 'writing' ? (r.words || '') : (r.score == null ? tr('noKey') : (r.wrong || ''))]));
   const csv = '﻿' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\r\n');
   download('ielts-results.csv', csv, 'text/csv;charset=utf-8');
 }
@@ -1054,11 +1341,11 @@ async function openEditor(id){
   if(id){
     const t = await DB.get(id);
     ED = Object.assign({}, t);
-    $('#edTitle').textContent = 'Изменить тест';
+
   } else {
     ED = {id: null, title: '', module: 'reading', readingType: 'academic', minutes: 60, parts: DEFAULTS.reading.parts,
           partPages: '', tasksPdf: null, from: 1, to: null, answersPdf: null, aFrom: 1, aTo: null, keyText: '', audio: []};
-    $('#edTitle').textContent = 'Новый тест';
+
   }
   $('#edName').value = ED.title || '';
   $('#edMin').value = ED.minutes;
@@ -1080,21 +1367,18 @@ function edSyncModule(){
   $('#edRtypeBox').classList.toggle('hidden', ED.module !== 'reading');
   $('#edAudioBox').classList.toggle('hidden', !l);
   $('#edPartsBox').classList.toggle('hidden', w);
-  $('#edPartPagesBox').querySelector('label').textContent = w
-    ? 'С какой страницы начинается Task 2 (необязательно). Тогда при переходе на Task 2 PDF сам перелистнётся.'
-    : 'С какой страницы начинается каждая часть (необязательно, через запятую). Тогда при переходе на Part 2 PDF сам перелистнётся.';
+  $('#edTitle').textContent = ED.id ? tr('edEdit') : tr('edNew');
+  $('#edPartPagesL').textContent = w ? tr('partPagesLW') : tr('partPagesL');
   $('#edKeyBox').classList.toggle('hidden', w);
   $('#edExtract').classList.toggle('hidden', w);
   $('#edWritingNote').classList.toggle('hidden', !w);
-  $('#edKeyTitle').textContent = w ? '3. Образцы ответов (необязательно)' : '3. Ответы (ключ)';
-  $('#edTimeHint').textContent = l
-    ? 'Listening: если загружено аудио, в режиме «как на экзамене» запись играет один раз, затем 2 минуты на проверку — и тест сдаётся сам. Время ниже — только когда аудио нет.'
-    : w ? 'Writing: Task 1 и Task 2 вместе, на экзамене 60 минут.' : 'Reading: на экзамене 60 минут на три текста.';
+  $('#edKeyTitle').textContent = w ? tr('edS3W') : tr('edS3Key');
+  $('#edTimeHint').textContent = l ? tr('hintL') : w ? tr('hintW') : tr('hintR');
 }
 
 function edFileInfo(){
-  $('#edTasksInfo').textContent = ED.tasksPdf ? ED.tasksPdf.name + (ED.tasksPages ? ' — страниц: ' + ED.tasksPages : '') : 'файл не выбран';
-  $('#edAnsInfo').textContent = ED.answersPdf ? ED.answersPdf.name + (ED.ansPages ? ' — страниц: ' + ED.ansPages : '') : 'файл не выбран';
+  $('#edTasksInfo').textContent = ED.tasksPdf ? ED.tasksPdf.name + (ED.tasksPages ? tr('pagesN', ED.tasksPages) : '') : tr('noFile');
+  $('#edAnsInfo').textContent = ED.answersPdf ? ED.answersPdf.name + (ED.ansPages ? tr('pagesN', ED.ansPages) : '') : tr('noFile');
   const al = $('#edAudioList'); al.innerHTML = '';
   (ED.audio || []).forEach((a, i) => al.append(h('div', null, (i + 1) + '. ' + a.name + ' ',
     h('button', {class: 'btn small danger', onclick: () => { ED.audio.splice(i, 1); edFileInfo(); }}, '×'))));
@@ -1110,48 +1394,47 @@ function edKeyPreview(){
   const total = sizes.reduce((a, b) => a + b, 0);
   const maxQ = Math.max(0, ...Object.keys(key.byQ).map(Number));
   const Q = buildQuestions(Math.max(total, maxQ), key, sizes);
-  const KIND = {tf: 'TRUE / FALSE / NG', yn: 'YES / NO / NG', letter: 'буквы', text: 'вписать'};
+  const KIND = {tf: 'TRUE / FALSE / NG', yn: 'YES / NO / NG', letter: tr('kindLetter'), text: tr('kindText')};
   const tb = h('table', {class: 't'});
-  tb.append(h('tr', null, h('th', null, '№'), h('th', null, 'Ответ'), h('th', null, 'Ученик видит')));
+  tb.append(h('tr', null, h('th', null, '№'), h('th', null, tr('thAnswer')), h('th', null, tr('thSees'))));
   Q.forEach(q => {
     const k = q.key;
     tb.append(h('tr', null, h('td', null, q.n),
-      h('td', null, k ? (k.group ? k.raw + ' (любой порядок)' : k.raw) : h('span', {class: 'miss'}, 'нет ответа')),
+      h('td', null, k ? (k.group ? k.raw + tr('anyOrder') : k.raw) : h('span', {class: 'miss'}, tr('noAnswer'))),
       h('td', null, h('span', {class: 'kind'}, KIND[q.kind] + (q.kind === 'letter' ? ' ' + q.options[0] + '–' + q.options[q.options.length - 1] : '')))));
   });
   box.append(tb);
   const msgs = [];
   const missing = Q.filter(q => !q.key).map(q => q.n);
-  if(missing.length && Object.keys(key.byQ).length) msgs.push('Нет ответа на вопросы: ' + missing.join(', '));
-  if(maxQ > total && total) msgs.push('В ключе есть вопрос ' + maxQ + ', а в частях всего ' + total + ' вопросов — поправьте «Вопросов в частях».');
-  if(key.dup.length) msgs.push('Вопрос записан дважды: ' + [...new Set(key.dup)].join(', ') + ' (берётся последняя строка).');
-  if(key.bad.length) msgs.push('Не понял строки: ' + key.bad.map(esc).join(' | '));
+  if(missing.length && Object.keys(key.byQ).length) msgs.push(tr('msgMissing', missing.join(', ')));
+  if(maxQ > total && total) msgs.push(tr('msgOver', maxQ, total));
+  if(key.dup.length) msgs.push(tr('msgDup', [...new Set(key.dup)].join(', ')));
+  if(key.bad.length) msgs.push(tr('msgBad', key.bad.join(' | ')));
   if(msgs.length) box.prepend(h('div', {class: 'note', style: 'margin:6px', html: msgs.map(esc).join('<br>')}));
 }
 
 async function edExtract(){
-  if(!ED.answersPdf) return toast('Сначала выберите PDF с ответами');
+  if(!ED.answersPdf) return toast(tr('pickAnsPdf'));
   const msg = $('#edExtractMsg');
-  msg.innerHTML = '<div class="sub">Ищу ответы…</div>';
+  msg.innerHTML = '<div class="sub">' + tr('searching') + '</div>';
   try{
     const doc = await openPdf(ED.answersPdf.data);
     const from = Math.max(1, +$('#edAFrom').value || 1);
     const to = Math.min(doc.numPages, +$('#edATo').value || doc.numPages);
     const chunks = await pdfChunks(doc, from, to);
     if(!chunks.length){
-      msg.innerHTML = '<div class="errmsg">В PDF нет текста — похоже, это скан (картинка). Впишите ключ вручную в поле ниже: по одному вопросу в строке, например «1 TRUE».</div>';
+      msg.innerHTML = '<div class="errmsg">' + tr('scanned') + '</div>';
       return;
     }
     const r = chunksToKey(chunks);
-    if(!r.count){ msg.innerHTML = '<div class="errmsg">Не нашёл ответов на страницах ' + from + '–' + to + '. Проверьте страницы или впишите ключ вручную.</div>'; return; }
-    if($('#edKey').value.trim() && !(await confirmBox('Заменить ключ?', 'В поле уже есть ключ. Заменить его найденным в PDF?', 'Заменить'))){ msg.innerHTML = ''; return; }
+    if(!r.count){ msg.innerHTML = '<div class="errmsg">' + tr('notFound', from, to) + '</div>'; return; }
+    if($('#edKey').value.trim() && !(await confirmBox(tr('replaceKeyQ'), tr('replaceKeyText'), tr('replace')))){ msg.innerHTML = ''; return; }
     $('#edKey').value = r.text;
-    let html = '<div class="okmsg">Найдено ответов: <b>' + r.count + '</b> (страницы ' + from + '–' + to + '). Обязательно проверьте ключ справа.</div>';
-    if(r.dup.length) html += '<div class="note" style="margin-top:6px">Некоторые номера встретились несколько раз (' + r.dup.slice(0, 12).join(', ') +
-      '). Скорее всего, на этих страницах ответы к нескольким тестам — сузьте диапазон страниц до одного теста и нажмите ещё раз.</div>';
+    let html = '<div class="okmsg">' + tr('foundN', r.count, from, to) + '</div>';
+    if(r.dup.length) html += '<div class="note" style="margin-top:6px">' + tr('foundDup', r.dup.slice(0, 12).join(', ')) + '</div>';
     msg.innerHTML = html;
     edKeyPreview();
-  }catch(e){ msg.innerHTML = '<div class="errmsg">Ошибка чтения PDF: ' + esc(e.message) + '</div>'; }
+  }catch(e){ msg.innerHTML = '<div class="errmsg">' + tr('pdfReadErr', esc(e.message)) + '</div>'; }
 }
 
 function readFileBuf(f){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsArrayBuffer(f); }); }
@@ -1166,21 +1449,21 @@ async function edSave(){
   ED.aFrom = Math.max(1, +$('#edAFrom').value || 1);
   ED.aTo = +$('#edATo').value || null;
   ED.keyText = $('#edKey').value;
-  if(!ED.tasksPdf) return toast('Загрузите PDF с заданиями');
+  if(!ED.tasksPdf) return toast(tr('uploadTasks'));
   if(!ED.title) ED.title = ED.tasksPdf.name.replace(/\.pdf$/i, '') + ' — ' + MOD_NAME[ED.module];
   if(ED.module !== 'writing'){
     const key = parseKey(ED.keyText);
     const total = partSizesOf(ED).reduce((a, b) => a + b, 0);
     const maxQ = Math.max(0, ...Object.keys(key.byQ).map(Number));
-    if(maxQ > total) return toast('В ключе вопрос ' + maxQ + ', а в частях всего ' + total + '. Исправьте «Вопросов в частях».', 4000);
+    if(maxQ > total) return toast(tr('keyOverToast', maxQ, total), 4000);
     if(!Object.keys(key.byQ).length &&
-       !(await confirmBox('Без ключа?', 'Ключ ответов пуст. Тест можно пройти, но проверить ответы не получится. Сохранить так?', 'Сохранить')))
+       !(await confirmBox(tr('noKeyQ'), tr('noKeyText'), tr('save'))))
       return;
   }
   if(!ED.id){ ED.id = uid(); ED.created = Date.now(); }
   ED.updated = Date.now();
-  try{ await DB.put(ED); }catch(e){ return modal('Не удалось сохранить', '<p>' + esc(e.message) + '</p><p>Возможно, на диске мало места.</p>'); }
-  toast('Тест сохранён');
+  try{ await DB.put(ED); }catch(e){ return modal(tr('saveFail'), '<p>' + esc(e.message) + '</p><p>' + tr('diskFull') + '</p>'); }
+  toast(tr('saved'));
   renderHome();
 }
 
@@ -1192,28 +1475,32 @@ async function openIntro(id){
   const t = await DB.get(id);
   if(!t) return;
   INTRO = {t, mode: LS.get('ielts_mode', 'strict')};
+  $('#inName').value = LS.get('ielts_lastname', '');
+  fillIntro();
+  showScreen('intro');
+  setTimeout(() => $('#inName').focus(), 50);
+}
+function fillIntro(){
+  const t = INTRO.t;
   $('#inTitle').textContent = t.title;
   const rt = runtimeFor(t);
   const info = [MOD_NAME[t.module]];
-  if(t.module === 'writing') info.push('Task 1 и Task 2', t.minutes + ' минут');
+  if(t.module === 'writing') info.push(tr('introW'), tr('nMin', t.minutes));
   else {
-    info.push(rt.Q.length + ' вопросов');
-    if(t.module === 'listening' && (t.audio || []).length) info.push('аудио: ' + t.audio.length + ' файл(ов), затем 2 минуты на проверку');
-    else info.push(t.minutes + ' минут');
+    info.push(tr('nQ', rt.Q.length));
+    if(t.module === 'listening' && (t.audio || []).length) info.push(tr('introAudio', t.audio.length));
+    else info.push(tr('nMin', t.minutes));
   }
   $('#inInfo').textContent = info.join(' · ');
-  $('#inName').value = LS.get('ielts_lastname', '');
   $('#inSound').classList.toggle('hidden', t.module !== 'listening');
   syncIntroMode();
-  showScreen('intro');
-  setTimeout(() => $('#inName').focus(), 50);
 }
 function syncIntroMode(){
   $$('#inMode button').forEach(b => b.classList.toggle('on', b.dataset.v === INTRO.mode));
   const L = INTRO.t.module === 'listening';
   $('#inModeHint').textContent = INTRO.mode === 'strict'
-    ? 'Время ограничено, когда оно кончается — тест сдаётся сам.' + (L ? ' Аудио играет один раз, без паузы и перемотки.' : '')
-    : 'Время только считается, тест не прерывается.' + (L ? ' Аудио можно ставить на паузу и перематывать.' : '');
+    ? tr('hintStrict') + (L ? tr('hintStrictL') : '')
+    : tr('hintPractice') + (L ? tr('hintPracticeL') : '');
 }
 function beep(){
   try{
@@ -1250,7 +1537,7 @@ function saveAttempt(){ if(X && !X.finished && !X.review) LS.set('ielts_attempt'
 
 async function startAttempt(){
   const name = $('#inName').value.trim();
-  if(!name){ toast('Введите имя ученика'); $('#inName').focus(); return; }
+  if(!name){ toast(tr('enterName')); $('#inName').focus(); return; }
   LS.set('ielts_lastname', name); LS.set('ielts_mode', INTRO.mode);
   const t = INTRO.t;
   X = {id: uid(), testId: t.id, name, mode: INTRO.mode, startedAt: Date.now(), answers: {}, flags: {}, hl: {},
@@ -1535,7 +1822,7 @@ function finishAttempt(){
 }
 function scoreAttempt(){
   X.res = checkAll(T.Q, X.answers);
-  if(!T.hasKey) return {score: null, total: T.Q.length, band: null, wrong: 'нет ключа'};
+  if(!T.hasKey) return {score: null, total: T.Q.length, band: null, wrong: ''};
   const score = T.Q.filter(q => X.res[q.n] === 'ok').length;
   const table = T.test.module === 'listening' ? 'listening' : (T.test.readingType === 'general' ? 'general' : 'academic');
   const band = toBand(table, score, T.Q.length);
@@ -1622,30 +1909,30 @@ function renderResults(){
   const t = T.test;
   const used = X.mode === 'practice' || T.hasAudio ? X.elapsed : (t.minutes * 60000 - Math.max(0, X.remaining));
   W.append(h('div', {class: 'topline noprint'},
-    h('button', {class: 'btn', onclick: () => renderHome()}, '← На главную'),
-    h('button', {class: 'btn', onclick: () => window.print()}, 'Печать'),
-    h('button', {class: 'btn', onclick: () => openIntro(t.id)}, 'Пройти ещё раз')));
+    h('button', {class: 'btn', onclick: () => renderHome()}, tr('toHome')),
+    h('button', {class: 'btn', onclick: () => window.print()}, tr('print')),
+    h('button', {class: 'btn', onclick: () => openIntro(t.id)}, tr('again'))));
   W.append(h('div', {class: 'card'},
     h('div', {class: 'row'}, h('span', {class: 'logo'}, 'IELTS'), h('h1', null, t.title)),
-    h('p', {class: 'sub', style: 'margin:8px 0 0'}, 'Ученик: ', h('b', null, X.name), ' · ' + MOD_NAME[t.module] + ' · ' +
-      fmtDate(X.finishedAt) + ' · затрачено ' + fmtClock(used / 1000) + (X.mode === 'practice' ? ' · тренировка' : ''))));
+    h('p', {class: 'sub', style: 'margin:8px 0 0'}, tr('studentL'), h('b', null, X.name), ' · ' + MOD_NAME[t.module] + ' · ' +
+      fmtDate(X.finishedAt) + ' · ' + tr('spent', fmtClock(used / 1000)) + (X.mode === 'practice' ? ' · ' + tr('practiceTag') : ''))));
   if(T.isW) return renderWritingResults(W);
 
   const res = X.res;
   if(!T.hasKey){
     const ta = h('textarea', {class: 'i', rows: 10, placeholder: '1 TRUE\n2 FALSE\n3 library'});
     const save = h('input', {type: 'checkbox', checked: true});
-    W.append(h('div', {class: 'card'}, h('h2', null, 'Ключа ответов нет'),
-      h('p', null, 'Ответы ученика сохранены. Вставьте ключ (по одному вопросу в строке) — и программа проверит.'), ta,
-      h('label', {class: 'row', style: 'margin-top:8px'}, save, ' сохранить этот ключ в тест'),
+    W.append(h('div', {class: 'card'}, h('h2', null, tr('noKeyH')),
+      h('p', null, tr('noKeyP')), ta,
+      h('label', {class: 'row', style: 'margin-top:8px'}, save, tr('saveKeyToTest')),
       h('div', {style: 'margin-top:10px'}, h('button', {class: 'btn primary', onclick: async () => {
-        if(!Object.keys(parseKey(ta.value).byQ).length) return toast('Ключ пуст или не распознан');
+        if(!Object.keys(parseKey(ta.value).byQ).length) return toast(tr('keyEmpty'));
         t.keyText = ta.value;
         if(save.checked){ const st = await DB.get(t.id); if(st){ st.keyText = ta.value; await DB.put(st); } }
         T = runtimeFor(t);
         Hist.update(X.id, scoreAttempt());
         renderResults();
-      }}, 'Проверить'))));
+      }}, tr('check')))));
     W.append(answersTable(res));
     return;
   }
@@ -1655,49 +1942,48 @@ function renderResults(){
   const stats = h('div');
   stats.append(
     h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Band'), h('div', {class: 'band-big'}, fmtBand(band))),
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Верно'), h('b', null, score + ' / ' + T.Q.length)),
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Ошибок'), h('b', {class: 'c-bad'}, T.Q.filter(q => res[q.n] === 'bad').length)),
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Без ответа'), h('b', null, T.Q.filter(q => res[q.n] === 'empty').length)));
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('correct')), h('b', null, score + ' / ' + T.Q.length)),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('errors')), h('b', {class: 'c-bad'}, T.Q.filter(q => res[q.n] === 'bad').length)),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('blank')), h('b', null, T.Q.filter(q => res[q.n] === 'empty').length)));
   // по частям и по типам заданий
   const tb = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
-  tb.append(h('tr', null, h('th', null, 'Часть'), h('th', null, 'Верно')));
+  tb.append(h('tr', null, h('th', null, tr('thPart')), h('th', null, tr('correct'))));
   for(let p = 0; p < T.nParts; p++){
     const qs = T.Q.filter(q => q.part === p); if(!qs.length) continue;
     tb.append(h('tr', null, h('td', null, 'Part ' + (p + 1) + ' (' + qs[0].n + '–' + qs[qs.length - 1].n + ')'),
       h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
   }
-  const KN = {tf: 'TRUE / FALSE / NOT GIVEN', yn: 'YES / NO / NOT GIVEN', letter: 'Выбор буквы (A, B, C…)', text: 'Вписать слово / число'};
+  const KN = {tf: 'TRUE / FALSE / NOT GIVEN', yn: 'YES / NO / NOT GIVEN', letter: tr('kLetter'), text: tr('kText')};
   const tb2 = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
-  tb2.append(h('tr', null, h('th', null, 'Тип задания'), h('th', null, 'Верно')));
+  tb2.append(h('tr', null, h('th', null, tr('thType')), h('th', null, tr('correct'))));
   Object.keys(KN).forEach(k => {
     const qs = T.Q.filter(q => q.kind === k && q.key); if(!qs.length) return;
     tb2.append(h('tr', null, h('td', null, KN[k]), h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
   });
   W.append(h('div', {class: 'card'}, stats,
-    h('p', {class: 'sub'}, 'Band — по официальной таблице пересчёта ' +
-      (table === 'listening' ? 'Listening' : table === 'general' ? 'General Training Reading' : 'Academic Reading') +
-      (T.Q.length !== 40 ? ' (вопросов не 40, поэтому пересчитано пропорционально)' : '') + '. Таблицы немного меняются от теста к тесту — это ориентир.'),
+    h('p', {class: 'sub'}, tr('bandNote', table === 'listening' ? 'Listening' : table === 'general' ? 'General Training Reading' : 'Academic Reading') +
+      (T.Q.length !== 40 ? tr('not40') : '') + tr('bandNote2')),
     h('div', {class: 'grid2'}, tb, tb2),
     h('div', {class: 'row noprint', style: 'margin-top:16px'},
-      h('button', {class: 'btn primary', onclick: openReview}, 'Посмотреть ответы в тесте'),
-      t.answersPdf ? h('button', {class: 'btn', onclick: () => previewPdf(t.answersPdf.data, 'Ответы: ' + t.answersPdf.name)}, 'Открыть PDF с ответами') : null)));
+      h('button', {class: 'btn primary', onclick: openReview}, tr('reviewBtn')),
+      t.answersPdf ? h('button', {class: 'btn', onclick: () => previewPdf(t.answersPdf.data, tr('prevAns', t.answersPdf.name))}, tr('openAnsPdf')) : null)));
   W.append(answersTable(res));
 }
 
 function answersTable(res){
   const tb = h('table', {class: 't'});
-  tb.append(h('tr', null, h('th', null, '№'), h('th', null, 'Ответ ученика'), h('th', null, 'Правильный ответ'), h('th', null, '')));
+  tb.append(h('tr', null, h('th', null, '№'), h('th', null, tr('thStudentAns')), h('th', null, tr('thCorrectAns')), h('th', null, '')));
   T.Q.forEach(q => {
     const r = res[q.n], a = X.answers[q.n] || '';
     const k = q.key;
     tb.append(h('tr', {class: r === 'ok' ? 'ok' : (r === 'bad' || r === 'empty') ? 'bad' : ''},
       h('td', null, h('b', null, q.n)),
       h('td', null, a ? a : h('span', {class: 'c-empty'}, '—')),
-      h('td', null, k ? (k.group ? k.raw + ' (в любом порядке)' : k.raw) : h('span', {class: 'c-empty'}, 'нет ключа')),
+      h('td', null, k ? (k.group ? k.raw + tr('anyOrder') : k.raw) : h('span', {class: 'c-empty'}, tr('noKeyCell'))),
       h('td', null, r === 'ok' ? h('span', {class: 'c-ok'}, '✓') : r === 'bad' ? h('span', {class: 'c-bad'}, '✗') :
-        r === 'empty' ? h('span', {class: 'c-bad'}, 'пусто') : '')));
+        r === 'empty' ? h('span', {class: 'c-bad'}, tr('emptyCell')) : '')));
   });
-  return h('div', {class: 'card'}, h('h2', null, 'Все ответы'), h('div', {style: 'overflow-x:auto'}, tb));
+  return h('div', {class: 'card'}, h('h2', null, tr('allAnswers')), h('div', {style: 'overflow-x:auto'}, tb));
 }
 
 /* разбор: тот же экран экзамена, но с правильными ответами */
@@ -1719,34 +2005,35 @@ function renderWritingResults(W){
     const txt = X.writing[k] || '', wc = wordCount(txt), min = k === 1 ? 150 : 250;
     W.append(h('div', {class: 'card'},
       h('div', {class: 'row', style: 'justify-content:space-between'}, h('h2', {style: 'margin:0'}, 'Task ' + k),
-        h('span', {class: wc < min ? 'c-bad' : 'c-ok'}, wc + ' слов' + (wc < min ? ' — меньше ' + min + ', на экзамене за это снижают балл' : ''))),
-      h('div', {style: 'white-space:pre-wrap;line-height:1.6;margin-top:10px;font-family:Arial'}, txt || h('span', {class: 'c-empty'}, '(пусто)'))));
+        h('span', {class: wc < min ? 'c-bad' : 'c-ok'}, tr('words', wc) + (wc < min ? tr('lessWords', min) : ''))),
+      h('div', {style: 'white-space:pre-wrap;line-height:1.6;margin-top:10px;font-family:Arial'}, txt || h('span', {class: 'c-empty'}, tr('emptyText')))));
   });
   const crit = ['Task Achievement / Response', 'Coherence & Cohesion', 'Lexical Resource', 'Grammar Range & Accuracy'];
-  const sc = {1: [null, null, null, null], 2: [null, null, null, null]};
+  // оценки храним в попытке, чтобы они не пропали при смене языка
+  const sc = X.wsc = X.wsc || {1: [null, null, null, null], 2: [null, null, null, null]};
   const out = h('div', {style: 'margin-top:12px;font-size:18px'});
   const recalc = () => {
     const avg = k => sc[k].every(v => v != null) ? sc[k].reduce((a, b) => a + b, 0) / 4 : null;
     const a1 = avg(1), a2 = avg(2);
-    if(a1 == null || a2 == null){ out.innerHTML = 'Выставьте все 8 оценок — появится итоговый band.'; return; }
+    if(a1 == null || a2 == null){ out.innerHTML = tr('needAll8'); return; }
     const band = roundBand((a1 + 2 * a2) / 3);
     out.innerHTML = 'Task 1: <b>' + a1.toFixed(2) + '</b> · Task 2: <b>' + a2.toFixed(2) + '</b> · Writing band: <b style="font-size:26px;color:var(--brand)">' + fmtBand(band) + '</b>';
     Hist.update(X.id, {band});
   };
   const tb = h('table', {class: 't'});
-  tb.append(h('tr', null, h('th', null, 'Критерий'), h('th', null, 'Task 1'), h('th', null, 'Task 2')));
+  tb.append(h('tr', null, h('th', null, tr('crit')), h('th', null, 'Task 1'), h('th', null, 'Task 2')));
   crit.forEach((c, i) => tb.append(h('tr', null, h('td', null, c), ...[1, 2].map(k => h('td', null,
     h('select', {class: 'i', style: 'width:80px', onchange: e => { sc[k][i] = e.target.value === '' ? null : +e.target.value; recalc(); }},
-      h('option', {value: ''}, '—'), ...[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(v => h('option', {value: v}, v))))))));
-  W.append(h('div', {class: 'card'}, h('h2', null, 'Оценка учителя (или самооценка)'),
-    h('p', {class: 'sub'}, 'Writing не проверяется автоматически. Поставьте оценки по четырём критериям IELTS. Task 2 весит вдвое больше Task 1.'),
+      h('option', {value: ''}, '—'), ...[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(v => h('option', {value: v, selected: sc[k][i] === v || null}, v))))))));
+  W.append(h('div', {class: 'card'}, h('h2', null, tr('teacherH')),
+    h('p', {class: 'sub'}, tr('teacherP')),
     tb, out,
     h('div', {class: 'row noprint', style: 'margin-top:14px'},
-      t.answersPdf ? h('button', {class: 'btn primary', onclick: () => previewPdf(t.answersPdf.data, 'Образцы: ' + t.answersPdf.name)}, 'Открыть образцы ответов (PDF)') : null,
+      t.answersPdf ? h('button', {class: 'btn primary', onclick: () => previewPdf(t.answersPdf.data, tr('prevModel', t.answersPdf.name))}, tr('openModels')) : null,
       h('button', {class: 'btn', onclick: () => download((X.name + ' - ' + t.title).replace(/[\\/:*?"<>|]+/g, '_') + '.txt',
         'IELTS Writing — ' + t.title + '\r\n' + X.name + ' — ' + fmtDate(X.finishedAt) + '\r\n\r\n' +
         'TASK 1 (' + wordCount(X.writing[1]) + ' words)\r\n\r\n' + (X.writing[1] || '') + '\r\n\r\n' +
-        'TASK 2 (' + wordCount(X.writing[2]) + ' words)\r\n\r\n' + (X.writing[2] || ''))}, 'Скачать тексты (.txt)'))));
+        'TASK 2 (' + wordCount(X.writing[2]) + ' words)\r\n\r\n' + (X.writing[2] || ''))}, tr('dlTexts')))));
   recalc();
 }
 
@@ -1764,7 +2051,7 @@ async function fromDataURL(u){
 }
 async function exportTest(id){
   const t = await DB.get(id);
-  toast('Готовлю файл…');
+  toast(tr('preparing'));
   const out = Object.assign({}, t);
   out.tasksPdf = t.tasksPdf ? {name: t.tasksPdf.name, data: await toDataURL(new Blob([t.tasksPdf.data], {type: 'application/pdf'}))} : null;
   out.answersPdf = t.answersPdf ? {name: t.answersPdf.name, data: await toDataURL(new Blob([t.answersPdf.data], {type: 'application/pdf'}))} : null;
@@ -1776,7 +2063,7 @@ async function exportTest(id){
 async function importTest(file){
   try{
     const j = JSON.parse(await file.text());
-    if(j.format !== 'ielts-cd-trainer' || !j.test) throw new Error('это не файл теста из этого тренажёра');
+    if(j.format !== 'ielts-cd-trainer' || !j.test) throw new Error(tr('notOurFile'));
     const t = j.test;
     if(t.tasksPdf) t.tasksPdf = {name: t.tasksPdf.name, data: await fromDataURL(t.tasksPdf.data)};
     if(t.answersPdf) t.answersPdf = {name: t.answersPdf.name, data: await fromDataURL(t.answersPdf.data)};
@@ -1784,13 +2071,13 @@ async function importTest(file){
     for(const a of (t.audio || [])){ const buf = await fromDataURL(a.data); au.push({name: a.name, blob: new Blob([buf], {type: (a.data.match(/^data:([^;,]+)/) || [])[1] || 'audio/mpeg'})}); }
     t.audio = au;
     if(await DB.get(t.id)){
-      if(!(await confirmBox('Такой тест уже есть', 'Тест «' + esc(t.title) + '» уже есть в библиотеке. Заменить его версией из файла?', 'Заменить', 'Добавить копией')))
-        { t.id = uid(); t.title += ' (копия)'; }
+      if(!(await confirmBox(tr('existsQ'), tr('existsText', esc(t.title)), tr('replace'), tr('addCopy'))))
+        { t.id = uid(); t.title += tr('copySuffix'); }
     }
     await DB.put(t);
-    toast('Тест «' + t.title + '» добавлен');
+    toast(tr('added', t.title));
     renderHome();
-  }catch(e){ modal('Не удалось загрузить', '<p>' + esc(e.message) + '</p>'); }
+  }catch(e){ modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
 }
 
 /* =====================================================================
@@ -1801,7 +2088,7 @@ function bindUI(){
   $('#btnImport').onclick = () => $('#importFile').click();
   $('#importFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if(f) importTest(f); };
   $('#btnCsv').onclick = historyCsv;
-  $('#btnClearHist').onclick = async () => { if(await confirmBox('Очистить историю?', 'Все результаты на этом компьютере будут удалены.', 'Очистить')){ Hist.clear(); renderHistory(); } };
+  $('#btnClearHist').onclick = async () => { if(await confirmBox(tr('clearHistQ'), tr('clearHistText'), tr('btnClear'))){ Hist.clear(); renderHistory(); } };
   ['#cL', '#cR', '#cW', '#cS'].forEach(s => $(s).oninput = calcOverall);
 
   // редактор
@@ -1818,14 +2105,14 @@ function bindUI(){
   $('#edTasksFile').onchange = async e => {
     const f = e.target.files[0]; if(!f) return;
     ED.tasksPdf = {name: f.name, data: await readFileBuf(f)}; ED.tasksPages = null;
-    try{ const d = await openPdf(ED.tasksPdf.data); ED.tasksPages = d.numPages; if(!$('#edTo').value) $('#edTo').value = d.numPages; }catch(err){ toast('Не удалось открыть PDF'); }
+    try{ const d = await openPdf(ED.tasksPdf.data); ED.tasksPages = d.numPages; if(!$('#edTo').value) $('#edTo').value = d.numPages; }catch(err){ toast(tr('pdfOpenFail')); }
     if(!$('#edName').value) $('#edName').value = f.name.replace(/\.pdf$/i, '') + ' — ' + MOD_NAME[ED.module];
     edFileInfo();
   };
   $('#edAnsFile').onchange = async e => {
     const f = e.target.files[0]; if(!f) return;
     ED.answersPdf = {name: f.name, data: await readFileBuf(f)}; ED.ansPages = null;
-    try{ const d = await openPdf(ED.answersPdf.data); ED.ansPages = d.numPages; if(!$('#edATo').value) $('#edATo').value = d.numPages; }catch(err){ toast('Не удалось открыть PDF'); }
+    try{ const d = await openPdf(ED.answersPdf.data); ED.ansPages = d.numPages; if(!$('#edATo').value) $('#edATo').value = d.numPages; }catch(err){ toast(tr('pdfOpenFail')); }
     edFileInfo();
   };
   $('#edAudioFile').onchange = e => {
@@ -1833,8 +2120,8 @@ function bindUI(){
     ED.audio = (ED.audio || []).concat(fs.map(f => ({name: f.name, blob: f})));
     e.target.value = ''; edFileInfo();
   };
-  $('#edPreviewTasks').onclick = () => previewPdf(ED.tasksPdf && ED.tasksPdf.data, 'Задания: ' + (ED.tasksPdf ? ED.tasksPdf.name : ''));
-  $('#edPreviewAns').onclick = () => previewPdf(ED.answersPdf && ED.answersPdf.data, 'Ответы: ' + (ED.answersPdf ? ED.answersPdf.name : ''));
+  $('#edPreviewTasks').onclick = () => previewPdf(ED.tasksPdf && ED.tasksPdf.data, tr('prevTasks', ED.tasksPdf ? ED.tasksPdf.name : ''));
+  $('#edPreviewAns').onclick = () => previewPdf(ED.answersPdf && ED.answersPdf.data, tr('prevAns', ED.answersPdf ? ED.answersPdf.name : ''));
   $('#edExtract').onclick = edExtract;
   $('#edKey').oninput = $('#edParts').oninput = () => { clearTimeout(ED._t); ED._t = setTimeout(edKeyPreview, 250); };
   $('#edSave').onclick = edSave;
@@ -1863,7 +2150,32 @@ function bindUI(){
   });
 }
 
+/* смена языка: подписи в разметке + перерисовка открытого экрана */
+function applyLang(){
+  document.documentElement.lang = LANG;
+  document.title = tr('appTitle');
+  $$('[data-i18n]').forEach(e => { e.textContent = tr(e.dataset.i18n); });
+  $$('[data-i18n-html]').forEach(e => { e.innerHTML = tr(e.dataset.i18nHtml); });
+  $$('[data-i18n-ph]').forEach(e => { e.placeholder = tr(e.dataset.i18nPh); });
+  $$('#langBar button').forEach(b => b.classList.toggle('on', b.dataset.l === LANG));
+}
+function setLang(l){
+  if(!LANGS.includes(l)) return;
+  LANG = l; LS.set('ielts_lang', l);
+  applyLang();
+  const open = ['home', 'editor', 'intro', 'results'].find(id => !$('#' + id).classList.contains('hidden'));
+  const y = window.scrollY;
+  if(open === 'home') renderHome().then(() => window.scrollTo(0, y));
+  else if(open === 'editor'){ edSyncModule(); edFileInfo(); edKeyPreview(); }
+  else if(open === 'intro') fillIntro();
+  else if(open === 'results'){ renderResults(); window.scrollTo(0, y); }
+}
+
 (async function init(){
+  LANG = LS.get('ielts_lang', 'uz');
+  if(!LANGS.includes(LANG)) LANG = 'uz';
+  applyLang();
+  $$('#langBar button').forEach(b => b.onclick = () => setLang(b.dataset.l));
   bindUI();
   await DB.open();
   renderHome();
