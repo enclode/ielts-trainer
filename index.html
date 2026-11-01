@@ -1,0 +1,1873 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>IELTS на компьютере — тренажёр</title>
+<style>
+/* ============ Общие цвета и шрифты ============ */
+:root{
+  --bg:#f3f5f8; --card:#fff; --ink:#1d2433; --muted:#667085; --line:#d9dee7;
+  --brand:#c8102e; --brand2:#a30d25; --blue:#1f5fbf; --ok:#16803c; --okbg:#e5f6ea;
+  --bad:#c62828; --badbg:#fdeaea; --warn:#b26a00; --warnbg:#fff4e0;
+  /* экран экзамена */
+  --x-bg:#fff; --x-ink:#000; --x-panel:#f4f4f4; --x-line:#c9c9c9; --x-accent:#1a73e8;
+  --x-fs:16px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);font-size:15px}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+.hidden{display:none!important}
+.screen{min-height:100%}
+
+/* ============ Главная, редактор, результаты ============ */
+.wrap{max-width:1100px;margin:0 auto;padding:20px 16px 60px}
+.topline{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.logo{display:inline-flex;align-items:center;justify-content:center;background:var(--brand);color:#fff;font-weight:700;
+  letter-spacing:1px;border-radius:6px;padding:6px 10px;font-size:18px}
+h1{font-size:22px;margin:0}
+h2{font-size:18px;margin:0 0 12px}
+h3{font-size:16px;margin:16px 0 8px}
+.sub{color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.btn{border:1px solid var(--line);background:#fff;border-radius:8px;padding:8px 14px;line-height:1.2}
+.btn:hover{background:#f6f7f9}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+.btn.primary:hover{background:var(--brand2)}
+.btn.blue{background:var(--blue);border-color:var(--blue);color:#fff}
+.btn.small{padding:5px 10px;font-size:13px}
+.btn.danger{color:var(--bad)}
+.btn:disabled{opacity:.5;cursor:default}
+label.f{display:block;font-size:13px;color:var(--muted);margin:10px 0 4px}
+input.i,select.i,textarea.i{width:100%;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+textarea.i{font-family:Consolas,Menlo,monospace;font-size:14px;line-height:1.45}
+input.n{width:80px}
+.pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:12px;background:#eef1f6;color:#344054}
+.pill.r{background:#e8f0fe;color:#1a56b8}.pill.l{background:#fdf0e1;color:#9a5400}.pill.w{background:#eaf6ec;color:#1d6b33}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:0;background:#fff;padding:8px 14px;border-right:1px solid var(--line)}
+.seg button:last-child{border-right:0}
+.seg button.on{background:var(--ink);color:#fff}
+.note{background:var(--warnbg);color:#6b4100;border-radius:8px;padding:10px 12px;font-size:14px}
+.okmsg{background:var(--okbg);color:#14532d;border-radius:8px;padding:10px 12px;font-size:14px}
+.errmsg{background:var(--badbg);color:#7f1d1d;border-radius:8px;padding:10px 12px;font-size:14px}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+table.t th{color:var(--muted);font-weight:600;font-size:13px}
+.tests{display:grid;gap:10px}
+.test{display:flex;align-items:center;gap:12px;border:1px solid var(--line);border-radius:10px;padding:12px;flex-wrap:wrap}
+.test .nm{font-weight:700}
+.test .grow{flex:1;min-width:200px}
+.empty{color:var(--muted);text-align:center;padding:20px}
+.steps{margin:0;padding-left:20px;line-height:1.6}
+.filebox{border:2px dashed var(--line);border-radius:10px;padding:12px;background:#fafbfc}
+.filebox .fn{font-weight:600;word-break:break-all}
+.keyprev{max-height:340px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.keyprev table td,.keyprev table th{padding:4px 8px}
+.kind{font-size:11px;border-radius:4px;padding:1px 6px;background:#eef1f6;white-space:nowrap}
+.miss{color:var(--bad);font-weight:600}
+.band-big{font-size:56px;font-weight:700;line-height:1;color:var(--brand)}
+.stat{display:inline-block;margin-right:28px;vertical-align:top}
+.stat b{display:block;font-size:26px}
+.c-ok{color:var(--ok);font-weight:700}.c-bad{color:var(--bad);font-weight:700}.c-empty{color:var(--muted)}
+tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
+.calc input{width:70px}
+.toast{position:fixed;left:50%;bottom:84px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:8px;
+  z-index:200;box-shadow:0 6px 20px rgba(0,0,0,.25);font-size:15px;max-width:90vw}
+
+/* ============ Модальные окна ============ */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:150;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;color:#000;border-radius:10px;max-width:520px;width:100%;padding:22px;box-shadow:0 12px 40px rgba(0,0,0,.3);max-height:92vh;overflow:auto}
+.modal.big{max-width:1000px;height:90vh;display:flex;flex-direction:column;padding:14px}
+.modal h3{margin-top:0}
+.modal .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
+
+/* ============ Экран экзамена (как в компьютерном IELTS) ============ */
+#exam{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--x-bg);color:var(--x-ink);font-size:var(--x-fs)}
+.xtop{height:56px;flex:none;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--x-line);background:var(--x-bg)}
+.xlogo{background:var(--brand);color:#fff;font-weight:700;padding:4px 8px;border-radius:3px;letter-spacing:1px;font-size:15px}
+.xcand{font-size:14px;line-height:1.2}
+.xcand small{display:block;opacity:.65;font-size:12px}
+.xtimer{flex:1;text-align:center;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px}
+.xtimer.low{color:#d00000}
+.xtimer .tbtn{font-weight:400;font-size:12px;border:1px solid var(--x-line);background:transparent;border-radius:4px;padding:2px 8px}
+.xicons{display:flex;align-items:center;gap:8px}
+.xicon{border:1px solid var(--x-line);background:transparent;border-radius:4px;padding:5px 10px;font-size:14px}
+.xvol{display:flex;align-items:center;gap:6px;font-size:13px}
+.xvol input{width:90px}
+.xmain{flex:1;display:flex;min-height:0}
+.xleft{flex:none;width:55%;min-width:220px;display:flex;flex-direction:column;min-height:0;background:var(--x-panel)}
+.xdiv{flex:none;width:10px;cursor:col-resize;background:var(--x-panel);border-left:1px solid var(--x-line);border-right:1px solid var(--x-line);
+  display:flex;align-items:center;justify-content:center}
+.xdiv::after{content:"";width:2px;height:34px;border-left:2px dotted #888}
+.xright{flex:1;min-width:260px;overflow:auto;padding:18px 22px 30px;background:var(--x-bg)}
+.xfoot{flex:none;min-height:62px;border-top:1px solid var(--x-line);display:flex;align-items:stretch;background:var(--x-bg)}
+.xparts{flex:1;display:flex;overflow-x:auto}
+.xpart{display:flex;align-items:center;gap:8px;padding:6px 14px;border-right:1px solid var(--x-line);cursor:pointer;white-space:nowrap;background:transparent;border-top:0;border-bottom:0;border-left:0}
+.xpart .pt{font-weight:700}
+.xpart .cnt{font-size:13px;opacity:.75}
+.xpart.on{cursor:default;background:var(--x-panel)}
+.qnums{display:flex;gap:3px;flex-wrap:wrap}
+.qn{min-width:28px;height:28px;border:1px solid var(--x-line);background:var(--x-bg);border-radius:3px;font-size:13px;padding:0 4px;position:relative}
+.qn.ans{border-bottom:3px solid var(--x-accent)}
+.qn.cur{outline:2px solid var(--x-accent);outline-offset:1px}
+.qn.flag{border-radius:50%}
+.qn.r-ok{background:#d9f2df;color:#000}.qn.r-bad{background:#fbd5d5;color:#000}
+.xnav{display:flex;align-items:center;gap:6px;padding:0 12px}
+.xnav button{width:46px;height:42px;border:0;background:#333;color:#fff;font-size:20px;border-radius:3px}
+.xnav button.sub{width:auto;padding:0 14px;font-size:15px;background:var(--x-accent);display:flex;align-items:center;gap:6px}
+.xreviewtag{background:#ffd54f;color:#000;font-weight:700;padding:3px 10px;border-radius:4px;font-size:13px}
+
+/* вопросы справа */
+.qhead{font-weight:700;font-size:1.15em;margin:0 0 4px}
+.qsub{opacity:.75;margin-bottom:16px;font-size:.92em}
+.q{display:flex;align-items:flex-start;gap:12px;padding:9px 8px;border-radius:6px;border:1px solid transparent}
+.q.cur{border-color:var(--x-accent);background:rgba(26,115,232,.05)}
+.qnum{flex:none;min-width:34px;height:30px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--x-ink);font-weight:700;border-radius:3px}
+.qbody{flex:1;min-width:0}
+.qin{width:100%;max-width:340px;height:32px;border:1.5px solid #8a8a8a;border-radius:3px;padding:0 8px;background:var(--x-bg);color:var(--x-ink);font-size:1em}
+.qin:focus{outline:2px solid var(--x-accent);border-color:var(--x-accent)}
+.opts{display:flex;flex-wrap:wrap;gap:6px}
+.opt{min-width:38px;height:32px;border:1.5px solid #8a8a8a;background:var(--x-bg);color:var(--x-ink);border-radius:3px;padding:0 10px;font-size:.95em}
+.opt.on{background:var(--x-accent);border-color:var(--x-accent);color:#fff}
+.flagbtn{flex:none;border:1px solid transparent;background:transparent;border-radius:4px;font-size:15px;opacity:.35;padding:4px 6px}
+.flagbtn.on{opacity:1;border-color:#e0a800;background:#fff4c2}
+.q:hover .flagbtn{opacity:.8}
+.q .res{font-size:.9em;margin-top:5px}
+.q.r-ok .qnum{background:#16803c;border-color:#16803c;color:#fff}
+.q.r-bad .qnum{background:#c62828;border-color:#c62828;color:#fff}
+.q.r-ok .qin,.q.r-ok .opt.on{border-color:#16803c}
+.q.r-bad .qin{border-color:#c62828}
+
+/* письмо */
+.wtask{display:flex;flex-direction:column;height:100%}
+.wta{flex:1;min-height:300px;width:100%;resize:none;border:1.5px solid #8a8a8a;border-radius:3px;padding:12px;line-height:1.6;background:var(--x-bg);color:var(--x-ink);font-size:1em;font-family:Arial,Helvetica,sans-serif}
+.wcount{margin-top:8px;font-size:.95em}
+
+/* просмотр PDF */
+.pdfview{display:flex;flex-direction:column;flex:1;min-height:0;height:100%}
+.pdfbar{flex:none;display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--x-line);font-size:13px;background:var(--x-panel);color:var(--x-ink);flex-wrap:wrap}
+.pdfbar button{border:1px solid var(--x-line);background:var(--x-bg);color:var(--x-ink);border-radius:3px;min-width:30px;height:28px;padding:0 8px}
+.pdfbar .sp{flex:1}
+.pdfscroll{flex:1;overflow:auto;padding:12px;position:relative}
+.pdfpage{position:relative;margin:0 auto 12px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.pdfpage canvas{position:absolute;left:0;top:0}
+.pdfpage .pno{position:absolute;right:-2px;top:-2px;transform:translateY(-100%);font-size:11px;opacity:.6;color:var(--x-ink)}
+.hlayer{position:absolute;inset:0;pointer-events:none;z-index:1}
+.hlayer div{position:absolute;background:rgba(255,230,0,.5);mix-blend-mode:multiply}
+.textLayer{position:absolute;text-align:initial;inset:0;overflow:hidden;line-height:1;-webkit-text-size-adjust:none;text-size-adjust:none;forced-color-adjust:none;transform-origin:0 0;z-index:2}
+.textLayer span,.textLayer br{color:transparent;position:absolute;white-space:pre;cursor:text;transform-origin:0% 0%}
+.textLayer span.markedContent{top:0;height:0}
+.textLayer ::selection{background:rgba(26,115,232,.35)}
+.textLayer .endOfContent{display:block;position:absolute;inset:100% 0 0;z-index:-1;cursor:default;user-select:none}
+.textLayer.selecting .endOfContent{top:0}
+.hlpop{position:fixed;z-index:120;background:#222;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.hlpop button{background:transparent;border:0;color:#fff;padding:7px 12px;font-size:14px}
+.hlpop button:hover{background:#444}
+.audiobar{flex:none;padding:6px 10px;border-bottom:1px solid var(--x-line);background:var(--x-panel)}
+.audiobar audio{width:100%;height:34px}
+.audiobar .tr{font-size:12px;opacity:.75;margin-bottom:3px}
+
+/* контраст (как в настройках настоящего экзамена) */
+#exam.c-wb{--x-bg:#000;--x-ink:#fff;--x-panel:#111;--x-line:#555;--x-accent:#4da3ff}
+#exam.c-yb{--x-bg:#000;--x-ink:#ffeb3b;--x-panel:#111;--x-line:#666;--x-accent:#ffeb3b}
+#exam.c-wb .pdfpage canvas,#exam.c-yb .pdfpage canvas{filter:invert(1) hue-rotate(180deg)}
+#exam.c-yb .opt.on,#exam.c-yb .xnav button.sub{color:#000}
+#exam.c-wb .q.r-ok .qnum,#exam.c-yb .q.r-ok .qnum{color:#fff}
+
+@media print{
+  body{background:#fff}
+  .noprint{display:none!important}
+  .card{border:0;padding:0}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ГЛАВНАЯ ===================== -->
+<div id="home" class="screen">
+ <div class="wrap">
+  <div class="topline">
+    <span class="logo">IELTS</span>
+    <div><h1>Компьютерный IELTS — тренажёр</h1>
+      <div class="sub">Загрузите PDF с заданиями и ключ ответов — ученик решает как на настоящем экзамене, проверка сразу</div></div>
+  </div>
+
+  <div id="libWarn" class="note hidden" style="margin-bottom:16px"></div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <h2 style="margin:0">Библиотека тестов</h2>
+      <div class="row">
+        <button class="btn" id="btnImport">Загрузить тест из файла</button>
+        <button class="btn primary" id="btnNew">+ Новый тест</button>
+      </div>
+    </div>
+    <div id="testList" class="tests"></div>
+    <input type="file" id="importFile" accept=".json,application/json" class="hidden">
+  </div>
+
+  <div id="resumeBox" class="card hidden"></div>
+
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:8px">
+      <h2 style="margin:0">История результатов</h2>
+      <div class="row">
+        <button class="btn small" id="btnCsv">Скачать таблицу (Excel)</button>
+        <button class="btn small danger" id="btnClearHist">Очистить</button>
+      </div>
+    </div>
+    <div id="histBox"></div>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h2>Как пользоваться</h2>
+      <ol class="steps">
+        <li>Нажмите <b>«Новый тест»</b>, выберите модуль (Listening, Reading или Writing).</li>
+        <li>Загрузите PDF с заданиями и укажите страницы нужного теста.</li>
+        <li>Загрузите PDF с ответами — программа сама найдёт ответы. Проверьте ключ и при необходимости исправьте.</li>
+        <li>Для Listening добавьте аудиофайлы (mp3) по порядку частей.</li>
+        <li>Сохраните тест — он останется в библиотеке на этом компьютере. Кнопкой «В файл» его можно перенести на другой компьютер.</li>
+        <li>Ученик нажимает «Начать», вводит имя и решает. После сдачи — балл, band и разбор ошибок.</li>
+      </ol>
+      <p class="sub">Выделять текст маркером можно, если PDF текстовый (не скан): выделите мышью фрагмент и нажмите «Highlight».</p>
+    </div>
+    <div class="card calc">
+      <h2>Калькулятор общего балла</h2>
+      <div class="row">
+        <label>Listening <input class="i" id="cL" type="number" min="0" max="9" step="0.5"></label>
+        <label>Reading <input class="i" id="cR" type="number" min="0" max="9" step="0.5"></label>
+        <label>Writing <input class="i" id="cW" type="number" min="0" max="9" step="0.5"></label>
+        <label>Speaking <input class="i" id="cS" type="number" min="0" max="9" step="0.5"></label>
+      </div>
+      <p style="margin:14px 0 0">Overall band: <b id="cOut" style="font-size:22px">—</b></p>
+      <p class="sub">Среднее четырёх модулей, округление по правилам IELTS: .25 вверх до .5, .75 вверх до целого.</p>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ===================== РЕДАКТОР ТЕСТА ===================== -->
+<div id="editor" class="screen hidden">
+ <div class="wrap">
+  <div class="topline">
+    <button class="btn" id="edBack">← Назад</button>
+    <h1 id="edTitle">Новый тест</h1>
+  </div>
+
+  <div class="card">
+    <h2>1. Что за тест</h2>
+    <label class="f">Название (например: Cambridge 18, Test 2, Reading)</label>
+    <input class="i" id="edName" placeholder="Cambridge 18 — Test 2 — Reading">
+    <label class="f">Модуль</label>
+    <div class="seg" id="edModule">
+      <button data-v="listening">Listening</button><button data-v="reading">Reading</button><button data-v="writing">Writing</button>
+    </div>
+    <div id="edRtypeBox">
+      <label class="f">Вид Reading (от этого зависит пересчёт в band)</label>
+      <div class="seg" id="edRtype"><button data-v="academic">Academic</button><button data-v="general">General Training</button></div>
+    </div>
+    <div class="row" style="margin-top:4px">
+      <div><label class="f">Время, минут</label><input class="i n" id="edMin" type="number" min="1" max="300"></div>
+      <div id="edPartsBox"><label class="f">Вопросов в частях (через запятую)</label><input class="i" id="edParts" style="width:160px"></div>
+    </div>
+    <p class="sub" id="edTimeHint"></p>
+  </div>
+
+  <div class="card">
+    <h2>2. PDF с заданиями</h2>
+    <div class="filebox">
+      <div class="row">
+        <input type="file" id="edTasksFile" accept="application/pdf,.pdf">
+        <span id="edTasksInfo" class="sub"></span>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span>Показывать страницы с</span><input class="i n" id="edFrom" type="number" min="1">
+        <span>по</span><input class="i n" id="edTo" type="number" min="1">
+        <button class="btn small" id="edPreviewTasks">Посмотреть PDF</button>
+      </div>
+      <div id="edPartPagesBox">
+        <label class="f">С какой страницы начинается каждая часть (необязательно, через запятую). Тогда при переходе на Part 2 PDF сам перелистнётся.</label>
+        <input class="i" id="edPartPages" placeholder="например: 1, 5, 9" style="max-width:260px">
+      </div>
+    </div>
+    <div id="edAudioBox" style="margin-top:14px">
+      <h3>Аудио для Listening</h3>
+      <div class="filebox">
+        <input type="file" id="edAudioFile" accept="audio/*" multiple>
+        <div id="edAudioList" class="sub" style="margin-top:6px"></div>
+        <div class="sub" style="margin-top:6px">Можно выбрать сразу несколько файлов — они будут играть по порядку имён (Part 1, Part 2…). Без аудио учитель может включить запись сам.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2 id="edKeyTitle">3. Ответы (ключ)</h2>
+    <div class="filebox">
+      <div class="row">
+        <input type="file" id="edAnsFile" accept="application/pdf,.pdf">
+        <span id="edAnsInfo" class="sub"></span>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span>Страницы с</span><input class="i n" id="edAFrom" type="number" min="1">
+        <span>по</span><input class="i n" id="edATo" type="number" min="1">
+        <button class="btn small" id="edPreviewAns">Посмотреть PDF</button>
+        <button class="btn small blue" id="edExtract">Найти ответы в PDF</button>
+      </div>
+    </div>
+    <div id="edKeyBox">
+      <div id="edExtractMsg" style="margin-top:10px"></div>
+      <div class="grid2" style="margin-top:10px">
+        <div>
+          <label class="f">Ключ: одна строка — один вопрос. Можно исправлять руками.</label>
+          <textarea class="i" id="edKey" rows="18" placeholder="1 TRUE&#10;2 NOT GIVEN&#10;3 library / the library&#10;4 (car) park&#10;14-15 B, D&#10;20 F [A-H]"></textarea>
+          <details class="sub" style="margin-top:6px"><summary>Как записывать ключ</summary>
+            <ul style="padding-left:18px;margin:6px 0">
+              <li><code>3 library / the library</code> — несколько верных вариантов через «/».</li>
+              <li><code>4 (car) park</code> — слово в скобках можно писать, а можно нет.</li>
+              <li><code>14-15 B, D</code> — «выберите две буквы», порядок любой.</li>
+              <li><code>20 F [A-H]</code> — в [квадратных скобках] какие буквы показать ученику.</li>
+              <li>TRUE/FALSE/NOT GIVEN и YES/NO/NOT GIVEN ученик выбирает кнопками, буквы — тоже кнопками, остальное вписывает.</li>
+            </ul></details>
+        </div>
+        <div>
+          <label class="f">Как программа поняла ключ</label>
+          <div id="edKeyPrev" class="keyprev"></div>
+        </div>
+      </div>
+    </div>
+    <p id="edWritingNote" class="sub hidden">Для Writing ключа нет: этот PDF (образцы ответов, если есть) откроется ученику после сдачи, чтобы сравнить со своим текстом.</p>
+  </div>
+
+  <div class="row" style="justify-content:flex-end">
+    <span id="edSaveMsg" class="sub"></span>
+    <button class="btn" id="edCancel">Отмена</button>
+    <button class="btn primary" id="edSave">Сохранить тест</button>
+  </div>
+ </div>
+</div>
+
+<!-- ===================== ПЕРЕД НАЧАЛОМ ===================== -->
+<div id="intro" class="screen hidden">
+ <div class="wrap" style="max-width:640px">
+  <div class="card" style="margin-top:40px">
+    <div class="row" style="margin-bottom:12px"><span class="logo">IELTS</span><h1 id="inTitle"></h1></div>
+    <div id="inInfo" class="sub" style="margin-bottom:12px"></div>
+    <label class="f">Имя ученика (Test taker)</label>
+    <input class="i" id="inName" placeholder="Фамилия Имя">
+    <label class="f">Режим</label>
+    <div class="seg" id="inMode"><button data-v="strict">Как на экзамене</button><button data-v="practice">Тренировка</button></div>
+    <p class="sub" id="inModeHint"></p>
+    <div id="inSound" class="hidden">
+      <label class="f">Проверка звука в наушниках</label>
+      <div class="row"><button class="btn small" id="inBeep">▶ Проверить звук</button><span class="sub">Громкость можно менять и во время теста.</span></div>
+    </div>
+    <div class="acts row" style="justify-content:space-between;margin-top:20px">
+      <button class="btn" id="inBack">← Назад</button>
+      <button class="btn primary" id="inStart" style="padding:10px 26px">Start test</button>
+    </div>
+  </div>
+ </div>
+</div>
+
+<!-- ===================== ЭКЗАМЕН ===================== -->
+<div id="exam" class="hidden">
+  <div class="xtop">
+    <span class="xlogo">IELTS</span>
+    <div class="xcand"><span id="xName"></span><small id="xMod"></small></div>
+    <div class="xtimer" id="xTimerBox"><span id="xTimer"></span><button class="tbtn" id="xHide">Hide</button></div>
+    <div class="xicons">
+      <div class="xvol hidden" id="xVolBox">🔊 <input type="range" id="xVol" min="0" max="1" step="0.05" value="1"></div>
+      <button class="xicon" id="xSettings" title="Settings">⚙ Settings</button>
+      <button class="xicon hidden" id="xBackRes">← Results</button>
+    </div>
+  </div>
+  <div class="xmain">
+    <div class="xleft" id="xLeft"></div>
+    <div class="xdiv" id="xDiv" title="Drag"></div>
+    <div class="xright" id="xRight"></div>
+  </div>
+  <div class="xfoot">
+    <div class="xparts" id="xParts"></div>
+    <div class="xnav">
+      <button id="xPrev" title="Previous">‹</button>
+      <button id="xNext" title="Next">›</button>
+      <button id="xSubmit" class="sub" title="Finish">✓ Submit</button>
+    </div>
+  </div>
+  <audio id="xAudio" preload="auto"></audio>
+</div>
+
+<!-- ===================== РЕЗУЛЬТАТЫ ===================== -->
+<div id="results" class="screen hidden">
+ <div class="wrap" id="resWrap"></div>
+</div>
+
+<div id="modalRoot"></div>
+
+<!-- Библиотека для чтения PDF (Mozilla pdf.js). Нужен интернет при открытии файла. -->
+<script>window.__PDFJS_BASE='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/';</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script>
+if(!window.pdfjsLib){
+  window.__PDFJS_BASE='https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/';
+  document.write('<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js"><\/script>');
+}
+</script>
+<script>
+'use strict';
+/* =====================================================================
+   Компьютерный IELTS — тренажёр.
+   Один файл: открыть в браузере (Chrome / Edge / Firefox).
+   Тесты хранятся в браузере этого компьютера (IndexedDB),
+   история результатов — в localStorage.
+   ===================================================================== */
+
+/* ---------- мелкие помощники ---------- */
+const $ = s => document.querySelector(s);
+const $$ = s => Array.from(document.querySelectorAll(s));
+function h(tag, attrs, ...kids){
+  const e = document.createElement(tag);
+  if(attrs) for(const k in attrs){
+    const v = attrs[k];
+    if(v == null || v === false) continue;
+    if(k === 'class') e.className = v;
+    else if(k === 'html') e.innerHTML = v;
+    else if(k.startsWith('on')) e.addEventListener(k.slice(2), v);
+    else e.setAttribute(k, v === true ? '' : v);
+  }
+  for(const c of kids.flat()) if(c != null && c !== false) e.append(c.nodeType ? c : String(c));
+  return e;
+}
+const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+function toast(msg, ms){
+  const t = h('div', {class:'toast'}, msg); document.body.append(t);
+  setTimeout(() => t.remove(), ms || 2600);
+}
+function showScreen(id){
+  ['home','editor','intro','exam','results'].forEach(s => $('#'+s).classList.toggle('hidden', s !== id));
+  window.scrollTo(0,0);
+}
+/* модальное окно; buttons: [{text, cls, value}] → Promise(value) */
+function modal(title, body, buttons, opts){
+  opts = opts || {};
+  return new Promise(res => {
+    const bg = h('div', {class:'modal-bg'});
+    const box = h('div', {class:'modal' + (opts.big ? ' big' : '')});
+    if(title) box.append(h('h3', null, title));
+    if(body) box.append(typeof body === 'string' ? h('div', {html: body}) : body);
+    const acts = h('div', {class:'acts'});
+    (buttons || [{text:'OK', cls:'primary', value:true}]).forEach(b => {
+      acts.append(h('button', {class:'btn ' + (b.cls || ''), onclick: () => { close(); res(b.value); }}, b.text));
+    });
+    box.append(acts); bg.append(box); $('#modalRoot').append(bg);
+    function close(){ bg.remove(); if(opts.onClose) opts.onClose(); }
+    if(opts.onOpen) opts.onOpen(box);
+  });
+}
+const confirmBox = (title, text, yes, no) =>
+  modal(title, '<p>' + text + '</p>', [{text: no || 'Отмена', value:false}, {text: yes || 'Да', cls:'primary', value:true}]);
+function fmtClock(sec){
+  sec = Math.max(0, Math.round(sec));
+  const m = Math.floor(sec / 60), s = sec % 60;
+  return m + ':' + String(s).padStart(2, '0');
+}
+function fmtDate(ts){
+  const d = new Date(ts);
+  return d.toLocaleDateString('ru-RU') + ' ' + d.toLocaleTimeString('ru-RU', {hour:'2-digit', minute:'2-digit'});
+}
+function download(name, data, type){
+  const blob = data instanceof Blob ? data : new Blob([data], {type: type || 'text/plain'});
+  const a = h('a', {href: URL.createObjectURL(blob), download: name});
+  document.body.append(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+}
+const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+const LS = {
+  get(k, d){ try{ const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); }catch(e){ return d; } },
+  set(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); return true; }catch(e){ return false; } },
+  del(k){ try{ localStorage.removeItem(k); }catch(e){} }
+};
+const MOD_NAME = {listening:'Listening', reading:'Reading', writing:'Writing'};
+const MOD_PILL = {listening:'l', reading:'r', writing:'w'};
+
+/* ---------- хранилище тестов (IndexedDB) ---------- */
+const DB = {
+  db: null, mem: {}, ok: true,
+  open(){
+    return new Promise(res => {
+      let rq;
+      try{ rq = indexedDB.open('ielts-cd-trainer', 1); }catch(e){ this.ok = false; return res(); }
+      rq.onupgradeneeded = () => rq.result.createObjectStore('tests', {keyPath: 'id'});
+      rq.onsuccess = () => { this.db = rq.result; res(); };
+      rq.onerror = () => { this.ok = false; res(); };
+    });
+  },
+  tx(mode){ return this.db.transaction('tests', mode).objectStore('tests'); },
+  req(r){ return new Promise((res, rej) => { r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); },
+  async all(){ if(!this.db) return Object.values(this.mem); return this.req(this.tx('readonly').getAll()); },
+  async get(id){ if(!this.db) return this.mem[id]; return this.req(this.tx('readonly').get(id)); },
+  async put(t){ if(!this.db){ this.mem[t.id] = t; return; } return this.req(this.tx('readwrite').put(t)); },
+  async del(id){ if(!this.db){ delete this.mem[id]; return; } return this.req(this.tx('readwrite').delete(id)); }
+};
+
+/* ---------- история результатов ---------- */
+const Hist = {
+  all(){ return LS.get('ielts_history', []); },
+  add(r){ const a = this.all(); a.unshift(r); LS.set('ielts_history', a.slice(0, 500)); },
+  update(id, patch){ const a = this.all(); const r = a.find(x => x.id === id); if(r){ Object.assign(r, patch); LS.set('ielts_history', a); } },
+  clear(){ LS.set('ielts_history', []); }
+};
+
+/* =====================================================================
+   КЛЮЧ ОТВЕТОВ: разбор текста и проверка ответа ученика
+   ===================================================================== */
+const LETTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+
+/* «(the) car park» → ["the car park", "car park"] */
+function expandOptional(s){
+  const m = s.match(/\(([^()]*)\)/);
+  if(!m) return [s];
+  const pre = s.slice(0, m.index), post = s.slice(m.index + m[0].length);
+  return [...expandOptional(pre + m[1] + post), ...expandOptional(pre + ' ' + post)];
+}
+/* приведение ответа к единому виду для сравнения */
+function normAns(s){
+  return String(s || '').toLowerCase()
+    .replace(/[‘’‛`´]/g, "'").replace(/[“”]/g, '"')
+    .replace(/[–—]/g, '-')
+    .replace(/(\d),(?=\d{3}(\D|$))/g, '$1')          // 1,000 → 1000
+    .replace(/[£$€]/g, '')
+    .replace(/\s*-\s*/g, '-')
+    .replace(/^[\s.,;:"']+|[\s.,;:!?"']+$/g, '')
+    .replace(/\s+/g, ' ').trim();
+}
+/* варианты одного ответа: «/» или « OR » разделяют варианты */
+function answerAlts(raw){
+  const parts = String(raw).split(/\s*\/\s*|\s+OR\s+/).map(s => s.trim()).filter(Boolean);
+  const out = [];
+  parts.forEach(p => expandOptional(p).forEach(v => { const n = normAns(v); if(n && !out.includes(n)) out.push(n); }));
+  return out;
+}
+const TFNG = ['TRUE', 'FALSE', 'NOT GIVEN'], YNNG = ['YES', 'NO', 'NOT GIVEN'];
+
+/* Разбор ключа. Возвращает {byQ:{n:{q,raw,alts,group,range}}, groups:[{qs,items,raw}], bad:[строки]} */
+function parseKey(text){
+  const res = {byQ: {}, groups: [], bad: [], dup: []};
+  String(text || '').split(/\r?\n/).forEach(line0 => {
+    let line = line0.replace(/[ \t]/g, ' ').replace(/\s+/g, ' ').trim();
+    if(!line || line.startsWith('#')) return;
+    let range = null;
+    const rm = line.match(/\[\s*([A-Za-z])\s*[-–]\s*([A-Za-z])\s*\]\s*$/);
+    if(rm){ range = [rm[1].toUpperCase(), rm[2].toUpperCase()]; line = line.slice(0, rm.index).trim(); }
+    // группа «14-15 B, D» / «21&22 A C» — порядок любой
+    let m = line.match(/^(\d{1,3})\s*(?:-|–|—|&|and|,)\s*(\d{1,3})[.):]?\s+(.+)$/i);
+    if(m && +m[2] > +m[1] && +m[2] - +m[1] <= 4){
+      const a = +m[1], b = +m[2];
+      let body = m[3].replace(/\(?\s*(?:in\s+)?(?:any|either)\s+order\s*\)?/ig, ' ')
+                     .replace(/\bboth\b|\bin\s+any\b/ig, ' ').replace(/\s+/g, ' ').trim();
+      let items;
+      if(/^[A-Za-z](?:\s*[,;/&]?\s*(?:and\s+)?[A-Za-z])+$/.test(body) && !/[a-z]{2}/i.test(body.replace(/\band\b/ig, '')))
+        items = body.replace(/\band\b/ig, ' ').split(/[\s,;/&]+/).filter(Boolean).map(x => x.toUpperCase());
+      else items = body.split(/\s*[,;]\s*|\s+and\s+/i).filter(Boolean);
+      const qs = []; for(let q = a; q <= b; q++) qs.push(q);
+      if(items.length < qs.length){ res.bad.push(line0.trim() + '  ← ответов меньше, чем вопросов'); return; }
+      const g = {qs, items: items.map(it => ({raw: it, alts: answerAlts(it)})), raw: items.join(', ')};
+      res.groups.push(g);
+      qs.forEach(q => {
+        if(res.byQ[q]) res.dup.push(q);
+        res.byQ[q] = {q, raw: g.raw, alts: [], group: g, range};
+      });
+      return;
+    }
+    m = line.match(/^(\d{1,3})[.):]?\s+(.+)$/);
+    if(m && +m[1] >= 1){
+      const q = +m[1];
+      let raw = m[2].trim().replace(/^NG$/i, 'NOT GIVEN');
+      if(res.byQ[q]) res.dup.push(q);
+      res.byQ[q] = {q, raw, alts: answerAlts(raw), group: null, range};
+      return;
+    }
+    res.bad.push(line0.trim());
+  });
+  return res;
+}
+
+/* Вид каждого вопроса: tf / yn / letter / text. Буквы и TF ищутся «блоками» подряд идущих вопросов. */
+function buildQuestions(total, key, partSizes){
+  const Q = [];
+  for(let n = 1; n <= total; n++) Q.push({n, kind: 'text', options: null, key: key ? key.byQ[n] || null : null});
+  if(key){
+    const firstAlt = e => e ? (e.group ? e.group.items.map(i => i.raw.trim()) : [e.raw.split(/\s*\/\s*|\s+OR\s+/)[0].trim()]) : [];
+    const kindOf = e => {
+      if(!e) return null;
+      const f = firstAlt(e);
+      if(f.every(x => /^[A-Z]$/.test(x))) return 'letter';
+      const u = f.map(x => x.toUpperCase());
+      if(u.every(x => x === 'NOT GIVEN')) return 'ng';
+      if(u.every(x => x === 'TRUE' || x === 'FALSE')) return 'tf';
+      if(u.every(x => x === 'YES' || x === 'NO')) return 'yn';
+      return 'text';
+    };
+    const kinds = Q.map(q => kindOf(q.key));
+    // блоки TRUE/FALSE/NOT GIVEN или YES/NO/NOT GIVEN
+    let i = 0;
+    while(i < Q.length){
+      if(['tf','yn','ng'].includes(kinds[i])){
+        let j = i; while(j < Q.length && ['tf','yn','ng'].includes(kinds[j])) j++;
+        const isYN = kinds.slice(i, j).includes('yn');
+        for(let k = i; k < j; k++){ Q[k].kind = isYN ? 'yn' : 'tf'; Q[k].options = isYN ? YNNG : TFNG; }
+        i = j;
+      } else if(kinds[i] === 'letter'){
+        let j = i; while(j < Q.length && kinds[j] === 'letter') j++;
+        let maxL = 'C', minL = 'A', declared = null;
+        for(let k = i; k < j; k++){
+          firstAlt(Q[k].key).forEach(x => { if(x > maxL) maxL = x; });
+          (Q[k].key.alts || []).forEach(a => { const A = a.toUpperCase(); if(/^[A-Z]$/.test(A) && A > maxL) maxL = A; });
+          if(Q[k].key.range) declared = Q[k].key.range;
+        }
+        if(declared){ minL = declared[0]; maxL = declared[1]; }
+        const opts = LETTERS.slice(LETTERS.indexOf(minL), LETTERS.indexOf(maxL) + 1).split('');
+        for(let k = i; k < j; k++){ Q[k].kind = 'letter'; Q[k].options = opts; }
+        i = j;
+      } else i++;
+    }
+  }
+  // распределение по частям
+  let p = 0, left = partSizes[0] || total;
+  Q.forEach(q => {
+    while(left <= 0 && p < partSizes.length - 1){ p++; left = partSizes[p]; }
+    q.part = p; left--;
+  });
+  return Q;
+}
+
+/* Проверка всех ответов: → {n: 'ok'|'bad'|'empty'|'nokey'} */
+function checkAll(Q, answers){
+  const res = {};
+  const doneGroups = new Set();
+  Q.forEach(q => {
+    const k = q.key;
+    if(!k){ res[q.n] = 'nokey'; return; }
+    if(k.group){
+      const g = k.group;
+      if(doneGroups.has(g)) return;
+      doneGroups.add(g);
+      const used = new Set();
+      g.qs.forEach(n => {
+        const a = normAns(answers[n]);
+        if(!a){ res[n] = 'empty'; return; }
+        const idx = g.items.findIndex((it, i) => !used.has(i) && it.alts.includes(a));
+        if(idx >= 0){ used.add(idx); res[n] = 'ok'; } else res[n] = 'bad';
+      });
+      return;
+    }
+    const a = normAns(answers[q.n]);
+    if(!a){ res[q.n] = 'empty'; return; }
+    res[q.n] = k.alts.includes(a) ? 'ok' : 'bad';
+  });
+  return res;
+}
+
+/* ---------- пересчёт в band (официальные таблицы, примерные) ---------- */
+const BANDS = {
+  listening: [[39,9],[37,8.5],[35,8],[32,7.5],[30,7],[26,6.5],[23,6],[18,5.5],[16,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5],[2,2],[1,1],[0,0]],
+  academic:  [[39,9],[37,8.5],[35,8],[33,7.5],[30,7],[27,6.5],[23,6],[19,5.5],[15,5],[13,4.5],[10,4],[8,3.5],[6,3],[4,2.5],[2,2],[1,1],[0,0]],
+  general:   [[40,9],[39,8.5],[37,8],[36,7.5],[34,7],[32,6.5],[30,6],[27,5.5],[23,5],[19,4.5],[15,4],[12,3.5],[9,3],[6,2.5],[3,2],[1,1],[0,0]]
+};
+function toBand(table, score, total){
+  const s = total === 40 ? score : Math.round(score * 40 / Math.max(1, total));
+  for(const [min, b] of BANDS[table]) if(s >= min) return b;
+  return 0;
+}
+const roundBand = x => Math.round(x * 2) / 2;   // .25 → .5, .75 → целое
+const fmtBand = b => (b == null || isNaN(b)) ? '—' : (Number.isInteger(b) ? b + '.0' : String(b));
+const wordCount = s => (String(s || '').match(/[^\s]+/g) || []).length;
+
+/* =====================================================================
+   PDF: загрузка, извлечение текста ключа, просмотрщик с маркером
+   ===================================================================== */
+function pdfReady(){
+  if(!window.pdfjsLib){
+    modal('Не загрузилась программа чтения PDF',
+      '<p>Для показа PDF нужен интернет при открытии этого файла. Проверьте подключение и обновите страницу (F5).</p>');
+    return false;
+  }
+  if(!pdfjsLib.GlobalWorkerOptions.workerSrc)
+    pdfjsLib.GlobalWorkerOptions.workerSrc = window.__PDFJS_BASE + 'pdf.worker.min.js';
+  return true;
+}
+const pdfCache = new Map();   // ArrayBuffer → Promise<PDFDocumentProxy>
+function openPdf(buf){
+  if(!pdfReady()) return Promise.reject(new Error('pdf.js not loaded'));
+  if(!pdfCache.has(buf)) pdfCache.set(buf, pdfjsLib.getDocument({data: new Uint8Array(buf.slice(0))}).promise);
+  return pdfCache.get(buf);
+}
+
+/* Текст страниц → «строки». Большие промежутки по горизонтали делят строку на колонки. */
+async function pdfChunks(doc, from, to){
+  const chunks = [];
+  for(let p = from; p <= to; p++){
+    const page = await doc.getPage(p);
+    const tc = await page.getTextContent();
+    const items = tc.items.filter(it => it.str && it.str.trim()).map(it => ({
+      s: it.str, x: it.transform[4], y: it.transform[5], w: it.width,
+      fh: Math.abs(it.transform[3]) || Math.abs(it.transform[0]) || 10
+    }));
+    items.sort((a, b) => b.y - a.y || a.x - b.x);
+    const lines = [];
+    items.forEach(it => {
+      const L = lines.find(l => Math.abs(l.y - it.y) < Math.max(2, it.fh * 0.45));
+      if(L) L.items.push(it); else lines.push({y: it.y, items: [it]});
+    });
+    lines.sort((a, b) => b.y - a.y);
+    lines.forEach(L => {
+      L.items.sort((a, b) => a.x - b.x);
+      let cur = '', lastEnd = null, fh = 10;
+      L.items.forEach(it => {
+        fh = it.fh;
+        if(lastEnd != null){
+          const gap = it.x - lastEnd;
+          if(gap > fh * 2.2){ if(cur.trim()) chunks.push(cur.trim()); cur = ''; }
+          else if(gap > fh * 0.12 && !/\s$/.test(cur) && !/^\s/.test(it.s)) cur += ' ';
+        }
+        cur += it.s; lastEnd = it.x + it.w;
+      });
+      if(cur.trim()) chunks.push(cur.trim());
+    });
+  }
+  return chunks;
+}
+
+/* Поиск пар «номер — ответ» в строках PDF. Возвращает текст ключа и замечания. */
+function chunksToKey(chunks){
+  const found = new Map(), dup = new Set();
+  const put = (q, ans) => {
+    ans = ans.replace(/\s+/g, ' ').trim();
+    if(!ans) return;
+    if(found.has(q)){ dup.add(q); return; }
+    found.set(q, ans);
+  };
+  chunks.forEach(ch0 => {
+    let ch = ch0.replace(/[–—]/g, '-')
+      .replace(/^(\d{1,2})\s*(?:&|and|-|,)\s*(\d{1,2})(?=[\s.)])/i, (m, a, b) => (+b > +a && +b - +a <= 4) ? a + '-' + b : m);
+    const toks = ch.split(' ');
+    let curQ = null, curTok = [], last = 0;
+    const flush = () => { if(curQ != null) put(curQ, curTok.join(' ')); curQ = null; curTok = []; };
+    toks.forEach((t, i) => {
+      const g = t.match(/^(\d{1,2})-(\d{1,2})[.):]?$/);
+      const s = t.match(/^(\d{1,2})[.):]?$/);
+      if(i === 0 && g && +g[1] >= 1 && +g[2] > +g[1] && +g[2] - +g[1] <= 4){ flush(); curQ = g[1] + '-' + g[2]; last = +g[2]; return; }
+      if(s){
+        const n = +s[1];
+        const isMarker = (i === 0 && n >= 1 && n <= 60) || (curQ != null && curTok.length > 0 && (n === last + 1));
+        if(isMarker){ flush(); curQ = n; last = n; return; }
+      }
+      if(curQ != null) curTok.push(t);
+    });
+    flush();
+  });
+  const nums = [...found.keys()].sort((a, b) => parseInt(a) - parseInt(b));
+  const text = nums.map(q => q + ' ' + found.get(q)).join('\n');
+  // «21-22» — это два вопроса
+  const count = nums.reduce((c, q) => { const m = String(q).match(/^(\d+)-(\d+)$/); return c + (m ? +m[2] - +m[1] + 1 : 1); }, 0);
+  return {text, count, dup: [...dup]};
+}
+
+/* Просмотрщик PDF: страницы рисуются по мере прокрутки, есть масштаб и маркер */
+class PdfView{
+  constructor(host, opts){
+    this.opts = opts || {};
+    this.host = host; host.innerHTML = '';
+    this.root = h('div', {class: 'pdfview'});
+    this.bar = h('div', {class: 'pdfbar'});
+    this.scroller = h('div', {class: 'pdfscroll'});
+    this.root.append(this.bar, this.scroller); host.append(this.root);
+    this.scale = 'fit'; this.pages = []; this.gen = 0;
+    this.hl = this.opts.highlights || null;   // {pageNum:[{x,y,w,h}]} в долях страницы
+    const lab = this.opts.lang === 'ru' ? {fit:'По ширине', page:'стр.'} : {fit:'Fit', page:'Page'};
+    this.lab = lab;
+    this.zoomLab = h('span', null, '');
+    this.pageLab = h('span', null, '');
+    this.bar.append(
+      h('button', {title: 'Zoom out', onclick: () => this.zoom(1 / 1.15)}, '−'),
+      this.zoomLab,
+      h('button', {title: 'Zoom in', onclick: () => this.zoom(1.15)}, '+'),
+      h('button', {onclick: () => { this.scale = 'fit'; this.layout(); }}, lab.fit),
+      h('span', {class: 'sp'}), this.pageLab);
+    if(this.opts.extraBar) this.bar.append(this.opts.extraBar);
+    this.io = new IntersectionObserver(ents => ents.forEach(en => {
+      if(en.isIntersecting){ const pg = this.pages.find(p => p.div === en.target); if(pg) this.render(pg); }
+    }), {root: this.scroller, rootMargin: '900px 0px'});
+    this.scroller.addEventListener('scroll', () => this.updPageLab());
+    this.ro = new ResizeObserver(() => { if(this.scale === 'fit') { clearTimeout(this.rt); this.rt = setTimeout(() => this.layout(), 150); } });
+    this.ro.observe(this.scroller);
+  }
+  async open(doc, from, to){
+    this.doc = doc;
+    from = Math.max(1, Math.min(doc.numPages, from || 1));
+    to = Math.max(from, Math.min(doc.numPages, to || doc.numPages));
+    this.from = from;
+    for(let p = from; p <= to; p++){
+      const page = await doc.getPage(p);
+      const vp = page.getViewport({scale: 1});
+      const div = h('div', {class: 'pdfpage', 'data-p': p});
+      const pg = {num: p, page, w: vp.width, h: vp.height, div, done: -1};
+      div.append(h('div', {class: 'hlayer'}));
+      this.pages.push(pg); this.scroller.append(div);
+    }
+    this.layout();
+  }
+  curScale(){
+    if(this.scale !== 'fit') return this.scale;
+    const maxW = Math.max(...this.pages.map(p => p.w), 1);
+    return Math.max(0.3, (this.scroller.clientWidth - 30) / maxW);
+  }
+  layout(){
+    if(!this.pages.length) return;
+    const top = this.topPage(), s = this.curScale();
+    this.gen++; this.s = s;
+    this.zoomLab.textContent = Math.round(s * 100) + '%';
+    this.pages.forEach(pg => {
+      pg.div.style.width = Math.floor(pg.w * s) + 'px';
+      pg.div.style.height = Math.floor(pg.h * s) + 'px';
+      this.io.unobserve(pg.div); this.io.observe(pg.div);
+    });
+    if(top) this.scrollToPage(top, true);
+    this.updPageLab();
+  }
+  zoom(f){ this.scale = Math.min(4, Math.max(0.3, this.curScale() * f)); this.layout(); }
+  async render(pg){
+    const gen = this.gen;
+    if(pg.done === gen || pg.busy === gen) return;
+    pg.busy = gen;
+    const s = this.s, vp = pg.page.getViewport({scale: s});
+    const dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const canvas = h('canvas');
+    canvas.width = Math.floor(vp.width * dpr); canvas.height = Math.floor(vp.height * dpr);
+    canvas.style.width = Math.floor(vp.width) + 'px'; canvas.style.height = Math.floor(vp.height) + 'px';
+    try{
+      await pg.page.render({canvasContext: canvas.getContext('2d'), viewport: vp,
+        transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : null}).promise;
+    }catch(e){ pg.busy = -1; return; }
+    if(gen !== this.gen) return;
+    pg.div.querySelectorAll('canvas,.textLayer,.pno').forEach(e => e.remove());
+    pg.div.prepend(canvas);
+    if(this.opts.showNums) pg.div.append(h('div', {class: 'pno'}, (this.opts.lang === 'ru' ? 'стр. ' : '') + pg.num));
+    try{
+      const tc = await pg.page.getTextContent();
+      if(gen !== this.gen) return;
+      const tl = h('div', {class: 'textLayer'});
+      tl.style.setProperty('--scale-factor', s);
+      pg.div.append(tl);
+      await pdfjsLib.renderTextLayer({textContentSource: tc, container: tl, viewport: vp, textDivs: []}).promise;
+      const eoc = h('div', {class: 'endOfContent'}); tl.append(eoc);
+      tl.addEventListener('mousedown', () => tl.classList.add('selecting'));
+    }catch(e){}
+    pg.done = gen;
+    this.drawHl(pg);
+  }
+  drawHl(pg){
+    const L = pg.div.querySelector('.hlayer'); L.innerHTML = '';
+    ((this.hl && this.hl[pg.num]) || []).forEach(r => L.append(h('div', {style:
+      `left:${r.x * 100}%;top:${r.y * 100}%;width:${r.w * 100}%;height:${r.h * 100}%`})));
+  }
+  topPage(){
+    const st = this.scroller.scrollTop + 20;
+    let best = null;
+    this.pages.forEach(pg => { if(pg.div.offsetTop <= st) best = pg.num; });
+    return best;
+  }
+  updPageLab(){
+    const t = this.topPage() || this.from;
+    this.pageLab.textContent = this.lab.page + ' ' + t + ' / ' + (this.pages.length ? this.pages[this.pages.length - 1].num : '');
+  }
+  scrollToPage(num, instant){
+    const pg = this.pages.find(p => p.num === num);
+    if(pg) this.scroller.scrollTo({top: pg.div.offsetTop - 12, behavior: instant ? 'auto' : 'smooth'});
+  }
+  /* выделенный мышью текст → прямоугольники по страницам */
+  selectionRects(){
+    const sel = window.getSelection();
+    if(!sel || sel.isCollapsed || !sel.rangeCount) return null;
+    const range = sel.getRangeAt(0);
+    if(!this.scroller.contains(range.commonAncestorContainer)) return null;
+    const out = {};
+    const walker = document.createTreeWalker(range.commonAncestorContainer.nodeType === 3 ?
+      range.commonAncestorContainer.parentNode : range.commonAncestorContainer, NodeFilter.SHOW_TEXT);
+    let node;
+    while((node = walker.nextNode())){
+      if(!range.intersectsNode(node) || !node.parentElement.closest('.textLayer')) continue;
+      const r = document.createRange();
+      r.selectNodeContents(node);
+      if(node === range.startContainer) r.setStart(node, range.startOffset);
+      if(node === range.endContainer) r.setEnd(node, range.endOffset);
+      const pageDiv = node.parentElement.closest('.pdfpage');
+      const pb = pageDiv.getBoundingClientRect();
+      Array.from(r.getClientRects()).forEach(cr => {
+        if(cr.width < 1 || cr.height < 1) return;
+        const num = +pageDiv.dataset.p;
+        (out[num] = out[num] || []).push({x: (cr.left - pb.left) / pb.width, y: (cr.top - pb.top) / pb.height,
+          w: cr.width / pb.width, h: cr.height / pb.height});
+      });
+    }
+    return Object.keys(out).length ? out : null;
+  }
+  addHl(rects){
+    for(const p in rects){ this.hl[p] = (this.hl[p] || []).concat(rects[p]); }
+    this.redrawAll();
+  }
+  clearHl(rects){
+    const hit = (a, b) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+    for(const p in rects) if(this.hl[p]) this.hl[p] = this.hl[p].filter(r => !rects[p].some(s => hit(r, s)));
+    this.redrawAll();
+  }
+  hlAt(clientX, clientY){
+    for(const pg of this.pages){
+      const b = pg.div.getBoundingClientRect();
+      if(clientX < b.left || clientX > b.right || clientY < b.top || clientY > b.bottom) continue;
+      const x = (clientX - b.left) / b.width, y = (clientY - b.top) / b.height;
+      const r = (this.hl[pg.num] || []).find(r => x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h);
+      if(r) return {[pg.num]: [{x: r.x, y: r.y, w: r.w, h: r.h}]};
+    }
+    return null;
+  }
+  redrawAll(){ this.pages.forEach(pg => this.drawHl(pg)); }
+  destroy(){ this.io.disconnect(); this.ro.disconnect(); this.host.innerHTML = ''; }
+}
+
+/* модальное окно с PDF (для учителя: найти нужные страницы) */
+async function previewPdf(buf, title){
+  if(!buf) return toast('Сначала выберите PDF-файл');
+  let view;
+  const box = h('div', {style: 'flex:1;min-height:0;display:flex;--x-panel:#f4f4f4;--x-line:#ccc;--x-bg:#fff;--x-ink:#000'});
+  const p = modal(title, box, [{text: 'Закрыть', value: true}], {big: true, onClose: () => view && view.destroy()});
+  try{
+    const doc = await openPdf(buf);
+    view = new PdfView(box, {lang: 'ru', showNums: true});
+    await view.open(doc, 1, doc.numPages);
+  }catch(e){ box.textContent = 'Не удалось открыть PDF: ' + e.message; }
+  return p;
+}
+document.addEventListener('mouseup', () => $$('.textLayer.selecting').forEach(t => t.classList.remove('selecting')));
+
+/* =====================================================================
+   ГЛАВНЫЙ ЭКРАН
+   ===================================================================== */
+const DEFAULTS = {
+  listening: {minutes: 32, parts: '10,10,10,10'},
+  reading:   {minutes: 60, parts: '13,13,14'},
+  writing:   {minutes: 60, parts: ''}
+};
+const partSizesOf = t => t.module === 'writing' ? [] :
+  String(t.parts || DEFAULTS[t.module].parts).split(/[,;\s]+/).map(Number).filter(n => n > 0);
+
+async function renderHome(){
+  showScreen('home');
+  if(!DB.ok){
+    $('#libWarn').classList.remove('hidden');
+    $('#libWarn').textContent = 'Браузер не даёт сохранять тесты на этом компьютере (частный режим?). Тесты будут работать, но пропадут после закрытия вкладки.';
+  }
+  const tests = (await DB.all()).sort((a, b) => (b.created || 0) - (a.created || 0));
+  const box = $('#testList'); box.innerHTML = '';
+  if(!tests.length) box.append(h('div', {class: 'empty'}, 'Тестов пока нет. Нажмите «+ Новый тест» и загрузите PDF.'));
+  tests.forEach(t => {
+    const nk = t.module === 'writing' ? null : Object.keys(parseKey(t.keyText).byQ).length;
+    const info = [];
+    info.push(t.minutes + ' мин');
+    if(t.module !== 'writing') info.push(nk ? 'ключ: ' + nk + ' отв.' : 'без ключа');
+    if(t.module === 'listening') info.push((t.audio || []).length ? 'аудио: ' + t.audio.length : 'без аудио');
+    if(t.module === 'reading') info.push(t.readingType === 'general' ? 'General' : 'Academic');
+    box.append(h('div', {class: 'test'},
+      h('span', {class: 'pill ' + MOD_PILL[t.module]}, MOD_NAME[t.module]),
+      h('div', {class: 'grow'}, h('div', {class: 'nm'}, t.title || 'Без названия'), h('div', {class: 'sub'}, info.join(' · '))),
+      h('button', {class: 'btn primary', onclick: () => openIntro(t.id)}, 'Начать'),
+      h('button', {class: 'btn small', onclick: () => openEditor(t.id)}, 'Изменить'),
+      h('button', {class: 'btn small', onclick: () => exportTest(t.id)}, 'В файл'),
+      h('button', {class: 'btn small danger', onclick: async () => {
+        if(await confirmBox('Удалить тест?', 'Тест «' + esc(t.title) + '» будет удалён из библиотеки этого компьютера. Результаты в истории останутся.', 'Удалить'))
+          { await DB.del(t.id); renderHome(); }
+      }}, 'Удалить')
+    ));
+  });
+  renderResume(tests);
+  renderHistory();
+}
+
+function renderResume(tests){
+  const a = LS.get('ielts_attempt', null), box = $('#resumeBox');
+  box.classList.add('hidden'); box.innerHTML = '';
+  if(!a || a.finished) return;
+  const t = tests.find(x => x.id === a.testId);
+  if(!t){ LS.del('ielts_attempt'); return; }
+  box.classList.remove('hidden');
+  box.append(h('div', {class: 'row', style: 'justify-content:space-between'},
+    h('div', null, h('b', null, 'Незаконченный тест: '), esc(a.name) + ' — ' + esc(t.title),
+      h('div', {class: 'sub'}, 'Начат ' + fmtDate(a.startedAt))),
+    h('div', {class: 'row'},
+      h('button', {class: 'btn', onclick: async () => {
+        if(await confirmBox('Сбросить?', 'Ответы этой попытки пропадут.', 'Сбросить')){ LS.del('ielts_attempt'); renderHome(); }
+      }}, 'Сбросить'),
+      h('button', {class: 'btn primary', onclick: () => resumeAttempt(a, t)}, 'Продолжить'))));
+}
+
+function renderHistory(){
+  const all = Hist.all(), box = $('#histBox'); box.innerHTML = '';
+  if(!all.length){ box.append(h('div', {class: 'empty'}, 'Здесь появятся результаты после первого теста.')); return; }
+  const tb = h('table', {class: 't'});
+  tb.append(h('tr', null, ...['Дата', 'Ученик', 'Тест', 'Модуль', 'Результат', 'Band', 'Ошибки'].map(x => h('th', null, x))));
+  all.slice(0, 100).forEach(r => tb.append(h('tr', null,
+    h('td', null, fmtDate(r.date)), h('td', null, r.name), h('td', null, r.title),
+    h('td', null, h('span', {class: 'pill ' + MOD_PILL[r.module]}, MOD_NAME[r.module])),
+    h('td', null, r.module === 'writing' ? (r.words || '') : (r.total ? r.score + ' / ' + r.total : '—')),
+    h('td', null, h('b', null, fmtBand(r.band))),
+    h('td', {class: 'sub'}, r.wrong || ''))));
+  box.append(h('div', {style: 'overflow-x:auto'}, tb));
+  if(all.length > 100) box.append(h('p', {class: 'sub'}, 'Показаны последние 100. Полный список — в таблице Excel.'));
+}
+
+function historyCsv(){
+  const rows = [['Дата', 'Ученик', 'Тест', 'Модуль', 'Верно', 'Всего', 'Band', 'Ошибки / слова']];
+  Hist.all().forEach(r => rows.push([fmtDate(r.date), r.name, r.title, MOD_NAME[r.module], r.score ?? '', r.total ?? '',
+    r.band == null ? '' : String(r.band).replace('.', ','), r.module === 'writing' ? (r.words || '') : (r.wrong || '')]));
+  const csv = '﻿' + rows.map(r => r.map(c => '"' + String(c).replace(/"/g, '""') + '"').join(';')).join('\r\n');
+  download('ielts-results.csv', csv, 'text/csv;charset=utf-8');
+}
+
+function calcOverall(){
+  const v = ['#cL', '#cR', '#cW', '#cS'].map(s => parseFloat($(s).value));
+  $('#cOut').textContent = v.every(x => !isNaN(x)) ? fmtBand(roundBand(v.reduce((a, b) => a + b, 0) / 4)) : '—';
+}
+
+/* =====================================================================
+   РЕДАКТОР ТЕСТА
+   ===================================================================== */
+let ED = null;   // редактируемый тест
+
+async function openEditor(id){
+  if(id){
+    const t = await DB.get(id);
+    ED = Object.assign({}, t);
+    $('#edTitle').textContent = 'Изменить тест';
+  } else {
+    ED = {id: null, title: '', module: 'reading', readingType: 'academic', minutes: 60, parts: DEFAULTS.reading.parts,
+          partPages: '', tasksPdf: null, from: 1, to: null, answersPdf: null, aFrom: 1, aTo: null, keyText: '', audio: []};
+    $('#edTitle').textContent = 'Новый тест';
+  }
+  $('#edName').value = ED.title || '';
+  $('#edMin').value = ED.minutes;
+  $('#edParts').value = ED.parts || '';
+  $('#edPartPages').value = ED.partPages || '';
+  $('#edKey').value = ED.keyText || '';
+  $('#edFrom').value = ED.from || 1; $('#edTo').value = ED.to || '';
+  $('#edAFrom').value = ED.aFrom || 1; $('#edATo').value = ED.aTo || '';
+  ['#edTasksFile', '#edAnsFile', '#edAudioFile'].forEach(s => $(s).value = '');
+  $('#edExtractMsg').innerHTML = ''; $('#edSaveMsg').textContent = '';
+  edSyncModule(); edFileInfo(); edKeyPreview();
+  showScreen('editor');
+}
+
+function edSyncModule(){
+  $$('#edModule button').forEach(b => b.classList.toggle('on', b.dataset.v === ED.module));
+  $$('#edRtype button').forEach(b => b.classList.toggle('on', b.dataset.v === ED.readingType));
+  const w = ED.module === 'writing', l = ED.module === 'listening';
+  $('#edRtypeBox').classList.toggle('hidden', ED.module !== 'reading');
+  $('#edAudioBox').classList.toggle('hidden', !l);
+  $('#edPartsBox').classList.toggle('hidden', w);
+  $('#edPartPagesBox').querySelector('label').textContent = w
+    ? 'С какой страницы начинается Task 2 (необязательно). Тогда при переходе на Task 2 PDF сам перелистнётся.'
+    : 'С какой страницы начинается каждая часть (необязательно, через запятую). Тогда при переходе на Part 2 PDF сам перелистнётся.';
+  $('#edKeyBox').classList.toggle('hidden', w);
+  $('#edExtract').classList.toggle('hidden', w);
+  $('#edWritingNote').classList.toggle('hidden', !w);
+  $('#edKeyTitle').textContent = w ? '3. Образцы ответов (необязательно)' : '3. Ответы (ключ)';
+  $('#edTimeHint').textContent = l
+    ? 'Listening: если загружено аудио, в режиме «как на экзамене» запись играет один раз, затем 2 минуты на проверку — и тест сдаётся сам. Время ниже — только когда аудио нет.'
+    : w ? 'Writing: Task 1 и Task 2 вместе, на экзамене 60 минут.' : 'Reading: на экзамене 60 минут на три текста.';
+}
+
+function edFileInfo(){
+  $('#edTasksInfo').textContent = ED.tasksPdf ? ED.tasksPdf.name + (ED.tasksPages ? ' — страниц: ' + ED.tasksPages : '') : 'файл не выбран';
+  $('#edAnsInfo').textContent = ED.answersPdf ? ED.answersPdf.name + (ED.ansPages ? ' — страниц: ' + ED.ansPages : '') : 'файл не выбран';
+  const al = $('#edAudioList'); al.innerHTML = '';
+  (ED.audio || []).forEach((a, i) => al.append(h('div', null, (i + 1) + '. ' + a.name + ' ',
+    h('button', {class: 'btn small danger', onclick: () => { ED.audio.splice(i, 1); edFileInfo(); }}, '×'))));
+  if(ED.tasksPdf && !ED.tasksPages) openPdf(ED.tasksPdf.data).then(d => { ED.tasksPages = d.numPages; edFileInfo(); }).catch(() => {});
+  if(ED.answersPdf && !ED.ansPages) openPdf(ED.answersPdf.data).then(d => { ED.ansPages = d.numPages; edFileInfo(); }).catch(() => {});
+}
+
+function edKeyPreview(){
+  const box = $('#edKeyPrev'); box.innerHTML = '';
+  if(ED.module === 'writing') return;
+  const key = parseKey($('#edKey').value);
+  const sizes = partSizesOf({module: ED.module, parts: $('#edParts').value});
+  const total = sizes.reduce((a, b) => a + b, 0);
+  const maxQ = Math.max(0, ...Object.keys(key.byQ).map(Number));
+  const Q = buildQuestions(Math.max(total, maxQ), key, sizes);
+  const KIND = {tf: 'TRUE / FALSE / NG', yn: 'YES / NO / NG', letter: 'буквы', text: 'вписать'};
+  const tb = h('table', {class: 't'});
+  tb.append(h('tr', null, h('th', null, '№'), h('th', null, 'Ответ'), h('th', null, 'Ученик видит')));
+  Q.forEach(q => {
+    const k = q.key;
+    tb.append(h('tr', null, h('td', null, q.n),
+      h('td', null, k ? (k.group ? k.raw + ' (любой порядок)' : k.raw) : h('span', {class: 'miss'}, 'нет ответа')),
+      h('td', null, h('span', {class: 'kind'}, KIND[q.kind] + (q.kind === 'letter' ? ' ' + q.options[0] + '–' + q.options[q.options.length - 1] : '')))));
+  });
+  box.append(tb);
+  const msgs = [];
+  const missing = Q.filter(q => !q.key).map(q => q.n);
+  if(missing.length && Object.keys(key.byQ).length) msgs.push('Нет ответа на вопросы: ' + missing.join(', '));
+  if(maxQ > total && total) msgs.push('В ключе есть вопрос ' + maxQ + ', а в частях всего ' + total + ' вопросов — поправьте «Вопросов в частях».');
+  if(key.dup.length) msgs.push('Вопрос записан дважды: ' + [...new Set(key.dup)].join(', ') + ' (берётся последняя строка).');
+  if(key.bad.length) msgs.push('Не понял строки: ' + key.bad.map(esc).join(' | '));
+  if(msgs.length) box.prepend(h('div', {class: 'note', style: 'margin:6px', html: msgs.map(esc).join('<br>')}));
+}
+
+async function edExtract(){
+  if(!ED.answersPdf) return toast('Сначала выберите PDF с ответами');
+  const msg = $('#edExtractMsg');
+  msg.innerHTML = '<div class="sub">Ищу ответы…</div>';
+  try{
+    const doc = await openPdf(ED.answersPdf.data);
+    const from = Math.max(1, +$('#edAFrom').value || 1);
+    const to = Math.min(doc.numPages, +$('#edATo').value || doc.numPages);
+    const chunks = await pdfChunks(doc, from, to);
+    if(!chunks.length){
+      msg.innerHTML = '<div class="errmsg">В PDF нет текста — похоже, это скан (картинка). Впишите ключ вручную в поле ниже: по одному вопросу в строке, например «1 TRUE».</div>';
+      return;
+    }
+    const r = chunksToKey(chunks);
+    if(!r.count){ msg.innerHTML = '<div class="errmsg">Не нашёл ответов на страницах ' + from + '–' + to + '. Проверьте страницы или впишите ключ вручную.</div>'; return; }
+    if($('#edKey').value.trim() && !(await confirmBox('Заменить ключ?', 'В поле уже есть ключ. Заменить его найденным в PDF?', 'Заменить'))){ msg.innerHTML = ''; return; }
+    $('#edKey').value = r.text;
+    let html = '<div class="okmsg">Найдено ответов: <b>' + r.count + '</b> (страницы ' + from + '–' + to + '). Обязательно проверьте ключ справа.</div>';
+    if(r.dup.length) html += '<div class="note" style="margin-top:6px">Некоторые номера встретились несколько раз (' + r.dup.slice(0, 12).join(', ') +
+      '). Скорее всего, на этих страницах ответы к нескольким тестам — сузьте диапазон страниц до одного теста и нажмите ещё раз.</div>';
+    msg.innerHTML = html;
+    edKeyPreview();
+  }catch(e){ msg.innerHTML = '<div class="errmsg">Ошибка чтения PDF: ' + esc(e.message) + '</div>'; }
+}
+
+function readFileBuf(f){ return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsArrayBuffer(f); }); }
+
+async function edSave(){
+  ED.title = $('#edName').value.trim();
+  ED.minutes = Math.max(1, +$('#edMin').value || DEFAULTS[ED.module].minutes);
+  ED.parts = $('#edParts').value.trim() || DEFAULTS[ED.module].parts;
+  ED.partPages = $('#edPartPages').value.trim();
+  ED.from = Math.max(1, +$('#edFrom').value || 1);
+  ED.to = +$('#edTo').value || null;
+  ED.aFrom = Math.max(1, +$('#edAFrom').value || 1);
+  ED.aTo = +$('#edATo').value || null;
+  ED.keyText = $('#edKey').value;
+  if(!ED.tasksPdf) return toast('Загрузите PDF с заданиями');
+  if(!ED.title) ED.title = ED.tasksPdf.name.replace(/\.pdf$/i, '') + ' — ' + MOD_NAME[ED.module];
+  if(ED.module !== 'writing'){
+    const key = parseKey(ED.keyText);
+    const total = partSizesOf(ED).reduce((a, b) => a + b, 0);
+    const maxQ = Math.max(0, ...Object.keys(key.byQ).map(Number));
+    if(maxQ > total) return toast('В ключе вопрос ' + maxQ + ', а в частях всего ' + total + '. Исправьте «Вопросов в частях».', 4000);
+    if(!Object.keys(key.byQ).length &&
+       !(await confirmBox('Без ключа?', 'Ключ ответов пуст. Тест можно пройти, но проверить ответы не получится. Сохранить так?', 'Сохранить')))
+      return;
+  }
+  if(!ED.id){ ED.id = uid(); ED.created = Date.now(); }
+  ED.updated = Date.now();
+  try{ await DB.put(ED); }catch(e){ return modal('Не удалось сохранить', '<p>' + esc(e.message) + '</p><p>Возможно, на диске мало места.</p>'); }
+  toast('Тест сохранён');
+  renderHome();
+}
+
+/* =====================================================================
+   ПЕРЕД НАЧАЛОМ
+   ===================================================================== */
+let INTRO = null;
+async function openIntro(id){
+  const t = await DB.get(id);
+  if(!t) return;
+  INTRO = {t, mode: LS.get('ielts_mode', 'strict')};
+  $('#inTitle').textContent = t.title;
+  const rt = runtimeFor(t);
+  const info = [MOD_NAME[t.module]];
+  if(t.module === 'writing') info.push('Task 1 и Task 2', t.minutes + ' минут');
+  else {
+    info.push(rt.Q.length + ' вопросов');
+    if(t.module === 'listening' && (t.audio || []).length) info.push('аудио: ' + t.audio.length + ' файл(ов), затем 2 минуты на проверку');
+    else info.push(t.minutes + ' минут');
+  }
+  $('#inInfo').textContent = info.join(' · ');
+  $('#inName').value = LS.get('ielts_lastname', '');
+  $('#inSound').classList.toggle('hidden', t.module !== 'listening');
+  syncIntroMode();
+  showScreen('intro');
+  setTimeout(() => $('#inName').focus(), 50);
+}
+function syncIntroMode(){
+  $$('#inMode button').forEach(b => b.classList.toggle('on', b.dataset.v === INTRO.mode));
+  const L = INTRO.t.module === 'listening';
+  $('#inModeHint').textContent = INTRO.mode === 'strict'
+    ? 'Время ограничено, когда оно кончается — тест сдаётся сам.' + (L ? ' Аудио играет один раз, без паузы и перемотки.' : '')
+    : 'Время только считается, тест не прерывается.' + (L ? ' Аудио можно ставить на паузу и перематывать.' : '');
+}
+function beep(){
+  try{
+    const ac = new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain();
+    o.frequency.value = 660; g.gain.value = 0.2; o.connect(g); g.connect(ac.destination);
+    o.start(); setTimeout(() => { o.stop(); ac.close(); }, 900);
+  }catch(e){}
+}
+
+/* =====================================================================
+   ЭКЗАМЕН
+   ===================================================================== */
+let T = null;    // всё, что нужно о тесте во время решения
+let X = null;    // попытка ученика (сохраняется, чтобы не потерять при закрытии вкладки)
+let XV = null;   // просмотрщик PDF слева
+let tick = null;
+
+function runtimeFor(test){
+  const isW = test.module === 'writing';
+  const key = isW ? null : parseKey(test.keyText);
+  const hasKey = !!key && Object.keys(key.byQ).length > 0;
+  const sizes = partSizesOf(test);
+  const total = sizes.reduce((a, b) => a + b, 0);
+  const maxQ = hasKey ? Math.max(...Object.keys(key.byQ).map(Number)) : 0;
+  const Q = isW ? [] : buildQuestions(Math.max(total, maxQ), hasKey ? key : null, sizes);
+  const nParts = isW ? 2 : Math.max(1, sizes.length);
+  const partPages = String(test.partPages || '').split(/[,;\s]+/).map(Number).filter(n => n > 0);
+  if(isW && partPages.length === 1) partPages.unshift(test.from || 1);
+  return {test, isW, key, hasKey, Q, nParts, partPages,
+    hasAudio: test.module === 'listening' && (test.audio || []).length > 0};
+}
+function saveAttempt(){ if(X && !X.finished && !X.review) LS.set('ielts_attempt', X); }
+
+async function startAttempt(){
+  const name = $('#inName').value.trim();
+  if(!name){ toast('Введите имя ученика'); $('#inName').focus(); return; }
+  LS.set('ielts_lastname', name); LS.set('ielts_mode', INTRO.mode);
+  const t = INTRO.t;
+  X = {id: uid(), testId: t.id, name, mode: INTRO.mode, startedAt: Date.now(), answers: {}, flags: {}, hl: {},
+       writing: {1: '', 2: ''}, cur: 1, task: 1, remaining: t.minutes * 60000, elapsed: 0,
+       audioIdx: 0, audioTime: 0, phase: 'main', checkLeft: 120000, alerts: {}, finished: false};
+  await enterExam(t);
+}
+async function resumeAttempt(a, t){ X = a; await enterExam(t); }
+
+async function enterExam(t){
+  T = runtimeFor(t);
+  if(!pdfReady()) return;
+  X.review = false;
+  showScreen('exam');
+  applyXSettings();
+  $('#xName').textContent = X.name;
+  $('#xMod').textContent = MOD_NAME[t.module] + (X.mode === 'practice' ? ' · practice' : '');
+  $('#xSubmit').classList.remove('hidden'); $('#xBackRes').classList.add('hidden');
+  $('#xTimerBox').classList.remove('hidden');
+  // слева PDF
+  const au0 = $('#xAudio'); au0.pause(); au0.controls = false; $('#exam').append(au0);   // плеер — обратно в скрытое место
+  const left = $('#xLeft'); left.innerHTML = '';
+  const pdfHost = h('div', {style: 'flex:1;min-height:0;display:flex;flex-direction:column'});
+  if(T.hasAudio && X.mode === 'practice') left.append(buildAudioBar());
+  left.append(pdfHost);
+  if(XV) XV.destroy();
+  XV = new PdfView(pdfHost, {highlights: X.hl});
+  try{
+    const doc = await openPdf(t.tasksPdf.data);
+    await XV.open(doc, t.from || 1, t.to || doc.numPages);
+  }catch(e){ pdfHost.textContent = 'PDF error: ' + e.message; }
+  renderRight(true); renderNav();
+  setupAudio();
+  clearInterval(tick); X.lastTick = Date.now();
+  tick = setInterval(onTick, 250); onTick();
+  saveAttempt();
+}
+
+/* ---------- аудио Listening ---------- */
+let audioURLs = [], audioDur = [];
+function setupAudio(){
+  const au = $('#xAudio');
+  au.pause(); audioURLs.forEach(u => URL.revokeObjectURL(u)); audioURLs = []; audioDur = [];
+  $('#xVolBox').classList.toggle('hidden', !T.hasAudio);
+  if(!T.hasAudio) { au.removeAttribute('src'); return; }
+  audioURLs = T.test.audio.map(a => URL.createObjectURL(a.blob));
+  au.volume = +$('#xVol').value;
+  // длительности всех дорожек — для таймера
+  audioURLs.forEach((u, i) => { const a = new Audio(); a.preload = 'metadata';
+    a.onloadedmetadata = () => { audioDur[i] = a.duration; }; a.src = u; });
+  if(X.phase === 'main') playTrack(X.audioIdx, X.audioTime);
+}
+function playTrack(i, time){
+  const au = $('#xAudio');
+  X.audioIdx = i;
+  au.src = audioURLs[i];
+  au.onloadedmetadata = () => { if(time) au.currentTime = Math.min(time, au.duration - 0.5); };
+  au.onended = () => {
+    if(X.audioIdx < audioURLs.length - 1){ X.audioTime = 0; playTrack(X.audioIdx + 1, 0); }
+    else if(X.mode === 'strict'){ X.phase = 'check'; xAlert('Recording finished. You have 2 minutes to check your answers.'); saveAttempt(); }
+  };
+  const tl = $('#xTrackLab'); if(tl) tl.textContent = 'Track ' + (i + 1) + ' / ' + audioURLs.length + ': ' + T.test.audio[i].name;
+  const sel = $('#xTrackSel'); if(sel) sel.value = i;
+  if(X.mode === 'strict' || time !== undefined) au.play().catch(() => {
+    modal('Sound', '<p>Click the button to start the recording.</p>', [{text: '▶ Play', cls: 'primary', value: 1}]).then(() => au.play());
+  });
+}
+function buildAudioBar(){
+  // в тренировке показываем обычный плеер (пауза, перемотка) — это тот же элемент <audio>
+  const au = $('#xAudio'); au.controls = true;
+  const sel = h('select', {id: 'xTrackSel', class: 'i', style: 'width:auto;padding:3px 6px;font-size:13px',
+    onchange: e => { X.audioTime = 0; playTrack(+e.target.value, 0); }},
+    T.test.audio.map((a, i) => h('option', {value: i}, 'Track ' + (i + 1) + ': ' + a.name)));
+  return h('div', {class: 'audiobar'}, h('div', {class: 'tr'}, sel), au);
+}
+
+/* ---------- таймер ---------- */
+function onTick(){
+  if(!X || X.finished || X.review) return;
+  const now = Date.now(), dt = Math.min(5000, now - (X.lastTick || now)); X.lastTick = now;
+  const el = $('#xTimer'), box = $('#xTimerBox');
+  const au = $('#xAudio');
+  if(au && T.hasAudio){ X.audioTime = au.currentTime || 0; }
+  let txt = '', low = false;
+  if(X.mode === 'practice'){
+    X.elapsed += dt;
+    txt = 'Time used: ' + fmtClock(X.elapsed / 1000);
+  } else if(T.hasAudio){
+    X.elapsed += dt;
+    if(X.phase === 'main'){
+      let rest = 0, known = true;
+      for(let i = X.audioIdx; i < audioURLs.length; i++){
+        if(audioDur[i] == null) { known = false; break; }
+        rest += i === X.audioIdx ? audioDur[i] - (au.currentTime || 0) : audioDur[i];
+      }
+      txt = known ? minutesLeft(rest + 120) : 'Listening…';
+    } else {
+      X.checkLeft -= dt; low = true;
+      txt = 'Check your answers: ' + fmtClock(X.checkLeft / 1000);
+      if(X.checkLeft <= 0) return autoSubmit();
+    }
+  } else {
+    X.remaining -= dt; X.elapsed += dt;
+    const sec = X.remaining / 1000;
+    txt = minutesLeft(sec); low = sec < 300;
+    [10, 5].forEach(m => { if(sec <= m * 60 && sec > m * 60 - 30 && !X.alerts[m]){ X.alerts[m] = 1; xAlert(m + ' minutes remaining'); } });
+    if(X.remaining <= 0) return autoSubmit();
+  }
+  el.textContent = txt; box.classList.toggle('low', low);
+  if(!X.saveAt || now - X.saveAt > 2000){ X.saveAt = now; saveAttempt(); }
+}
+function minutesLeft(sec){
+  if(sec < 60) return fmtClock(sec) + ' left';
+  const m = Math.ceil(sec / 60);
+  return m + (m === 1 ? ' minute left' : ' minutes left');
+}
+function xAlert(text){
+  const t = h('div', {class: 'toast', style: 'top:64px;bottom:auto;background:#ffd54f;color:#000;font-weight:700'}, text);
+  document.body.append(t); setTimeout(() => t.remove(), 6000);
+}
+
+/* ---------- правая панель ---------- */
+let shownPart = -1;
+const curPart = () => T.isW ? X.task - 1 : (T.Q[X.cur - 1] ? T.Q[X.cur - 1].part : 0);
+
+function renderRight(force){
+  const p = curPart();
+  if(!force && p === shownPart) return;
+  const prev = shownPart; shownPart = p;
+  const R = $('#xRight'); R.innerHTML = ''; R.scrollTop = 0;
+  if(T.isW) renderWritingTask(R);
+  else {
+    const qs = T.Q.filter(q => q.part === p);
+    if(qs.length){
+      R.append(h('div', {class: 'qhead'}, 'Part ' + (p + 1)),
+        h('div', {class: 'qsub'}, 'Questions ' + qs[0].n + '–' + qs[qs.length - 1].n +
+          (T.test.module === 'listening' ? '. Listen and answer the questions.' : '. Read the text and answer the questions.') +
+          (X.review ? '' : ' Write or choose your answers below.')));
+      qs.forEach(q => R.append(renderQ(q)));
+    }
+  }
+  if(XV && T.partPages[p] && prev !== p && prev !== -1) XV.scrollToPage(T.partPages[p]);
+}
+
+function renderQ(q){
+  const ans = X.answers[q.n] || '';
+  const rv = X.review ? X.res[q.n] : null;
+  const row = h('div', {class: 'q' + (X.cur === q.n ? ' cur' : '') + (rv === 'ok' ? ' r-ok' : rv === 'bad' || rv === 'empty' ? ' r-bad' : ''),
+    'data-n': q.n, onclick: () => { if(X.cur !== q.n) goQ(q.n, false); }});
+  const body = h('div', {class: 'qbody'});
+  if(q.options){
+    const opts = h('div', {class: 'opts'});
+    q.options.forEach(o => opts.append(h('button', {class: 'opt' + (ans === o ? ' on' : ''), disabled: X.review || null,
+      onclick: e => { e.stopPropagation(); setAnswer(q.n, X.answers[q.n] === o ? '' : o); row.querySelectorAll('.opt').forEach(b => b.classList.toggle('on', b.textContent === X.answers[q.n])); goQ(q.n, false); }}, o)));
+    body.append(opts);
+  } else {
+    body.append(h('input', {class: 'qin', value: ans, disabled: X.review || null, spellcheck: 'false', autocomplete: 'off',
+      autocorrect: 'off', autocapitalize: 'off', maxlength: 80,
+      oninput: e => setAnswer(q.n, e.target.value),
+      onfocus: () => { if(X.cur !== q.n) goQ(q.n, false); }}));
+  }
+  if(X.review){
+    const k = q.key;
+    const corr = !k ? 'no key' : k.group ? k.raw + ' (any order)' : k.raw;
+    body.append(h('div', {class: 'res'},
+      rv === 'ok' ? h('span', {class: 'c-ok'}, '✓ Correct') :
+      h('span', null, h('span', {class: 'c-bad'}, rv === 'empty' ? '✗ No answer' : rv === 'nokey' ? '' : '✗ Wrong'),
+        '  Correct answer: ', h('b', null, corr))));
+  }
+  row.append(h('div', {class: 'qnum'}, q.n), body);
+  if(!X.review) row.append(h('button', {class: 'flagbtn' + (X.flags[q.n] ? ' on' : ''), title: 'Review later',
+    onclick: e => { e.stopPropagation(); X.flags[q.n] = !X.flags[q.n]; e.currentTarget.classList.toggle('on', !!X.flags[q.n]); renderNav(); saveAttempt(); }}, '⚑'));
+  return row;
+}
+
+function setAnswer(n, v){
+  X.answers[n] = v;
+  renderNav(); saveAttempt();
+}
+
+function goQ(n, focus){
+  if(T.isW){ X.task = n; renderRight(); renderNav(); saveAttempt(); if(focus){ const ta = $('#xRight textarea'); if(ta) ta.focus(); } return; }
+  if(n < 1 || n > T.Q.length) return;
+  X.cur = n;
+  renderRight();
+  $$('#xRight .q').forEach(r => r.classList.toggle('cur', +r.dataset.n === n));
+  renderNav();
+  const row = $('#xRight .q[data-n="' + n + '"]');
+  if(row){
+    row.scrollIntoView({block: 'nearest'});
+    if(focus){ const inp = row.querySelector('input'); if(inp && !inp.disabled) inp.focus(); }
+  }
+  saveAttempt();
+}
+
+function renderNav(){
+  const box = $('#xParts'); box.innerHTML = '';
+  const cp = curPart();
+  if(T.isW){
+    [1, 2].forEach(k => {
+      const on = X.task === k;
+      box.append(h('button', {class: 'xpart' + (on ? ' on' : ''), onclick: () => goQ(k, true)},
+        h('span', {class: 'pt'}, 'Part ' + k), h('span', {class: 'cnt'}, wordCount(X.writing[k]) + ' words')));
+    });
+    return;
+  }
+  for(let p = 0; p < T.nParts; p++){
+    const qs = T.Q.filter(q => q.part === p);
+    if(!qs.length) continue;
+    const answered = qs.filter(q => (X.answers[q.n] || '').trim()).length;
+    if(p === cp){
+      const nums = h('div', {class: 'qnums'});
+      qs.forEach(q => {
+        let c = 'qn';
+        if((X.answers[q.n] || '').trim()) c += ' ans';
+        if(X.flags[q.n]) c += ' flag';
+        if(q.n === X.cur) c += ' cur';
+        if(X.review) c += X.res[q.n] === 'ok' ? ' r-ok' : X.res[q.n] === 'nokey' ? '' : ' r-bad';
+        nums.append(h('button', {class: c, onclick: () => goQ(q.n, true)}, q.n));
+      });
+      box.append(h('div', {class: 'xpart on'}, h('span', {class: 'pt'}, 'Part ' + (p + 1)), nums));
+    } else {
+      box.append(h('button', {class: 'xpart', onclick: () => goQ(qs[0].n, true)},
+        h('span', {class: 'pt'}, 'Part ' + (p + 1)), h('span', {class: 'cnt'}, answered + ' of ' + qs.length)));
+    }
+  }
+}
+
+/* ---------- Writing ---------- */
+function renderWritingTask(R){
+  const k = X.task, min = k === 1 ? 150 : 250;
+  const ta = h('textarea', {class: 'wta', spellcheck: 'false', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off',
+    readonly: X.review || null, placeholder: X.review ? '' : 'Type your answer here'});
+  ta.value = X.writing[k] || '';
+  const wc = h('div', {class: 'wcount'});
+  const upd = () => { wc.textContent = 'Word count: ' + wordCount(ta.value); };
+  ta.addEventListener('input', () => { X.writing[k] = ta.value; upd(); renderNav(); saveAttempt(); });
+  upd();
+  R.append(h('div', {class: 'wtask'},
+    h('div', {class: 'qhead'}, 'Part ' + k),
+    h('div', {class: 'qsub'}, (k === 1 ? 'You should spend about 20 minutes on this task. ' : 'You should spend about 40 minutes on this task. ') +
+      'Write at least ' + min + ' words.'),
+    ta, wc));
+}
+
+/* ---------- сдача ---------- */
+async function askSubmit(){
+  let txt;
+  if(T.isW){
+    const w1 = wordCount(X.writing[1]), w2 = wordCount(X.writing[2]);
+    txt = 'Task 1: ' + w1 + ' words. Task 2: ' + w2 + ' words.';
+  } else {
+    const un = T.Q.filter(q => !(X.answers[q.n] || '').trim()).length;
+    txt = un ? 'You have <b>' + un + '</b> unanswered question' + (un > 1 ? 's' : '') + '.' : 'All questions are answered.';
+  }
+  const ok = await modal('Submit test?', '<p>' + txt + '</p><p>Once you submit, you cannot change your answers.</p>',
+    [{text: 'Cancel', value: false}, {text: 'Submit', cls: 'primary', value: true}]);
+  if(ok) finishAttempt();
+}
+function autoSubmit(){
+  clearInterval(tick);
+  $('#xTimer').textContent = 'Time is up';
+  xAlert('Time is up. Your answers have been submitted.');
+  setTimeout(finishAttempt, 600);
+}
+function stopExam(){
+  clearInterval(tick);
+  const au = $('#xAudio'); if(au){ au.pause(); }
+  hidePop();
+}
+function finishAttempt(){
+  stopExam();
+  X.finished = true; X.finishedAt = Date.now();
+  LS.del('ielts_attempt');
+  const rec = {id: X.id, date: X.finishedAt, name: X.name, title: T.test.title, module: T.test.module};
+  if(T.isW){
+    rec.words = 'T1: ' + wordCount(X.writing[1]) + ', T2: ' + wordCount(X.writing[2]);
+    rec.band = null;
+  } else Object.assign(rec, scoreAttempt());
+  Hist.add(rec);
+  renderResults();
+}
+function scoreAttempt(){
+  X.res = checkAll(T.Q, X.answers);
+  if(!T.hasKey) return {score: null, total: T.Q.length, band: null, wrong: 'нет ключа'};
+  const score = T.Q.filter(q => X.res[q.n] === 'ok').length;
+  const table = T.test.module === 'listening' ? 'listening' : (T.test.readingType === 'general' ? 'general' : 'academic');
+  const band = toBand(table, score, T.Q.length);
+  const wrong = T.Q.filter(q => X.res[q.n] === 'bad' || X.res[q.n] === 'empty').map(q => q.n).join(', ');
+  return {score, total: T.Q.length, band, wrong};
+}
+
+/* ---------- маркер (выделение текста в PDF) ---------- */
+let popEl = null;
+function hidePop(){ if(popEl){ popEl.remove(); popEl = null; } }
+function showPop(x, y, items){
+  hidePop();
+  popEl = h('div', {class: 'hlpop', onmousedown: e => e.preventDefault()});
+  items.forEach(([label, fn]) => popEl.append(h('button', {onclick: () => { fn(); hidePop(); }}, label)));
+  document.body.append(popEl);
+  const w = popEl.offsetWidth;
+  popEl.style.left = Math.max(4, Math.min(window.innerWidth - w - 4, x - w / 2)) + 'px';
+  popEl.style.top = Math.max(4, y - 46) + 'px';
+}
+function onExamMouseUp(e){
+  if(!XV || $('#exam').classList.contains('hidden')) return;
+  if(popEl && popEl.contains(e.target)) return;
+  setTimeout(() => {
+    const rects = XV.selectionRects();
+    if(rects){
+      showPop(e.clientX, e.clientY, [
+        ['Highlight', () => { XV.addHl(rects); window.getSelection().removeAllRanges(); saveAttempt(); }],
+        ['Clear', () => { XV.clearHl(rects); window.getSelection().removeAllRanges(); saveAttempt(); }]]);
+      return;
+    }
+    const hit = XV.scroller.contains(e.target) ? XV.hlAt(e.clientX, e.clientY) : null;
+    if(hit) showPop(e.clientX, e.clientY, [['Clear highlight', () => { XV.clearHl(hit); saveAttempt(); }]]);
+    else hidePop();
+  }, 0);
+}
+
+/* ---------- настройки вида (как на экзамене) ---------- */
+function applyXSettings(){
+  const s = LS.get('ielts_xset', {fs: 16, c: ''});
+  const ex = $('#exam');
+  ex.classList.remove('c-wb', 'c-yb'); if(s.c) ex.classList.add(s.c);
+  ex.style.setProperty('--x-fs', s.fs + 'px');
+}
+function openXSettings(){
+  const s = LS.get('ielts_xset', {fs: 16, c: ''});
+  const box = h('div');
+  const mk = (title, opts, key) => {
+    const seg = h('div', {class: 'seg', style: 'margin-bottom:14px'});
+    opts.forEach(([v, lab]) => seg.append(h('button', {class: s[key] === v ? 'on' : '', onclick: e => {
+      s[key] = v; LS.set('ielts_xset', s); applyXSettings();
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on');
+    }}, lab)));
+    box.append(h('div', {style: 'margin:4px 0 6px;font-weight:700'}, title), seg);
+  };
+  mk('Text size', [[16, 'Standard'], [19, 'Large'], [22, 'Extra large']], 'fs');
+  mk('Contrast', [['', 'Black on white'], ['c-wb', 'White on black'], ['c-yb', 'Yellow on black']], 'c');
+  box.append(h('button', {class: 'btn small', onclick: () => {
+    for(const k in X.hl) delete X.hl[k]; XV && XV.redrawAll(); saveAttempt(); toast('Highlights cleared');
+  }}, 'Clear all highlights'));
+  modal('Settings', box, [{text: 'Close', cls: 'primary', value: 1}]);
+}
+
+/* ---------- перетаскивание границы между панелями ---------- */
+function initDivider(){
+  const d = $('#xDiv');
+  d.addEventListener('pointerdown', e => {
+    e.preventDefault(); d.setPointerCapture(e.pointerId);
+    const main = $('.xmain').getBoundingClientRect();
+    const mv = ev => {
+      const pct = Math.min(80, Math.max(20, (ev.clientX - main.left) / main.width * 100));
+      $('#xLeft').style.width = pct + '%';
+    };
+    const up = () => { d.removeEventListener('pointermove', mv); d.removeEventListener('pointerup', up); };
+    d.addEventListener('pointermove', mv); d.addEventListener('pointerup', up);
+  });
+}
+
+/* =====================================================================
+   РЕЗУЛЬТАТЫ
+   ===================================================================== */
+function renderResults(){
+  showScreen('results');
+  const W = $('#resWrap'); W.innerHTML = '';
+  const t = T.test;
+  const used = X.mode === 'practice' || T.hasAudio ? X.elapsed : (t.minutes * 60000 - Math.max(0, X.remaining));
+  W.append(h('div', {class: 'topline noprint'},
+    h('button', {class: 'btn', onclick: () => renderHome()}, '← На главную'),
+    h('button', {class: 'btn', onclick: () => window.print()}, 'Печать'),
+    h('button', {class: 'btn', onclick: () => openIntro(t.id)}, 'Пройти ещё раз')));
+  W.append(h('div', {class: 'card'},
+    h('div', {class: 'row'}, h('span', {class: 'logo'}, 'IELTS'), h('h1', null, t.title)),
+    h('p', {class: 'sub', style: 'margin:8px 0 0'}, 'Ученик: ', h('b', null, X.name), ' · ' + MOD_NAME[t.module] + ' · ' +
+      fmtDate(X.finishedAt) + ' · затрачено ' + fmtClock(used / 1000) + (X.mode === 'practice' ? ' · тренировка' : ''))));
+  if(T.isW) return renderWritingResults(W);
+
+  const res = X.res;
+  if(!T.hasKey){
+    const ta = h('textarea', {class: 'i', rows: 10, placeholder: '1 TRUE\n2 FALSE\n3 library'});
+    const save = h('input', {type: 'checkbox', checked: true});
+    W.append(h('div', {class: 'card'}, h('h2', null, 'Ключа ответов нет'),
+      h('p', null, 'Ответы ученика сохранены. Вставьте ключ (по одному вопросу в строке) — и программа проверит.'), ta,
+      h('label', {class: 'row', style: 'margin-top:8px'}, save, ' сохранить этот ключ в тест'),
+      h('div', {style: 'margin-top:10px'}, h('button', {class: 'btn primary', onclick: async () => {
+        if(!Object.keys(parseKey(ta.value).byQ).length) return toast('Ключ пуст или не распознан');
+        t.keyText = ta.value;
+        if(save.checked){ const st = await DB.get(t.id); if(st){ st.keyText = ta.value; await DB.put(st); } }
+        T = runtimeFor(t);
+        Hist.update(X.id, scoreAttempt());
+        renderResults();
+      }}, 'Проверить'))));
+    W.append(answersTable(res));
+    return;
+  }
+  const score = T.Q.filter(q => res[q.n] === 'ok').length;
+  const table = t.module === 'listening' ? 'listening' : (t.readingType === 'general' ? 'general' : 'academic');
+  const band = toBand(table, score, T.Q.length);
+  const stats = h('div');
+  stats.append(
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Band'), h('div', {class: 'band-big'}, fmtBand(band))),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Верно'), h('b', null, score + ' / ' + T.Q.length)),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Ошибок'), h('b', {class: 'c-bad'}, T.Q.filter(q => res[q.n] === 'bad').length)),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Без ответа'), h('b', null, T.Q.filter(q => res[q.n] === 'empty').length)));
+  // по частям и по типам заданий
+  const tb = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
+  tb.append(h('tr', null, h('th', null, 'Часть'), h('th', null, 'Верно')));
+  for(let p = 0; p < T.nParts; p++){
+    const qs = T.Q.filter(q => q.part === p); if(!qs.length) continue;
+    tb.append(h('tr', null, h('td', null, 'Part ' + (p + 1) + ' (' + qs[0].n + '–' + qs[qs.length - 1].n + ')'),
+      h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
+  }
+  const KN = {tf: 'TRUE / FALSE / NOT GIVEN', yn: 'YES / NO / NOT GIVEN', letter: 'Выбор буквы (A, B, C…)', text: 'Вписать слово / число'};
+  const tb2 = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
+  tb2.append(h('tr', null, h('th', null, 'Тип задания'), h('th', null, 'Верно')));
+  Object.keys(KN).forEach(k => {
+    const qs = T.Q.filter(q => q.kind === k && q.key); if(!qs.length) return;
+    tb2.append(h('tr', null, h('td', null, KN[k]), h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
+  });
+  W.append(h('div', {class: 'card'}, stats,
+    h('p', {class: 'sub'}, 'Band — по официальной таблице пересчёта ' +
+      (table === 'listening' ? 'Listening' : table === 'general' ? 'General Training Reading' : 'Academic Reading') +
+      (T.Q.length !== 40 ? ' (вопросов не 40, поэтому пересчитано пропорционально)' : '') + '. Таблицы немного меняются от теста к тесту — это ориентир.'),
+    h('div', {class: 'grid2'}, tb, tb2),
+    h('div', {class: 'row noprint', style: 'margin-top:16px'},
+      h('button', {class: 'btn primary', onclick: openReview}, 'Посмотреть ответы в тесте'),
+      t.answersPdf ? h('button', {class: 'btn', onclick: () => previewPdf(t.answersPdf.data, 'Ответы: ' + t.answersPdf.name)}, 'Открыть PDF с ответами') : null)));
+  W.append(answersTable(res));
+}
+
+function answersTable(res){
+  const tb = h('table', {class: 't'});
+  tb.append(h('tr', null, h('th', null, '№'), h('th', null, 'Ответ ученика'), h('th', null, 'Правильный ответ'), h('th', null, '')));
+  T.Q.forEach(q => {
+    const r = res[q.n], a = X.answers[q.n] || '';
+    const k = q.key;
+    tb.append(h('tr', {class: r === 'ok' ? 'ok' : (r === 'bad' || r === 'empty') ? 'bad' : ''},
+      h('td', null, h('b', null, q.n)),
+      h('td', null, a ? a : h('span', {class: 'c-empty'}, '—')),
+      h('td', null, k ? (k.group ? k.raw + ' (в любом порядке)' : k.raw) : h('span', {class: 'c-empty'}, 'нет ключа')),
+      h('td', null, r === 'ok' ? h('span', {class: 'c-ok'}, '✓') : r === 'bad' ? h('span', {class: 'c-bad'}, '✗') :
+        r === 'empty' ? h('span', {class: 'c-bad'}, 'пусто') : '')));
+  });
+  return h('div', {class: 'card'}, h('h2', null, 'Все ответы'), h('div', {style: 'overflow-x:auto'}, tb));
+}
+
+/* разбор: тот же экран экзамена, но с правильными ответами */
+function openReview(){
+  X.review = true;
+  showScreen('exam'); applyXSettings();
+  $('#xSubmit').classList.add('hidden'); $('#xBackRes').classList.remove('hidden');
+  $('#xVolBox').classList.add('hidden');
+  $('#xTimer').innerHTML = '<span class="xreviewtag">REVIEW</span>';
+  $('#xTimerBox').classList.remove('low');
+  shownPart = -1; renderRight(true); renderNav();
+  setTimeout(() => XV && XV.layout(), 50);
+}
+
+/* Writing: тексты, количество слов, оценка по критериям */
+function renderWritingResults(W){
+  const t = T.test;
+  [1, 2].forEach(k => {
+    const txt = X.writing[k] || '', wc = wordCount(txt), min = k === 1 ? 150 : 250;
+    W.append(h('div', {class: 'card'},
+      h('div', {class: 'row', style: 'justify-content:space-between'}, h('h2', {style: 'margin:0'}, 'Task ' + k),
+        h('span', {class: wc < min ? 'c-bad' : 'c-ok'}, wc + ' слов' + (wc < min ? ' — меньше ' + min + ', на экзамене за это снижают балл' : ''))),
+      h('div', {style: 'white-space:pre-wrap;line-height:1.6;margin-top:10px;font-family:Arial'}, txt || h('span', {class: 'c-empty'}, '(пусто)'))));
+  });
+  const crit = ['Task Achievement / Response', 'Coherence & Cohesion', 'Lexical Resource', 'Grammar Range & Accuracy'];
+  const sc = {1: [null, null, null, null], 2: [null, null, null, null]};
+  const out = h('div', {style: 'margin-top:12px;font-size:18px'});
+  const recalc = () => {
+    const avg = k => sc[k].every(v => v != null) ? sc[k].reduce((a, b) => a + b, 0) / 4 : null;
+    const a1 = avg(1), a2 = avg(2);
+    if(a1 == null || a2 == null){ out.innerHTML = 'Выставьте все 8 оценок — появится итоговый band.'; return; }
+    const band = roundBand((a1 + 2 * a2) / 3);
+    out.innerHTML = 'Task 1: <b>' + a1.toFixed(2) + '</b> · Task 2: <b>' + a2.toFixed(2) + '</b> · Writing band: <b style="font-size:26px;color:var(--brand)">' + fmtBand(band) + '</b>';
+    Hist.update(X.id, {band});
+  };
+  const tb = h('table', {class: 't'});
+  tb.append(h('tr', null, h('th', null, 'Критерий'), h('th', null, 'Task 1'), h('th', null, 'Task 2')));
+  crit.forEach((c, i) => tb.append(h('tr', null, h('td', null, c), ...[1, 2].map(k => h('td', null,
+    h('select', {class: 'i', style: 'width:80px', onchange: e => { sc[k][i] = e.target.value === '' ? null : +e.target.value; recalc(); }},
+      h('option', {value: ''}, '—'), ...[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(v => h('option', {value: v}, v))))))));
+  W.append(h('div', {class: 'card'}, h('h2', null, 'Оценка учителя (или самооценка)'),
+    h('p', {class: 'sub'}, 'Writing не проверяется автоматически. Поставьте оценки по четырём критериям IELTS. Task 2 весит вдвое больше Task 1.'),
+    tb, out,
+    h('div', {class: 'row noprint', style: 'margin-top:14px'},
+      t.answersPdf ? h('button', {class: 'btn primary', onclick: () => previewPdf(t.answersPdf.data, 'Образцы: ' + t.answersPdf.name)}, 'Открыть образцы ответов (PDF)') : null,
+      h('button', {class: 'btn', onclick: () => download((X.name + ' - ' + t.title).replace(/[\\/:*?"<>|]+/g, '_') + '.txt',
+        'IELTS Writing — ' + t.title + '\r\n' + X.name + ' — ' + fmtDate(X.finishedAt) + '\r\n\r\n' +
+        'TASK 1 (' + wordCount(X.writing[1]) + ' words)\r\n\r\n' + (X.writing[1] || '') + '\r\n\r\n' +
+        'TASK 2 (' + wordCount(X.writing[2]) + ' words)\r\n\r\n' + (X.writing[2] || ''))}, 'Скачать тексты (.txt)'))));
+  recalc();
+}
+
+/* =====================================================================
+   ПЕРЕНОС ТЕСТА НА ДРУГОЙ КОМПЬЮТЕР (один файл .json)
+   ===================================================================== */
+const toDataURL = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
+async function fromDataURL(u){
+  try{ return await (await fetch(u)).arrayBuffer(); }
+  catch(e){
+    const b64 = u.slice(u.indexOf(',') + 1), bin = atob(b64), arr = new Uint8Array(bin.length);
+    for(let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i);
+    return arr.buffer;
+  }
+}
+async function exportTest(id){
+  const t = await DB.get(id);
+  toast('Готовлю файл…');
+  const out = Object.assign({}, t);
+  out.tasksPdf = t.tasksPdf ? {name: t.tasksPdf.name, data: await toDataURL(new Blob([t.tasksPdf.data], {type: 'application/pdf'}))} : null;
+  out.answersPdf = t.answersPdf ? {name: t.answersPdf.name, data: await toDataURL(new Blob([t.answersPdf.data], {type: 'application/pdf'}))} : null;
+  out.audio = [];
+  for(const a of (t.audio || [])) out.audio.push({name: a.name, data: await toDataURL(a.blob)});
+  const json = JSON.stringify({format: 'ielts-cd-trainer', version: 1, test: out});
+  download((t.title || 'ielts-test').replace(/[\\/:*?"<>|]+/g, '_') + '.ielts.json', json, 'application/json');
+}
+async function importTest(file){
+  try{
+    const j = JSON.parse(await file.text());
+    if(j.format !== 'ielts-cd-trainer' || !j.test) throw new Error('это не файл теста из этого тренажёра');
+    const t = j.test;
+    if(t.tasksPdf) t.tasksPdf = {name: t.tasksPdf.name, data: await fromDataURL(t.tasksPdf.data)};
+    if(t.answersPdf) t.answersPdf = {name: t.answersPdf.name, data: await fromDataURL(t.answersPdf.data)};
+    const au = [];
+    for(const a of (t.audio || [])){ const buf = await fromDataURL(a.data); au.push({name: a.name, blob: new Blob([buf], {type: (a.data.match(/^data:([^;,]+)/) || [])[1] || 'audio/mpeg'})}); }
+    t.audio = au;
+    if(await DB.get(t.id)){
+      if(!(await confirmBox('Такой тест уже есть', 'Тест «' + esc(t.title) + '» уже есть в библиотеке. Заменить его версией из файла?', 'Заменить', 'Добавить копией')))
+        { t.id = uid(); t.title += ' (копия)'; }
+    }
+    await DB.put(t);
+    toast('Тест «' + t.title + '» добавлен');
+    renderHome();
+  }catch(e){ modal('Не удалось загрузить', '<p>' + esc(e.message) + '</p>'); }
+}
+
+/* =====================================================================
+   ЗАПУСК: привязка кнопок
+   ===================================================================== */
+function bindUI(){
+  $('#btnNew').onclick = () => openEditor(null);
+  $('#btnImport').onclick = () => $('#importFile').click();
+  $('#importFile').onchange = e => { const f = e.target.files[0]; e.target.value = ''; if(f) importTest(f); };
+  $('#btnCsv').onclick = historyCsv;
+  $('#btnClearHist').onclick = async () => { if(await confirmBox('Очистить историю?', 'Все результаты на этом компьютере будут удалены.', 'Очистить')){ Hist.clear(); renderHistory(); } };
+  ['#cL', '#cR', '#cW', '#cS'].forEach(s => $(s).oninput = calcOverall);
+
+  // редактор
+  $('#edBack').onclick = $('#edCancel').onclick = () => renderHome();
+  $$('#edModule button').forEach(b => b.onclick = () => {
+    const was = ED.module; ED.module = b.dataset.v;
+    if(was !== ED.module){
+      if(+$('#edMin').value === DEFAULTS[was].minutes || !$('#edMin').value) $('#edMin').value = DEFAULTS[ED.module].minutes;
+      if($('#edParts').value === DEFAULTS[was].parts || !$('#edParts').value) $('#edParts').value = DEFAULTS[ED.module].parts;
+    }
+    edSyncModule(); edKeyPreview();
+  });
+  $$('#edRtype button').forEach(b => b.onclick = () => { ED.readingType = b.dataset.v; edSyncModule(); });
+  $('#edTasksFile').onchange = async e => {
+    const f = e.target.files[0]; if(!f) return;
+    ED.tasksPdf = {name: f.name, data: await readFileBuf(f)}; ED.tasksPages = null;
+    try{ const d = await openPdf(ED.tasksPdf.data); ED.tasksPages = d.numPages; if(!$('#edTo').value) $('#edTo').value = d.numPages; }catch(err){ toast('Не удалось открыть PDF'); }
+    if(!$('#edName').value) $('#edName').value = f.name.replace(/\.pdf$/i, '') + ' — ' + MOD_NAME[ED.module];
+    edFileInfo();
+  };
+  $('#edAnsFile').onchange = async e => {
+    const f = e.target.files[0]; if(!f) return;
+    ED.answersPdf = {name: f.name, data: await readFileBuf(f)}; ED.ansPages = null;
+    try{ const d = await openPdf(ED.answersPdf.data); ED.ansPages = d.numPages; if(!$('#edATo').value) $('#edATo').value = d.numPages; }catch(err){ toast('Не удалось открыть PDF'); }
+    edFileInfo();
+  };
+  $('#edAudioFile').onchange = e => {
+    const fs = Array.from(e.target.files).sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}));
+    ED.audio = (ED.audio || []).concat(fs.map(f => ({name: f.name, blob: f})));
+    e.target.value = ''; edFileInfo();
+  };
+  $('#edPreviewTasks').onclick = () => previewPdf(ED.tasksPdf && ED.tasksPdf.data, 'Задания: ' + (ED.tasksPdf ? ED.tasksPdf.name : ''));
+  $('#edPreviewAns').onclick = () => previewPdf(ED.answersPdf && ED.answersPdf.data, 'Ответы: ' + (ED.answersPdf ? ED.answersPdf.name : ''));
+  $('#edExtract').onclick = edExtract;
+  $('#edKey').oninput = $('#edParts').oninput = () => { clearTimeout(ED._t); ED._t = setTimeout(edKeyPreview, 250); };
+  $('#edSave').onclick = edSave;
+
+  // перед началом
+  $$('#inMode button').forEach(b => b.onclick = () => { INTRO.mode = b.dataset.v; syncIntroMode(); });
+  $('#inBeep').onclick = beep;
+  $('#inBack').onclick = () => renderHome();
+  $('#inStart').onclick = startAttempt;
+  $('#inName').onkeydown = e => { if(e.key === 'Enter') startAttempt(); };
+
+  // экзамен
+  $('#xHide').onclick = () => { const s = $('#xTimer'); s.style.visibility = s.style.visibility === 'hidden' ? '' : 'hidden';
+    $('#xHide').textContent = s.style.visibility === 'hidden' ? 'Show' : 'Hide'; };
+  $('#xVol').oninput = e => { const au = $('#xAudio'); if(au) au.volume = +e.target.value; };
+  $('#xSettings').onclick = openXSettings;
+  $('#xSubmit').onclick = askSubmit;
+  $('#xBackRes').onclick = () => { X.review = false; renderResults(); };
+  $('#xPrev').onclick = () => T.isW ? goQ(Math.max(1, X.task - 1), true) : goQ(Math.max(1, X.cur - 1), true);
+  $('#xNext').onclick = () => T.isW ? goQ(Math.min(2, X.task + 1), true) : goQ(Math.min(T.Q.length, X.cur + 1), true);
+  document.addEventListener('mouseup', onExamMouseUp);
+  document.addEventListener('mousedown', e => { if(popEl && !popEl.contains(e.target)) hidePop(); });
+  initDivider();
+  window.addEventListener('beforeunload', e => {
+    if(X && !X.finished && !X.review && !$('#exam').classList.contains('hidden')){ saveAttempt(); e.preventDefault(); e.returnValue = ''; }
+  });
+}
+
+(async function init(){
+  bindUI();
+  await DB.open();
+  renderHome();
+})();
+</script>
+</body>
+</html>
