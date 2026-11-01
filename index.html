@@ -749,6 +749,10 @@ const TR = {
   kText: ['So‘z / son yozish', 'Typing a word / number', 'Вписать слово / число'],
   bandNote: ['Band — rasmiy {0} jadvali bo‘yicha.', 'The band uses the official {0} conversion table.', 'Band — по официальной таблице пересчёта {0}.'],
   not40: [' Savollar 40 ta emas, shuning uchun mutanosib qayta hisoblandi.', ' There are not 40 questions, so it was scaled proportionally.', ' Вопросов не 40, поэтому пересчитано пропорционально.'],
+  shortNoBand: ['Band faqat to‘liq test (40 savol) uchun hisoblanadi. Bu qisqa test — faqat to‘g‘ri javoblar soni ko‘rsatiladi.',
+                'The band is only calculated for a full test (40 questions). This is a short test, so only the score is shown.',
+                'Band считается только для полного теста (40 вопросов). Это короткий тест — показан только счёт.'],
+  noKeyQs: [' Kalitsiz savollar ({0}) hisobga olinmaydi.', ' Questions without a key ({0}) are not counted.', ' Вопросы без ключа ({0}) не считаются.'],
   bandNote2: [' Jadvallar testdan testga biroz farq qiladi — bu taxminiy natija.', ' The tables vary slightly from test to test — treat it as a guide.', ' Таблицы немного меняются от теста к тесту — это ориентир.'],
   reviewBtn: ['Javoblarni testda ko‘rish', 'See answers in the test', 'Посмотреть ответы в тесте'],
   openAnsPdf: ['Javoblar PDF faylini ochish', 'Open the answers PDF', 'Открыть PDF с ответами'],
@@ -1827,11 +1831,14 @@ function scoreAttempt(){
   X.res = checkAll(T.Q, X.answers);
   if(!T.hasKey) return {score: null, total: T.Q.length, band: null, wrong: ''};
   const score = T.Q.filter(q => X.res[q.n] === 'ok').length;
+  const total = T.Q.filter(q => q.key).length;   // вопросы без ключа не считаем
   const table = T.test.module === 'listening' ? 'listening' : (T.test.readingType === 'general' ? 'general' : 'academic');
-  const band = toBand(table, score, T.Q.length);
+  const band = isShortTest() ? null : toBand(table, score, total);
   const wrong = T.Q.filter(q => X.res[q.n] === 'bad' || X.res[q.n] === 'empty').map(q => q.n).join(', ');
-  return {score, total: T.Q.length, band, wrong};
+  return {score, total, band, wrong};
 }
+/* короткий тест (например, одна секция из 10 вопросов): band по нему не имеет смысла */
+function isShortTest(){ return T.Q.length < 30; }
 
 /* ---------- маркер (выделение текста в PDF) ---------- */
 let popEl = null;
@@ -1941,20 +1948,23 @@ function renderResults(){
   }
   const score = T.Q.filter(q => res[q.n] === 'ok').length;
   const table = t.module === 'listening' ? 'listening' : (t.readingType === 'general' ? 'general' : 'academic');
-  const band = toBand(table, score, T.Q.length);
+  const short = isShortTest();
+  const total = T.Q.filter(q => q.key).length;
+  const nokey = T.Q.length - total;
+  const band = short ? null : toBand(table, score, total);
   const stats = h('div');
-  stats.append(
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Band'), h('div', {class: 'band-big'}, fmtBand(band))),
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('correct')), h('b', null, score + ' / ' + T.Q.length)),
+  stats.append(...[   // пустые элементы отбрасываем, иначе на экране появится «null»
+    short ? null : h('div', {class: 'stat'}, h('span', {class: 'sub'}, 'Band'), h('div', {class: 'band-big'}, fmtBand(band))),
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('correct')), h('b', {class: short ? 'band-big' : null}, score + ' / ' + total)),
     h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('errors')), h('b', {class: 'c-bad'}, T.Q.filter(q => res[q.n] === 'bad').length)),
-    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('blank')), h('b', null, T.Q.filter(q => res[q.n] === 'empty').length)));
+    h('div', {class: 'stat'}, h('span', {class: 'sub'}, tr('blank')), h('b', null, T.Q.filter(q => res[q.n] === 'empty').length))].filter(Boolean));
   // по частям и по типам заданий
   const tb = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
   tb.append(h('tr', null, h('th', null, tr('thPart')), h('th', null, tr('correct'))));
   for(let p = 0; p < T.nParts; p++){
     const qs = T.Q.filter(q => q.part === p); if(!qs.length) continue;
     tb.append(h('tr', null, h('td', null, 'Part ' + (p + 1) + ' (' + qs[0].n + '–' + qs[qs.length - 1].n + ')'),
-      h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
+      h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.filter(q => q.key).length)));
   }
   const KN = {tf: 'TRUE / FALSE / NOT GIVEN', yn: 'YES / NO / NOT GIVEN', letter: tr('kLetter'), text: tr('kText')};
   const tb2 = h('table', {class: 't', style: 'margin-top:14px;max-width:560px'});
@@ -1964,8 +1974,9 @@ function renderResults(){
     tb2.append(h('tr', null, h('td', null, KN[k]), h('td', null, qs.filter(q => res[q.n] === 'ok').length + ' / ' + qs.length)));
   });
   W.append(h('div', {class: 'card'}, stats,
-    h('p', {class: 'sub'}, tr('bandNote', table === 'listening' ? 'Listening' : table === 'general' ? 'General Training Reading' : 'Academic Reading') +
-      (T.Q.length !== 40 ? tr('not40') : '') + tr('bandNote2')),
+    h('p', {class: 'sub'}, (short ? tr('shortNoBand') :
+      tr('bandNote', table === 'listening' ? 'Listening' : table === 'general' ? 'General Training Reading' : 'Academic Reading') +
+      (total !== 40 ? tr('not40') : '') + tr('bandNote2')) + (nokey ? tr('noKeyQs', nokey) : '')),
     h('div', {class: 'grid2'}, tb, tb2),
     h('div', {class: 'row noprint', style: 'margin-top:16px'},
       h('button', {class: 'btn primary', onclick: openReview}, tr('reviewBtn')),
