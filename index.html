@@ -173,9 +173,26 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 .hlpop{position:fixed;z-index:120;background:#222;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .hlpop button{background:transparent;border:0;color:#fff;padding:7px 12px;font-size:14px}
 .hlpop button:hover{background:#444}
-.audiobar{flex:none;padding:6px 10px;border-bottom:1px solid var(--x-line);background:var(--x-panel)}
-.audiobar audio{width:100%;height:34px}
-.audiobar .tr{font-size:12px;opacity:.75;margin-bottom:3px}
+.audiobar{flex:none;padding:8px 12px 6px;border-bottom:1px solid var(--x-line);background:var(--x-panel);color:var(--x-ink)}
+.audiobar .tr{font-size:12px;margin-bottom:6px}
+.audiobar .tr select{width:auto;padding:3px 6px;font-size:13px;border:1px solid var(--x-line);border-radius:4px;background:var(--x-bg);color:var(--x-ink)}
+/* плеер с точной перемоткой (тренировка и разбор) */
+.ap-row{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ap-btn{min-width:48px;height:34px;border:1px solid var(--x-line);background:var(--x-bg);color:var(--x-ink);border-radius:4px;
+  font-size:13px;padding:0 8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.ap-btn:hover{border-color:var(--x-accent)}
+.ap-play{min-width:56px;font-size:16px;background:var(--x-accent);border-color:var(--x-accent);color:#fff}
+.ap-time{font-variant-numeric:tabular-nums;font-size:14px;margin-left:6px;min-width:92px}
+.ap-speed{display:inline-flex;border:1px solid var(--x-line);border-radius:4px;overflow:hidden;margin-left:auto}
+.ap-speed button{border:0;border-right:1px solid var(--x-line);background:var(--x-bg);color:var(--x-ink);padding:0 8px;height:30px;font-size:12px}
+.ap-speed button:last-child{border-right:0}
+.ap-speed button.on{background:var(--x-ink);color:var(--x-bg)}
+.ap-line{position:relative;margin-top:8px}
+.ap-line input{display:block;width:100%;margin:0;height:24px;accent-color:var(--x-accent);cursor:pointer}
+.ap-tip{position:absolute;bottom:26px;transform:translateX(-50%);background:#222;color:#fff;font-size:11px;padding:2px 6px;
+  border-radius:3px;pointer-events:none;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ap-hint{font-size:11px;opacity:.6;margin-top:2px}
+#exam.c-yb .ap-play{color:#000}
 
 /* контраст (как в настройках настоящего экзамена) */
 #exam.c-wb{--x-bg:#000;--x-ink:#fff;--x-panel:#111;--x-line:#555;--x-accent:#4da3ff}
@@ -1592,34 +1609,114 @@ function setupAudio(){
   if(!T.hasAudio) { au.removeAttribute('src'); return; }
   audioURLs = T.test.audio.map(a => URL.createObjectURL(a.blob));
   au.volume = +$('#xVol').value;
+  // скорость: на «экзамене» всегда обычная, в тренировке — как выбрал ученик
+  au.defaultPlaybackRate = au.playbackRate = (X.mode === 'practice' && X.apRate) || 1;
   // длительности всех дорожек — для таймера
   audioURLs.forEach((u, i) => { const a = new Audio(); a.preload = 'metadata';
     a.onloadedmetadata = () => { audioDur[i] = a.duration; }; a.src = u; });
   if(X.phase === 'main') playTrack(X.audioIdx, X.audioTime);
 }
-function playTrack(i, time){
+function playTrack(i, time, autoplay){
   const au = $('#xAudio');
   X.audioIdx = i;
   au.src = audioURLs[i];
   au.onloadedmetadata = () => { if(time) au.currentTime = Math.min(time, au.duration - 0.5); };
   au.onended = () => {
     if(X.audioIdx < audioURLs.length - 1){ X.audioTime = 0; playTrack(X.audioIdx + 1, 0); }
-    else if(X.mode === 'strict'){ X.phase = 'check'; xAlert('Recording finished. You have 2 minutes to check your answers.'); saveAttempt(); }
+    else if(X.mode === 'strict' && !X.review){ X.phase = 'check'; xAlert('Recording finished. You have 2 minutes to check your answers.'); saveAttempt(); }
   };
   const tl = $('#xTrackLab'); if(tl) tl.textContent = 'Track ' + (i + 1) + ' / ' + audioURLs.length + ': ' + T.test.audio[i].name;
   const sel = $('#xTrackSel'); if(sel) sel.value = i;
-  if(X.mode === 'strict' || time !== undefined) au.play().catch(() => {
+  if(autoplay === undefined) autoplay = X.mode === 'strict' || time !== undefined;
+  if(autoplay) au.play().catch(() => {
     modal('Sound', '<p>Click the button to start the recording.</p>', [{text: '▶ Play', cls: 'primary', value: 1}]).then(() => au.play());
   });
 }
+/* Плеер для тренировки и разбора: точная перемотка, скорость, полоса с подсказкой времени.
+   В режиме «как на экзамене» его нет — запись играет один раз, как на настоящем IELTS. */
+const AP_STEPS = [-10, -3, 3, 10];
+const AP_RATES = [0.75, 0.9, 1, 1.25];
+let apDragging = false;
 function buildAudioBar(){
-  // в тренировке показываем обычный плеер (пауза, перемотка) — это тот же элемент <audio>
-  const au = $('#xAudio'); au.controls = true;
-  const sel = h('select', {id: 'xTrackSel', class: 'i', style: 'width:auto;padding:3px 6px;font-size:13px',
-    onchange: e => { X.audioTime = 0; playTrack(+e.target.value, 0); }},
-    T.test.audio.map((a, i) => h('option', {value: i}, 'Track ' + (i + 1) + ': ' + a.name)));
-  return h('div', {class: 'audiobar'}, h('div', {class: 'tr'}, sel), au);
+  const au = $('#xAudio'); au.controls = false;
+  const bar = h('div', {class: 'audiobar', id: 'xAudioBar'});
+  if(T.test.audio.length > 1){
+    bar.append(h('div', {class: 'tr'}, h('select', {id: 'xTrackSel',
+      onchange: e => { X.audioTime = 0; playTrack(+e.target.value, 0, !au.paused); e.target.blur(); }},
+      T.test.audio.map((a, i) => h('option', {value: i}, 'Track ' + (i + 1) + ': ' + a.name)))));
+  }
+  const step = s => h('button', {class: 'ap-btn', title: (s < 0 ? 'Back ' : 'Forward ') + Math.abs(s) + ' seconds' +
+      (Math.abs(s) === 3 ? '  (← →)' : '  (Shift + ← →)'),
+    onclick: e => { apSeek(s); e.currentTarget.blur(); }}, s < 0 ? '« ' + (-s) + ' s' : s + ' s »');
+  const play = h('button', {class: 'ap-btn ap-play', id: 'apPlay', title: 'Play / Pause  (Space)',
+    onclick: e => { apToggle(); e.currentTarget.blur(); }}, '▶');
+  const rate = X.apRate || 1;
+  au.defaultPlaybackRate = au.playbackRate = rate;
+  const speed = h('div', {class: 'ap-speed', title: 'Playback speed'}, AP_RATES.map(r =>
+    h('button', {class: r === rate ? 'on' : '', 'data-r': r, onclick: e => {
+      X.apRate = r; au.defaultPlaybackRate = au.playbackRate = r;
+      speed.querySelectorAll('button').forEach(b => b.classList.toggle('on', +b.dataset.r === r));
+      e.currentTarget.blur(); saveAttempt();
+    }}, r + '×')));
+  const line = h('input', {type: 'range', id: 'apLine', min: 0, max: 1, step: 0.1, value: 0, 'aria-label': 'Position'});
+  const tip = h('div', {class: 'ap-tip hidden'});
+  line.addEventListener('pointerdown', () => { apDragging = true; });
+  line.addEventListener('input', () => { au.currentTime = +line.value; apUpdate(); });
+  line.addEventListener('change', () => { apDragging = false; line.blur(); });
+  line.addEventListener('pointermove', e => {          // подсказка: какое время под мышью
+    const r = line.getBoundingClientRect(), d = au.duration || 0;
+    if(!d) return;
+    const x = Math.min(Math.max(e.clientX - r.left, 0), r.width);
+    tip.textContent = fmtClock(x / r.width * d); tip.style.left = x + 'px'; tip.classList.remove('hidden');
+  });
+  line.addEventListener('pointerleave', () => tip.classList.add('hidden'));
+  bar.append(
+    h('div', {class: 'ap-row'}, step(-10), step(-3), play, step(3), step(10),
+      h('span', {class: 'ap-time', id: 'apTime'}, '0:00 / 0:00'), speed),
+    h('div', {class: 'ap-line'}, line, tip),
+    h('div', {class: 'ap-hint'}, 'Space — play / pause  ·  ← → — 3 s  ·  Shift + ← → — 10 s'));
+  if(!au._apBound){                                   // обработчики вешаем на плеер один раз
+    au._apBound = true;
+    ['timeupdate', 'play', 'pause', 'loadedmetadata', 'durationchange', 'seeked'].forEach(ev => au.addEventListener(ev, apUpdate));
+  }
+  requestAnimationFrame(apLoop);
+  return bar;
 }
+function apToggle(){
+  const au = $('#xAudio');
+  if(!au.src) return;
+  if(au.paused) au.play().catch(() => {}); else au.pause();
+}
+function apSeek(d){
+  const au = $('#xAudio');
+  if(!au.src || !isFinite(au.duration)) return;
+  au.currentTime = Math.min(Math.max(au.currentTime + d, 0), Math.max(0, au.duration - 0.05));
+  apUpdate();
+}
+function apUpdate(){
+  const au = $('#xAudio'), line = $('#apLine');
+  if(!line) return;
+  const d = isFinite(au.duration) ? au.duration : 0;
+  line.max = d || 1;
+  if(!apDragging) line.value = au.currentTime || 0;
+  $('#apTime').textContent = fmtClock(au.currentTime || 0) + ' / ' + fmtClock(d);
+  $('#apPlay').textContent = au.paused ? '▶' : '❚❚';
+}
+function apLoop(){                                    // плавное движение полосы во время игры
+  if(!$('#apLine')) return;
+  if(!$('#xAudio').paused) apUpdate();
+  requestAnimationFrame(apLoop);
+}
+document.addEventListener('pointerup', () => { apDragging = false; });
+/* горячие клавиши — только когда курсор не в поле ответа */
+document.addEventListener('keydown', e => {
+  if(!$('#xAudioBar') || $('#exam').classList.contains('hidden') || $('#modalRoot').children.length) return;
+  if(e.ctrlKey || e.metaKey || e.altKey) return;
+  if(e.target.closest && e.target.closest('input,textarea,select,button,[contenteditable]')) return;
+  if(e.code === 'Space'){ e.preventDefault(); apToggle(); }
+  else if(e.key === 'ArrowLeft'){ e.preventDefault(); apSeek(e.shiftKey ? -10 : -3); }
+  else if(e.key === 'ArrowRight'){ e.preventDefault(); apSeek(e.shiftKey ? 10 : 3); }
+});
 
 /* ---------- таймер ---------- */
 function onTick(){
@@ -2005,7 +2102,11 @@ function openReview(){
   X.review = true;
   showScreen('exam'); applyXSettings();
   $('#xSubmit').classList.add('hidden'); $('#xBackRes').classList.remove('hidden');
-  $('#xVolBox').classList.add('hidden');
+  $('#xVolBox').classList.toggle('hidden', !T.hasAudio);
+  if(T.hasAudio && !$('#xAudioBar')){                 // в разборе можно переслушать запись с перемоткой
+    $('#xLeft').prepend(buildAudioBar());
+    playTrack(X.audioIdx && X.audioIdx < audioURLs.length ? X.audioIdx : 0, 0, false);
+  }
   $('#xTimer').innerHTML = '<span class="xreviewtag">REVIEW</span>';
   $('#xTimerBox').classList.remove('low');
   shownPart = -1; renderRight(true); renderNav();
@@ -2157,7 +2258,7 @@ function bindUI(){
   $('#xVol').oninput = e => { const au = $('#xAudio'); if(au) au.volume = +e.target.value; };
   $('#xSettings').onclick = openXSettings;
   $('#xSubmit').onclick = askSubmit;
-  $('#xBackRes').onclick = () => { X.review = false; renderResults(); };
+  $('#xBackRes').onclick = () => { $('#xAudio').pause(); X.review = false; renderResults(); };
   $('#xPrev').onclick = () => T.isW ? goQ(Math.max(1, X.task - 1), true) : goQ(Math.max(1, X.cur - 1), true);
   $('#xNext').onclick = () => T.isW ? goQ(Math.min(2, X.task + 1), true) : goQ(Math.min(T.Q.length, X.cur + 1), true);
   document.addEventListener('mouseup', onExamMouseUp);
