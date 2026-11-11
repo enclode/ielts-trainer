@@ -91,67 +91,173 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 .modal h3{margin-top:0}
 .modal .acts{display:flex;justify-content:flex-end;gap:10px;margin-top:18px;flex-wrap:wrap}
 
-/* ============ Экран экзамена (как в компьютерном IELTS) ============ */
-#exam{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--x-bg);color:var(--x-ink);font-size:var(--x-fs)}
-.xtop{height:56px;flex:none;display:flex;align-items:center;gap:14px;padding:0 16px;border-bottom:1px solid var(--x-line);background:var(--x-bg)}
-.xlogo{background:var(--brand);color:#fff;font-weight:700;padding:4px 8px;border-radius:3px;letter-spacing:1px;font-size:15px}
-.xcand{font-size:14px;line-height:1.2}
-.xcand small{display:block;opacity:.65;font-size:12px}
-.xtimer{flex:1;text-align:center;font-weight:700;font-size:17px;display:flex;align-items:center;justify-content:center;gap:10px}
-.xtimer.low{color:#d00000}
-.xtimer .tbtn{font-weight:400;font-size:12px;border:1px solid var(--x-line);background:transparent;border-radius:4px;padding:2px 8px}
-.xicons{display:flex;align-items:center;gap:8px}
-.xicon{border:1px solid var(--x-line);background:transparent;border-radius:4px;padding:5px 10px;font-size:14px}
-.xvol{display:flex;align-items:center;gap:6px;font-size:13px}
-.xvol input{width:90px}
-.xmain{flex:1;display:flex;min-height:0}
-.xleft{flex:none;width:55%;min-width:220px;display:flex;flex-direction:column;min-height:0;background:var(--x-panel)}
-.xdiv{flex:none;width:10px;cursor:col-resize;background:var(--x-panel);border-left:1px solid var(--x-line);border-right:1px solid var(--x-line);
-  display:flex;align-items:center;justify-content:center}
-.xdiv::after{content:"";width:2px;height:34px;border-left:2px dotted #888}
-.xright{flex:1;min-width:260px;overflow:auto;padding:18px 22px 30px;background:var(--x-bg)}
-.xfoot{flex:none;min-height:62px;border-top:1px solid var(--x-line);display:flex;align-items:stretch;background:var(--x-bg)}
-.xparts{flex:1;display:flex;overflow-x:auto}
-.xpart{display:flex;align-items:center;gap:8px;padding:6px 14px;border-right:1px solid var(--x-line);cursor:pointer;white-space:nowrap;background:transparent;border-top:0;border-bottom:0;border-left:0}
-.xpart .pt{font-weight:700}
-.xpart .cnt{font-size:13px;opacity:.75}
-.xpart.on{cursor:default;background:var(--x-panel)}
-.qnums{display:flex;gap:3px;flex-wrap:wrap}
-.qn{min-width:28px;height:28px;border:1px solid var(--x-line);background:var(--x-bg);border-radius:3px;font-size:13px;padding:0 4px;position:relative}
-.qn.ans{border-bottom:3px solid var(--x-accent)}
-.qn.cur{outline:2px solid var(--x-accent);outline-offset:1px}
-.qn.flag{border-radius:50%}
-.qn.r-ok{background:#d9f2df;color:#000}.qn.r-bad{background:#fbd5d5;color:#000}
-.xnav{display:flex;align-items:center;gap:6px;padding:0 12px}
-.xnav button{width:46px;height:42px;border:0;background:#333;color:#fff;font-size:20px;border-radius:3px}
-.xnav button.sub{width:auto;padding:0 14px;font-size:15px;background:var(--x-accent);display:flex;align-items:center;gap:6px}
-.xreviewtag{background:#ffd54f;color:#000;font-weight:700;padding:3px 10px;border-radius:4px;font-size:13px}
+/* ============ Экран экзамена: повторяет официальный пробный компьютерный IELTS ============ */
+#exam,#pre{--x-page:#dbe5f5;--x-panel:#dde3ee;--x-bg:#fff;--x-ink:#000;--x-line:#b8c3d6;--x-accent:#34b2f1;--x-gap:#2f86c8;--x-focus:#cbe5f8;
+  font-family:Arial,Helvetica,sans-serif}
+#exam{position:fixed;inset:0;display:flex;flex-direction:column;background:var(--x-page);color:var(--x-ink);font-size:var(--x-fs)}
+.xtop{height:30px;flex:none;display:flex;align-items:center;padding:0 10px;background:#000;color:#fff;font-size:14px;position:relative}
+.xcand{display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;max-width:38%}
+.xmod{color:#9fd3f5;font-size:12px;margin-left:6px}
+.xtimer{position:absolute;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:6px;color:#fff0bd;cursor:pointer;white-space:nowrap;user-select:none}
+.xtimer .big{font-size:21px;line-height:1}
+.xtimer.red{color:#ff3333}
+.xtimer.flash{animation:xflash .5s infinite}
+@keyframes xflash{50%{opacity:.15}}
+.xicons{margin-left:auto;display:flex;align-items:center;gap:8px}
+.xbtn{font-size:14px;padding:3px 14px;background:#6aade4;color:#050608;border:0;border-radius:6px;cursor:pointer;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 1px 1px rgba(255,255,255,.2)}
+.xbtn:hover{background:#82bdec}
+.xbtn .qm{display:inline-block;background:#fff;color:#2b6cb0;border:1px solid #2b6cb0;font-size:11px;font-weight:700;width:14px;height:14px;
+  line-height:13px;text-align:center;margin-left:4px;border-radius:2px;vertical-align:1px}
+.xvol{display:flex;align-items:center;gap:4px}
+.xvol input{width:64px;accent-color:#fff;cursor:pointer}
+.xtitle{flex:none;margin:10px 10px;padding:12px 10.5px;background:var(--x-bg);color:var(--x-ink);font-size:18.5px;font-weight:700;
+  box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.xtitle .sub{font-weight:400;font-size:15px;margin-left:10px}
+.xreviewtag{background:#ffd54f;color:#000;font-weight:700;padding:2px 10px;border-radius:4px;font-size:13px}
+#xAudioSlot{flex:none;margin:0 10px 8px}
+#xAudioSlot:empty{display:none}
+.xmain{flex:1;display:flex;min-height:0;padding:0 10px 6px}
+.xpanel{background:var(--x-panel);border-radius:6px;box-shadow:0 1px 3.5px rgba(0,0,0,.25)}
+.xleft{flex:none;width:55%;min-width:220px;display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.xdiv{flex:none;width:12px;cursor:col-resize;display:flex;align-items:center;justify-content:center}
+.xdiv::after{content:"";width:3px;height:40px;border-left:2px dotted #7b8aa3;border-right:2px dotted #7b8aa3}
+.xright{flex:1;min-width:260px;overflow:auto;padding:14px 11px 30px}
+#exam.full .xleft,#exam.full .xdiv{display:none}
+.xfoot{flex:none;height:48px;position:relative}
+.xrev{position:absolute;left:8px;bottom:6px;font-size:13px;display:flex;align-items:center;gap:3px;cursor:pointer;user-select:none}
+.xqnav{position:absolute;left:84px;right:130px;bottom:0;min-height:40px;background:rgba(255,255,255,.25);border:1px solid #fff;border-bottom:0;
+  border-radius:8px 8px 0 0;box-shadow:0 1px 3px rgba(0,0,0,.5);padding:8px 44px 6px 8px;display:flex;align-items:flex-end}
+.xqnav ul{margin:0;padding:0;display:flex;flex-wrap:wrap;gap:2px}
+.xqnav li{list-style:none;width:23px;height:23px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;
+  color:#fff;background:#000;border:1px solid #000;border-radius:2px;cursor:pointer;user-select:none;box-sizing:border-box}
+.xqnav li:hover{color:#33bbff}
+.xqnav li.newpart{margin-left:8px}
+.xqnav li.answered{background:#fff;border-color:#fff;color:#000}
+.xqnav li.answered span{border-bottom:2px solid #000;line-height:14px}
+.xqnav li.current{background:linear-gradient(#b5e3fb,#4cb6ee);border-color:#34b2f1;color:#0d4f78}
+.xqnav li.current.answered span{border-color:#0d4f78}
+.xqnav li.review{border-radius:50%}
+.xqnav li.r-ok{background:#2e9b4f;border-color:#2e9b4f;color:#fff}
+.xqnav li.r-bad{background:#d23b3b;border-color:#d23b3b;color:#fff}
+.xqnav.summary{background:transparent;box-shadow:none;border-color:transparent}
+.xqnav.summary ul{gap:1px}
+.xqnav.summary li{width:14px;height:14px;border-radius:0}
+.xqnav.summary li span{display:none}
+.xqnav.summary li.current{background:#34b2f1}
+.xqnav .pencil{position:absolute;right:6px;bottom:4px;width:32px;height:32px;border:0;background:transparent;cursor:pointer;padding:0}
+.xarrow{position:absolute;bottom:3px;width:46px;height:46px;border-radius:50%;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;
+  background:radial-gradient(circle at 50% 30%,#fff 0,#e3e7ec 55%,#b9c0ca 100%);box-shadow:0 1px 3px rgba(0,0,0,.45)}
+.xarrow:hover{filter:brightness(1.05)}
+.xarrow.prev{right:62px}.xarrow.next{right:10px}
 
-/* вопросы справа */
-.qhead{font-weight:700;font-size:1.15em;margin:0 0 4px}
-.qsub{opacity:.75;margin-bottom:16px;font-size:.92em}
-.q{display:flex;align-items:flex-start;gap:12px;padding:9px 8px;border-radius:6px;border:1px solid transparent}
-.q.cur{border-color:var(--x-accent);background:rgba(26,115,232,.05)}
-.qnum{flex:none;min-width:34px;height:30px;display:flex;align-items:center;justify-content:center;border:1.5px solid var(--x-ink);font-weight:700;border-radius:3px}
-.qbody{flex:1;min-width:0}
-.qin{width:100%;max-width:340px;height:32px;border:1.5px solid #8a8a8a;border-radius:3px;padding:0 8px;background:var(--x-bg);color:var(--x-ink);font-size:1em}
-.qin:focus{outline:2px solid var(--x-accent);border-color:var(--x-accent)}
-.opts{display:flex;flex-wrap:wrap;gap:6px}
-.opt{min-width:38px;height:32px;border:1.5px solid #8a8a8a;background:var(--x-bg);color:var(--x-ink);border-radius:3px;padding:0 10px;font-size:.95em}
-.opt.on{background:var(--x-accent);border-color:var(--x-accent);color:#fff}
-.flagbtn{flex:none;border:1px solid transparent;background:transparent;border-radius:4px;font-size:15px;opacity:.35;padding:4px 6px}
-.flagbtn.on{opacity:1;border-color:#e0a800;background:#fff4c2}
-.q:hover .flagbtn{opacity:.8}
-.q .res{font-size:.9em;margin-top:5px}
-.q.r-ok .qnum{background:#16803c;border-color:#16803c;color:#fff}
-.q.r-bad .qnum{background:#c62828;border-color:#c62828;color:#fff}
-.q.r-ok .qin,.q.r-ok .opt.on{border-color:#16803c}
-.q.r-bad .qin{border-color:#c62828}
+/* задание прямо на экране (как на экзамене) */
+.paper{font-size:1em;line-height:1.5}
+.phead{margin:0 0 14px}
+.phead h4{font-size:1em;margin:0 0 2px}
+.pinstr{font-size:1em}
+.pbody{margin:0 0 18px 14px}
+.pbody .ptitle{font-weight:700;font-size:1.07em;margin:14px 0 12px}
+.pbody table{border-collapse:collapse;margin:6px 0 10px;background:rgba(255,255,255,.35)}
+.pbody td,.pbody th{border:1px solid #98a5b9;padding:5px 9px;vertical-align:top;text-align:left}
+.pbody th{background:rgba(255,255,255,.55)}
+.pbody p{margin:0 0 9px}
+.pbody ul{margin:2px 0 10px;padding-left:22px}
+.pbody li{margin:0 0 7px}
+.gap{display:inline-block;width:117px;height:20px;border:1px solid var(--x-gap);background:var(--x-bg);color:var(--x-ink);border-radius:0;
+  font:700 13px Arial,Helvetica,sans-serif;text-align:center;padding:0 3px;vertical-align:middle;margin:1px 3px;box-sizing:border-box;line-height:18px}
+.gap::placeholder{color:var(--x-ink);opacity:1;font-weight:700}
+.gap:focus,.gap.cur{background:var(--x-focus);border:2px solid #222;outline:none;border-radius:2px}
+span.gap{cursor:pointer;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;width:auto;min-width:117px;padding:0 8px}
+span.gap.empty{color:var(--x-ink)}
+span.gap.over{background:var(--x-focus);border:2px dashed #222}
+.gap.ok{border:2px solid #2e9b4f;background:#e3f6e8}
+.gap.bad{border:2px solid #d23b3b;background:#fde4e4}
+.mark{font-size:.86em;font-weight:700;margin:0 4px;white-space:nowrap}
+.mark.ok{color:#1f7a3c}.mark.bad{color:#b42323}
+.mark .ca{color:#1f7a3c}
+.mcq{display:inline-block;vertical-align:top;width:48.5%;margin:0 1% 22px 0;box-sizing:border-box}
+.mcq.wide{display:block;width:100%}
+.mcq .qt{margin:8px 0 12px;padding:4px 6px 4px 10px}
+.mcq .qt b{margin-right:10px}
+.mcq.cur .qt{background:linear-gradient(#e9f7fe,#bfe6fb)}
+.mcq label{display:flex;align-items:center;gap:8px;margin:0 0 11px 6px;cursor:pointer;width:fit-content}
+.mcq label input{margin:0}
+.mcq label.okopt{color:#1f7a3c;font-weight:700}
+.mcq label.badopt{color:#b42323;text-decoration:line-through}
+.dragwrap{display:flex;gap:30px;align-items:flex-start;flex-wrap:wrap}
+.dragwrap .pbody{flex:1;min-width:260px}
+.dragopts{min-width:200px}
+.dragopts h5{font-size:1.07em;margin:14px 0 18px}
+.dragopt{display:block;width:fit-content;padding:2px 14px;margin:0 0 14px;background:linear-gradient(#fff,#e2e7ee);border:1px solid #98a5b9;border-radius:3px;cursor:grab;user-select:none}
+.dragopt.sel{outline:2px solid #34b2f1;background:#d7efff}
+/* список вопросов (для тестов из PDF) */
+.lhead h4{font-size:1em;margin:0 0 2px}
+.lhead div{margin:0 0 14px}
+.lq{display:flex;align-items:center;gap:10px;padding:6px 8px;border-radius:3px;flex-wrap:wrap}
+.lq.cur{background:linear-gradient(#e9f7fe,#bfe6fb)}
+.lq .ln{min-width:24px;text-align:right}
+.lopts{display:flex;flex-wrap:wrap;gap:4px 18px}
+.lopts label{display:flex;align-items:center;gap:5px;cursor:pointer}
+.lopts label.okopt{color:#1f7a3c;font-weight:700}
+.lopts label.badopt{color:#b42323;text-decoration:line-through}
+mark.hl{background:#ffe866;color:inherit}
+/* сопоставление: таблица с кружками (как «Plan/Map/Diagram labelling» на экзамене) */
+.pgrid{border-collapse:collapse;margin:6px 0 14px 14px;background:rgba(255,255,255,.45)}
+.pgrid th{background:#c6dcf6;border:1px solid #7f8da3;padding:5px 14px;font-weight:700}
+.pgrid td{border:1px solid #7f8da3;padding:5px 10px}
+.pgrid td.rq b{margin-right:8px}
+.pgrid td.cell{text-align:center;cursor:pointer;width:48px}
+.pgrid td.cell input{pointer-events:none;margin:0}
+.pgrid tr.cur td{background:#d3ebfb}
+.pgrid td.ok{background:#d4efda}.pgrid td.bad{background:#f6d4d4}
+#exam.c-wb .pgrid th,#exam.c-yb .pgrid th,#exam.c-wb .pgrid tr.cur td,#exam.c-yb .pgrid tr.cur td{background:rgba(52,178,241,.28)}
 
 /* письмо */
 .wtask{display:flex;flex-direction:column;height:100%}
-.wta{flex:1;min-height:300px;width:100%;resize:none;border:1.5px solid #8a8a8a;border-radius:3px;padding:12px;line-height:1.6;background:var(--x-bg);color:var(--x-ink);font-size:1em;font-family:Arial,Helvetica,sans-serif}
-.wcount{margin-top:8px;font-size:.95em}
+.wta{flex:1;min-height:300px;width:100%;resize:none;border:1px solid var(--x-gap);border-radius:2px;padding:10px;line-height:1.6;background:var(--x-bg);color:var(--x-ink);font-size:1em;font-family:Arial,Helvetica,sans-serif}
+.wta:focus{outline:2px solid #222}
+.wcount{margin-top:6px;font-size:.95em;text-align:right}
+
+/* окна в стиле экзамена: Help, Hide, конец теста */
+.xov{position:fixed;inset:0;z-index:160;display:flex;justify-content:center;align-items:flex-start;padding:60px 12px 12px;background:rgba(0,0,0,.4)}
+.xov.solid{background:#555}
+.xdlg{width:770px;max-width:100%;background:#dbe5f5;border-radius:10px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.45);color:#000;font-family:Arial,Helvetica,sans-serif;
+  max-height:calc(100vh - 80px);display:flex;flex-direction:column}
+.xdlg h1{margin:0;background:#000;color:#fff;font-size:15px;padding:11px 40px 11px 14px;border-bottom:3px solid #4a4a4a;display:flex;align-items:center;gap:10px;flex:none}
+.xdlg h1 .x{position:absolute;right:12px;top:10px}
+.xdlg .xclose{margin-left:auto;width:18px;height:18px;border:0;background:#c62828;color:#fff;font-size:12px;line-height:18px;padding:0;border-radius:2px;cursor:pointer}
+.xdlg .body{padding:14px 12px 18px;font-size:15px;overflow:auto}
+.xdlg .body p{margin:0 0 14px}
+.xdlg .acts{display:flex;justify-content:center;gap:12px;padding:0 0 18px;flex:none}
+.ibtn{color:#1e415b;font-size:15.4px;font-weight:700;padding:6px 16px;background:linear-gradient(#fff,#dfe5ee);border:1px solid #a9b6c7;border-radius:4px;
+  box-shadow:0 1px 2px rgba(0,0,0,.25);text-shadow:0 1px 0 #fff;cursor:pointer;font-family:Arial,Helvetica,sans-serif}
+.ibtn:hover{background:linear-gradient(#fff,#eef2f7)}
+.xtabs{display:flex;gap:6px;border-bottom:1px solid #7f8da3;margin:0 0 14px;padding-left:8px}
+.xtabs button{padding:6px 18px;font-size:15px;font-weight:700;border:1px solid #7f8da3;border-bottom:0;border-radius:6px 6px 0 0;background:linear-gradient(#e9eef5,#c3cddb);color:#333;cursor:pointer;margin-bottom:-1px}
+.xtabs button.on{background:#dbe5f5;color:#000}
+.xdlg h5{font-size:14px;margin:12px 0 8px}
+.xdlg .body li{margin:0 0 6px}
+
+/* вступительные экраны (как на экзамене) */
+#pre{position:fixed;inset:0;background:var(--x-page);display:flex;flex-direction:column;color:#000;overflow:auto}
+#pre .band{height:74px;background:#fff;display:flex;align-items:center;padding:0 14px;flex:none}
+.ilogo{font:900 60px/1 Arial,Helvetica,sans-serif;color:#e4173e;letter-spacing:-2px;transform:scaleY(.95)}
+#pre .strip{min-height:28px;background:#000;color:#fff;font-size:14px;display:flex;align-items:center;gap:6px;padding:0 10px;flex:none}
+#pre .strip .xvol{margin-left:auto}
+#pre .shade{height:14px;background:linear-gradient(rgba(0,0,0,.12),rgba(0,0,0,0));flex:none}
+#pre .box{width:760px;max-width:calc(100% - 24px);margin:26px auto 0}
+#pre .boxhead{display:flex;align-items:flex-end;gap:12px;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.55);font-weight:700;font-size:15px;margin:0 0 -4px 8px}
+#pre .card{background:transparent;border:1px solid #fff;border-radius:10px;padding:16px 12px 22px;font-size:15px;color:#333;margin:0}
+#pre .card p{margin:0 0 8px}
+#pre .info{display:flex;align-items:center;gap:8px;margin:14px 0;color:#000}
+#pre .info.c{justify-content:center;font-weight:700;color:#444}
+#pre .center{text-align:center;margin-top:12px}
+#pre .instr{margin:12px 10px;padding:12px 10px 26px;background:var(--x-panel);border-radius:6px;box-shadow:0 1px 3.5px rgba(0,0,0,.25);font-size:14px}
+#pre .instr h2{font-size:18px;margin:4px 0 22px}
+#pre .instr h3{font-size:16px;margin:22px 0 14px}
+#pre .instr ul{margin:0;padding-left:60px}
+#pre .instr li{margin:0 0 6px}
 
 /* просмотр PDF */
 .pdfview{display:flex;flex-direction:column;flex:1;min-height:0;height:100%}
@@ -173,7 +279,7 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 .hlpop{position:fixed;z-index:120;background:#222;color:#fff;border-radius:6px;display:flex;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.3)}
 .hlpop button{background:transparent;border:0;color:#fff;padding:7px 12px;font-size:14px}
 .hlpop button:hover{background:#444}
-.audiobar{flex:none;padding:8px 12px 6px;border-bottom:1px solid var(--x-line);background:var(--x-panel);color:var(--x-ink)}
+.audiobar{flex:none;padding:8px 12px 6px;background:var(--x-panel);color:var(--x-ink);border-radius:6px;box-shadow:0 1px 3.5px rgba(0,0,0,.25)}
 .audiobar .tr{font-size:12px;margin-bottom:6px}
 .audiobar .tr select{width:auto;padding:3px 6px;font-size:13px;border:1px solid var(--x-line);border-radius:4px;background:var(--x-bg);color:var(--x-ink)}
 /* плеер с точной перемоткой (тренировка и разбор) */
@@ -194,12 +300,14 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 .ap-hint{font-size:11px;opacity:.6;margin-top:2px}
 #exam.c-yb .ap-play{color:#000}
 
-/* контраст (как в настройках настоящего экзамена) */
-#exam.c-wb{--x-bg:#000;--x-ink:#fff;--x-panel:#111;--x-line:#555;--x-accent:#4da3ff}
-#exam.c-yb{--x-bg:#000;--x-ink:#ffeb3b;--x-panel:#111;--x-line:#666;--x-accent:#ffeb3b}
+/* цвета (как в настройках настоящего экзамена) */
+#exam.c-wb{--x-page:#000;--x-panel:#161616;--x-bg:#000;--x-ink:#fff;--x-line:#555;--x-gap:#8ab4ff;--x-focus:#23364d}
+#exam.c-yb{--x-page:#000;--x-panel:#161616;--x-bg:#000;--x-ink:#ffeb3b;--x-line:#666;--x-gap:#ffeb3b;--x-focus:#3a3500}
 #exam.c-wb .pdfpage canvas,#exam.c-yb .pdfpage canvas{filter:invert(1) hue-rotate(180deg)}
-#exam.c-yb .opt.on,#exam.c-yb .xnav button.sub{color:#000}
-#exam.c-wb .q.r-ok .qnum,#exam.c-yb .q.r-ok .qnum{color:#fff}
+#exam.c-wb .gap:focus,#exam.c-yb .gap:focus,#exam.c-wb .gap.cur,#exam.c-yb .gap.cur{border-color:var(--x-ink)}
+#exam.c-wb .mcq.cur .qt,#exam.c-yb .mcq.cur .qt,#exam.c-wb .lq.cur,#exam.c-yb .lq.cur{background:rgba(52,178,241,.28)}
+#exam.c-wb .pbody table,#exam.c-yb .pbody table,#exam.c-wb .pbody th,#exam.c-yb .pbody th{background:transparent}
+#exam.c-yb .ap-play{color:#000}
 
 @media print{
   body{background:#fff}
@@ -401,29 +509,31 @@ tr.ok td{background:#f3fbf5}tr.bad td{background:#fff6f6}
 </div>
 
 <!-- ===================== ЭКЗАМЕН ===================== -->
+<!-- оформление повторяет официальный пробный компьютерный IELTS (computer.ieltsessentials.com) -->
+<div id="pre" class="hidden"></div>
 <div id="exam" class="hidden">
   <div class="xtop">
-    <span class="xlogo">IELTS</span>
-    <div class="xcand"><span id="xName"></span><small id="xMod"></small></div>
-    <div class="xtimer" id="xTimerBox"><span id="xTimer"></span><button class="tbtn" id="xHide">Hide</button></div>
+    <div class="xcand"><span class="ico-person"></span><span id="xName"></span><span id="xMod" class="xmod"></span></div>
+    <div class="xtimer" id="xTimerBox" title="Click to hide or show the time"><span class="ico-clock"></span><span id="xTimer"></span></div>
     <div class="xicons">
-      <div class="xvol hidden" id="xVolBox">🔊 <input type="range" id="xVol" min="0" max="1" step="0.05" value="1"></div>
-      <button class="xicon" id="xSettings" title="Settings">⚙ Settings</button>
-      <button class="xicon hidden" id="xBackRes">← Results</button>
+      <button class="xbtn hidden" id="xBackRes">Results</button>
+      <button class="xbtn" id="xHelp">Help<span class="qm">?</span></button>
+      <button class="xbtn" id="xHide">Hide</button>
+      <div class="xvol hidden" id="xVolBox"><span class="ico-speaker"></span><input type="range" id="xVol" min="0" max="1" step="0.05" value="1" title="Volume"></div>
     </div>
   </div>
+  <div class="xtitle" id="xTitle"></div>
+  <div id="xAudioSlot"></div>
   <div class="xmain">
-    <div class="xleft" id="xLeft"></div>
+    <div class="xleft xpanel" id="xLeft"></div>
     <div class="xdiv" id="xDiv" title="Drag"></div>
-    <div class="xright" id="xRight"></div>
+    <div class="xright xpanel" id="xRight"></div>
   </div>
   <div class="xfoot">
-    <div class="xparts" id="xParts"></div>
-    <div class="xnav">
-      <button id="xPrev" title="Previous">‹</button>
-      <button id="xNext" title="Next">›</button>
-      <button id="xSubmit" class="sub" title="Finish">✓ Submit</button>
-    </div>
+    <label class="xrev"><input type="checkbox" id="xReview"> Review</label>
+    <div class="xqnav" id="xQNav"><ul id="xParts"></ul><button class="pencil" id="xSummary" title="Smaller / bigger question numbers"></button></div>
+    <button class="xarrow prev" id="xPrev" title="Previous"></button>
+    <button class="xarrow next" id="xNext" title="Next"></button>
   </div>
   <audio id="xAudio" preload="auto"></audio>
 </div>
@@ -475,8 +585,8 @@ function toast(msg, ms){
   setTimeout(() => t.remove(), ms || 2600);
 }
 function showScreen(id){
-  ['home','editor','intro','exam','results'].forEach(s => $('#'+s).classList.toggle('hidden', s !== id));
-  $('#langBar').classList.toggle('hidden', id === 'exam');
+  ['home','editor','intro','pre','exam','results'].forEach(s => $('#'+s).classList.toggle('hidden', s !== id));
+  $('#langBar').classList.toggle('hidden', id === 'exam' || id === 'pre');
   window.scrollTo(0,0);
 }
 /* модальное окно; buttons: [{text, cls, value}] → Promise(value) */
@@ -1541,11 +1651,11 @@ function syncIntroMode(){
     ? tr('hintStrict') + (L ? tr('hintStrictL') : '')
     : tr('hintPractice') + (L ? tr('hintPracticeL') : '');
 }
-function beep(){
+function beep(vol){
   try{
     const ac = new (window.AudioContext || window.webkitAudioContext)();
     const o = ac.createOscillator(), g = ac.createGain();
-    o.frequency.value = 660; g.gain.value = 0.2; o.connect(g); g.connect(ac.destination);
+    o.frequency.value = 660; g.gain.value = 0.2 * (vol == null ? 1 : vol); o.connect(g); g.connect(ac.destination);
     o.start(); setTimeout(() => { o.stop(); ac.close(); }, 900);
   }catch(e){}
 }
@@ -1569,10 +1679,122 @@ function runtimeFor(test){
   const nParts = isW ? 2 : Math.max(1, sizes.length);
   const partPages = String(test.partPages || '').split(/[,;\s]+/).map(Number).filter(n => n > 0);
   if(isW && partPages.length === 1) partPages.unshift(test.from || 1);
-  return {test, isW, key, hasKey, Q, nParts, partPages,
+  const paper = !isW && Array.isArray(test.paper) && test.paper.length ? test.paper : null;   // задание прямо на экране
+  return {test, isW, key, hasKey, Q, nParts, partPages, paper,
     hasAudio: test.module === 'listening' && (test.audio || []).length > 0};
 }
 function saveAttempt(){ if(X && !X.finished && !X.review) LS.set('ielts_attempt', X); }
+
+/* ---------- значки экрана экзамена (рисуем сами, без картинок) ---------- */
+const ICO = {
+  person: '<svg width="14" height="16" viewBox="0 0 14 16"><circle cx="7" cy="4.4" r="3.4" fill="#f1c48f"/><path d="M.8 16c0-4 2.6-6.2 6.2-6.2s6.2 2.2 6.2 6.2z" fill="#4c9a3a"/></svg>',
+  clock: '<svg width="18" height="18" viewBox="0 0 24 24"><path d="M3.5 7.5l3.5-3.5M20.5 7.5L17 4" stroke="#d33" stroke-width="3" stroke-linecap="round"/><circle cx="12" cy="13.5" r="8" fill="#fff" stroke="#9fb0c4" stroke-width="2"/><path d="M12 9.5v4.2l3 1.8" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/></svg>',
+  speaker: '<svg width="16" height="14" viewBox="0 0 16 14"><path d="M1 4.6h3l4-3.6v12L4 9.4H1z" fill="#fff"/><path d="M10.6 4.4a3.6 3.6 0 010 5.2M12.6 2.4a6.4 6.4 0 010 9.2" stroke="#fff" stroke-width="1.3" fill="none"/></svg>',
+  pencil: '<svg width="32" height="32" viewBox="0 0 32 32"><rect x="3" y="9" width="19" height="19" fill="#fff" stroke="#b9c2cf"/><path d="M9.5 23.5l2-6.5L24.3 4.2l4.5 4.5L16 21.5z" fill="#f7c21a" stroke="#9a7300"/><path d="M9.5 23.5l2-6.5 4.5 4.5z" fill="#f2dcae"/></svg>',
+  next: '<svg width="28" height="28" viewBox="0 0 24 24"><path d="M3 9h10V3.5l8.5 8.5-8.5 8.5V15H3z" fill="#111"/></svg>',
+  prev: '<svg width="28" height="28" viewBox="0 0 24 24"><path d="M21 9H11V3.5L2.5 12l8.5 8.5V15h10z" fill="#111"/></svg>',
+  finish: '<svg width="28" height="28" viewBox="0 0 24 24"><path d="M3 12.5l3-3 4.5 4.5L18 6l3 3-10.5 10.5z" fill="#111"/></svg>',
+  info: '<svg width="18" height="18" viewBox="0 0 18 18"><circle cx="9" cy="9" r="8.2" fill="#2f86c8" stroke="#1d5f93"/><rect x="8" y="7.5" width="2" height="6" fill="#fff"/><circle cx="9" cy="5" r="1.2" fill="#fff"/></svg>',
+  people: '<svg width="48" height="48" viewBox="0 0 48 48"><circle cx="16" cy="12" r="7" fill="#f1c48f"/><path d="M4 40c0-9 5-14 12-14s12 5 12 14z" fill="#3b5f9c"/><circle cx="31" cy="15" r="6.5" fill="#f1c48f"/><path d="M20 42c0-8 5-13 11-13s11 5 11 13z" fill="#c0392b"/><rect x="28" y="28" width="16" height="16" rx="3" fill="#3a9a3a"/><path d="M31 36l3.5 3.5 6.5-7" stroke="#fff" stroke-width="2.6" fill="none"/></svg>',
+  phones: '<svg width="48" height="48" viewBox="0 0 48 48"><path d="M8 28a16 16 0 0132 0" stroke="#333" stroke-width="4" fill="none"/><rect x="4" y="26" width="9" height="15" rx="3" fill="#2f86c8"/><rect x="35" y="26" width="9" height="15" rx="3" fill="#2f86c8"/></svg>',
+  help: '<svg width="40" height="40" viewBox="0 0 40 40"><circle cx="20" cy="20" r="18" fill="#2f86c8" stroke="#fff" stroke-width="3"/><circle cx="20" cy="11" r="3" fill="#fff"/><path d="M11 16h18M20 16v8l-4 9M20 24l4 9" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/></svg>',
+  screen: '<svg width="44" height="36" viewBox="0 0 44 36"><rect x="2" y="2" width="40" height="27" rx="2" fill="#1a8fd6" stroke="#ccc" stroke-width="2"/><rect x="16" y="30" width="12" height="4" fill="#999"/></svg>'
+};
+
+/* окно в стиле экзамена: чёрная шапка, голубое поле, кнопки по центру → Promise(value) */
+function xDialog(title, body, buttons, opts){
+  opts = opts || {};
+  return new Promise(res => {
+    const ov = h('div', {class: 'xov' + (opts.solid ? ' solid' : '')});
+    const dlg = h('div', {class: 'xdlg'});
+    const close = v => { ov.remove(); res(v); };
+    const head = h('h1', null, opts.icon ? h('span', {html: opts.icon}) : null, h('span', null, title));
+    if(opts.closeX !== false) head.append(h('button', {class: 'xclose', title: 'Close', onclick: () => close(opts.closeValue)}, '✕'));
+    const bd = h('div', {class: 'body'});
+    if(typeof body === 'string') bd.innerHTML = body; else bd.append(body);
+    const acts = h('div', {class: 'acts'});
+    (buttons || [['OK', true]]).forEach(([t, v]) => acts.append(h('button', {class: 'ibtn', onclick: () => close(v)}, t)));
+    dlg.append(head, bd, acts); ov.append(dlg); document.body.append(ov);
+    const first = acts.querySelector('button:last-child'); if(first) setTimeout(() => first.focus(), 30);
+  });
+}
+
+/* ---------- вступительные экраны: данные кандидата → звук → инструкции ---------- */
+function candLine(){ return X.name + ' - ' + X.cand; }
+function preShow(stripInner, content){
+  const pre = $('#pre'); pre.innerHTML = '';
+  pre.append(h('div', {class: 'band'}, h('span', {class: 'ilogo'}, 'IELTS')),
+    h('div', {class: 'strip'}, stripInner), h('div', {class: 'shade'}), content);
+  showScreen('pre');
+}
+function preVol(){
+  const v = h('input', {type: 'range', min: 0, max: 1, step: 0.05, value: $('#xVol').value,
+    oninput: e => { $('#xVol').value = e.target.value; $('#xAudio').volume = +e.target.value; }});
+  return h('div', {class: 'xvol', html: ICO.speaker}, v);
+}
+function preBox(icon, title, cardKids){
+  return h('div', {class: 'box'}, h('div', {class: 'boxhead'}, h('span', {html: icon}), h('span', null, title)),
+    h('div', {class: 'card'}, cardKids));
+}
+const preInfo = (text, c) => h('div', {class: 'info' + (c ? ' c' : '')}, h('span', {html: ICO.info}), h('span', {html: text}));
+function preStep(fn){ return new Promise(res => fn(res)); }
+
+async function runPre(t){
+  T = runtimeFor(t);
+  const L = t.module === 'listening';
+  await preStep(done => preShow('', preBox(ICO.people, 'Confirm your details', [
+    h('p', null, 'Name: ', h('b', null, X.name)),
+    h('p', null, 'Date of birth: '),
+    h('p', null, 'Candidate number: ', h('b', null, X.cand)),
+    preInfo('If your details are not correct, please inform the invigilator.'),
+    h('div', {class: 'center'}, h('button', {class: 'ibtn', onclick: done}, 'My details are correct'))])));
+  if(L){
+    await preStep(done => preShow([h('span', {html: ICO.person}), h('span', null, candLine()), preVol()],
+      preBox(ICO.phones, 'Test sound', [
+        h('p', null, 'Put on your headphones and click on the ', h('b', null, 'Play sound'), ' button to play a sample sound.'),
+        h('div', {class: 'center'}, h('button', {class: 'ibtn', onclick: () => beep(+$('#xVol').value)}, 'Play sound')),
+        preInfo('If you cannot hear the sound clearly, please tell the invigilator.'),
+        h('div', {class: 'center'}, h('button', {class: 'ibtn', onclick: done}, 'Continue'))])));
+  }
+  const n = T.isW ? 2 : T.Q.length, parts = T.isW ? 2 : T.nParts;
+  const partsTxt = parts === 1 ? 'There is one part to the test.' : 'There are ' + ['', 'one', 'two', 'three', 'four', 'five'][parts] + ' parts to the test.';
+  let head, time, ins, inf;
+  if(L){
+    let mins = t.minutes;
+    if(T.hasAudio){ const d = await audioTotal(); if(d) mins = Math.round(d / 60) + 2; }
+    head = 'IELTS Listening'; time = 'Approximately ' + mins + ' minutes';
+    ins = ['Answer <b>all</b> the questions.', 'You can change your answers at any time during the test.'];
+    inf = ['There are ' + n + ' questions in this test.', 'Each question carries one mark.', partsTxt,
+      X.mode === 'practice' ? 'This is a practice test: you can pause and rewind the recording.' : 'You will hear each part once.',
+      'For each part of the test there will be time for you to look through the questions and time for you to check your answers.'];
+  } else if(T.isW){
+    head = 'IELTS ' + (t.readingType === 'general' ? 'General Training' : 'Academic') + ' Writing'; time = t.minutes + ' minutes';
+    ins = ['Answer <b>both</b> parts.', 'You can change your answers at any time during the test.'];
+    inf = ['There are two parts in this test.', 'Part 2 contributes twice as much as Part 1 to the writing score.',
+      'The test clock will show you when there are 10 minutes and 5 minutes remaining.'];
+  } else {
+    head = 'IELTS ' + (t.readingType === 'general' ? 'General Training' : 'Academic') + ' Reading'; time = t.minutes + ' minutes';
+    ins = ['Answer <b>all</b> the questions.', 'You can change your answers at any time during the test.'];
+    inf = ['There are ' + n + ' questions in this test.', 'Each question carries one mark.', partsTxt,
+      'The test clock will show you when there are 10 minutes and 5 minutes remaining.'];
+  }
+  await preStep(done => preShow([h('span', {html: ICO.person}), h('span', null, candLine()), L ? preVol() : null],
+    h('div', {class: 'instr'}, h('h2', null, head), h('p', null, 'Time: ' + time),
+      h('h3', null, 'INSTRUCTIONS TO CANDIDATES'), h('ul', null, ins.map(x => h('li', {html: x}))),
+      h('h3', null, 'INFORMATION FOR CANDIDATES'), h('ul', null, inf.map(x => h('li', {html: x}))),
+      preInfo('Do not click \'Start test\' until you are told to do so.', true),
+      h('div', {class: 'center'}, h('button', {class: 'ibtn', id: 'preStart', onclick: done}, 'Start test')))));
+  await enterExam(t);
+}
+/* общая длина всех записей теста (для строки «Approximately … minutes») */
+function audioTotal(){
+  return Promise.all((T.test.audio || []).map(a => new Promise(res => {
+    const u = URL.createObjectURL(a.blob), el = new Audio(); el.preload = 'metadata';
+    const fin = v => { URL.revokeObjectURL(u); res(v); };
+    el.onloadedmetadata = () => fin(el.duration || 0); el.onerror = () => fin(0); el.src = u;
+    setTimeout(() => fin(0), 4000);
+  }))).then(a => a.reduce((s, x) => s + x, 0));
+}
 
 async function startAttempt(){
   const name = $('#inName').value.trim();
@@ -1581,39 +1803,456 @@ async function startAttempt(){
   const t = INTRO.t;
   X = {id: uid(), testId: t.id, name, mode: INTRO.mode, startedAt: Date.now(), answers: {}, flags: {}, hl: {},
        writing: {1: '', 2: ''}, cur: 1, task: 1, remaining: t.minutes * 60000, elapsed: 0,
-       audioIdx: 0, audioTime: 0, phase: 'main', checkLeft: 120000, alerts: {}, finished: false};
-  await enterExam(t);
+       audioIdx: 0, audioTime: 0, phase: 'main', checkLeft: 120000, alerts: {}, finished: false,
+       cand: String(100000 + Math.floor(Math.random() * 900000))};
+  await runPre(t);
 }
 async function resumeAttempt(a, t){ X = a; await enterExam(t); }
 
 async function enterExam(t){
   T = runtimeFor(t);
-  if(!pdfReady()) return;
+  if(!T.paper && !pdfReady()) return;
+  if(!X.cand) X.cand = String(100000 + Math.floor(Math.random() * 900000));
   X.review = false;
   showScreen('exam');
   applyXSettings();
-  $('#xName').textContent = X.name;
-  $('#xMod').textContent = MOD_NAME[t.module] + (X.mode === 'practice' ? ' · practice' : '');
-  $('#xSubmit').classList.remove('hidden'); $('#xBackRes').classList.add('hidden');
+  $('#exam').classList.toggle('full', !!T.paper);
+  $('#xName').textContent = candLine();
+  $('#xMod').textContent = X.mode === 'practice' ? 'Practice' : '';
+  $('#xBackRes').classList.add('hidden'); $('#xHelp').classList.remove('hidden'); $('#xHide').classList.remove('hidden');
   $('#xTimerBox').classList.remove('hidden');
-  // слева PDF
+  $('#xNext').classList.remove('hidden');
   const au0 = $('#xAudio'); au0.pause(); au0.controls = false; $('#exam').append(au0);   // плеер — обратно в скрытое место
+  const slot = $('#xAudioSlot'); slot.innerHTML = '';
+  if(T.hasAudio && X.mode === 'practice') slot.append(buildAudioBar());
   const left = $('#xLeft'); left.innerHTML = '';
-  const pdfHost = h('div', {style: 'flex:1;min-height:0;display:flex;flex-direction:column'});
-  if(T.hasAudio && X.mode === 'practice') left.append(buildAudioBar());
-  left.append(pdfHost);
-  if(XV) XV.destroy();
-  XV = new PdfView(pdfHost, {highlights: X.hl});
-  try{
-    const doc = await openPdf(t.tasksPdf.data);
-    await XV.open(doc, t.from || 1, t.to || doc.numPages);
-  }catch(e){ pdfHost.textContent = 'PDF error: ' + e.message; }
-  renderRight(true); renderNav();
+  if(XV){ XV.destroy(); XV = null; }
+  if(!T.paper){
+    const pdfHost = h('div', {style: 'flex:1;min-height:0;display:flex;flex-direction:column'});
+    left.append(pdfHost);
+    XV = new PdfView(pdfHost, {highlights: X.hl});
+    try{
+      const doc = await openPdf(t.tasksPdf.data);
+      await XV.open(doc, t.from || 1, t.to || doc.numPages);
+    }catch(e){ pdfHost.textContent = 'PDF error: ' + e.message; }
+  }
+  shownPart = -1; renderRight(true); renderNav();
   setupAudio();
   clearInterval(tick); X.lastTick = Date.now();
   tick = setInterval(onTick, 250); onTick();
   saveAttempt();
+  setTimeout(() => goQ(T.isW ? X.task : X.cur, true), 60);
 }
+
+/* ---------- таймер ---------- */
+function onTick(){
+  if(!X || X.finished || X.review) return;
+  const now = Date.now(), dt = Math.min(5000, now - (X.lastTick || now)); X.lastTick = now;
+  const au = $('#xAudio');
+  if(au && T.hasAudio){ X.audioTime = au.currentTime || 0; }
+  let html = '', red = false;
+  if(X.mode === 'practice'){
+    X.elapsed += dt;
+    html = '<span class="big">' + fmtClock(X.elapsed / 1000) + '</span> time used';
+  } else if(T.hasAudio){
+    X.elapsed += dt;
+    if(X.phase === 'main'){
+      let rest = 0, known = true;
+      for(let i = X.audioIdx; i < audioURLs.length; i++){
+        if(audioDur[i] == null) { known = false; break; }
+        rest += i === X.audioIdx ? audioDur[i] - (au.currentTime || 0) : audioDur[i];
+      }
+      html = known ? timerHTML(rest + 120) : 'Listening…';
+    } else {
+      X.checkLeft -= dt; red = true;
+      html = '<span class="big">' + fmtClock(X.checkLeft / 1000) + '</span> to check your answers';
+      if(X.checkLeft <= 0) return autoSubmit();
+    }
+  } else {
+    X.remaining -= dt; X.elapsed += dt;
+    const sec = X.remaining / 1000;
+    html = timerHTML(sec); red = sec < 300;
+    [10, 5].forEach(m => { if(sec <= m * 60 && sec > m * 60 - 30 && !X.alerts[m]){
+      X.alerts[m] = 1; xAlert(m + ' minutes remaining');
+      const b = $('#xTimerBox'); b.classList.add('flash'); setTimeout(() => b.classList.remove('flash'), 5000);
+    } });
+    if(X.remaining <= 0) return autoSubmit();
+  }
+  const el = $('#xTimer');
+  el.innerHTML = X.timerHidden ? 'Click to show the time' : html;
+  $('#xTimerBox').classList.toggle('red', red && !X.timerHidden);
+  if(!X.saveAt || now - X.saveAt > 2000){ X.saveAt = now; saveAttempt(); }
+}
+function timerHTML(sec){
+  if(sec < 60) return '<span class="big">' + Math.max(0, Math.ceil(sec)) + '</span> seconds left';
+  const m = Math.ceil(sec / 60);
+  return '<span class="big">' + m + '</span> ' + (m === 1 ? 'minute left' : 'minutes left');
+}
+
+/* ---------- полоса заголовка и правая панель ---------- */
+let shownPart = -1;
+const curPart = () => T.isW ? X.task - 1 : (T.Q[X.cur - 1] ? T.Q[X.cur - 1].part : 0);
+
+function renderTitle(p){
+  const tl = $('#xTitle'); tl.innerHTML = '';
+  if(T.isW){
+    const k = p + 1;
+    tl.append(h('span', null, 'Part ' + k), h('span', {class: 'sub'}, (k === 1 ? 'You should spend about 20 minutes on this task.' :
+      'You should spend about 40 minutes on this task.') + ' Write at least ' + (k === 1 ? 150 : 250) + ' words.'));
+    return;
+  }
+  const qs = T.Q.filter(q => q.part === p);
+  if(!qs.length) return;
+  const range = qs[0].n + ' – ' + qs[qs.length - 1].n;
+  tl.append(h('span', null, 'Part ' + (p + 1)), h('span', {class: 'sub'},
+    (T.test.module === 'listening' ? 'Listen and answer questions ' : 'Read the text and answer questions ') + range + '.'));
+}
+
+function renderRight(force){
+  const p = curPart();
+  if(!force && p === shownPart) return;
+  const prev = shownPart; shownPart = p;
+  renderTitle(p);
+  const R = $('#xRight'); R.innerHTML = ''; R.scrollTop = 0;
+  if(T.isW) renderWritingTask(R);
+  else if(T.paper) renderPaper(R, p);
+  else {
+    const qs = T.Q.filter(q => q.part === p);
+    if(qs.length){
+      R.append(h('div', {class: 'lhead'}, h('h4', null, 'Questions ' + qs[0].n + ' – ' + qs[qs.length - 1].n),
+        h('div', null, 'Read the questions in the text on the left. Write or choose your answers below.')));
+      qs.forEach(q => R.append(renderQ(q)));
+    }
+  }
+  if(XV && T.partPages[p] && prev !== p && prev !== -1) XV.scrollToPage(T.partPages[p]);
+}
+
+/* поле для ответа: номер вопроса виден внутри, как на экзамене */
+function gapInput(n){
+  const rv = X.review ? X.res[n] : null;
+  const inp = h('input', {class: 'gap' + (rv === 'ok' ? ' ok' : rv === 'bad' || rv === 'empty' ? ' bad' : ''), 'data-qs': n,
+    placeholder: n, value: X.answers[n] || '', disabled: X.review || null, spellcheck: 'false', autocomplete: 'off',
+    autocorrect: 'off', autocapitalize: 'off', maxlength: 60,
+    oninput: e => { setAnswer(n, e.target.value); fitGap(e.target); }, onfocus: () => { if(X.cur !== n) goQ(n, false); }});
+  fitGap(inp);
+  if(!X.review) return inp;
+  const f = document.createDocumentFragment(); f.append(inp, reviewMark(n)); return f;
+}
+/* поле растягивается под длинный ответ (например, номер карты) */
+function fitGap(inp){ inp.style.width = Math.max(117, Math.round(inp.value.length * 7.8 + 18)) + 'px'; }
+/* в разборе: рядом с ответом — верно / неверно и правильный ответ */
+function reviewMark(n){
+  const r = X.res[n], k = T.Q[n - 1] && T.Q[n - 1].key;
+  if(r === 'ok') return h('span', {class: 'mark ok'}, '✓');
+  if(r === 'nokey' || !k) return h('span', {class: 'mark'}, '');
+  return h('span', {class: 'mark bad'}, '✗ ', h('span', {class: 'ca'}, k.group ? k.raw + ' (any order)' : k.raw));
+}
+/* переключатель: повторный щелчок по выбранному ответу снимает выбор (как на экзамене) */
+function radioToggle(lab, inp, n, val){
+  lab.addEventListener('mousedown', () => { inp._was = inp.checked; });
+  inp.addEventListener('click', () => {
+    if(inp._was){ inp.checked = false; setAnswer(n, ''); } else setAnswer(n, val);
+    inp._was = false; goQ(n, false);
+  });
+}
+
+function renderQ(q){
+  const ans = X.answers[q.n] || '', rv = X.review ? X.res[q.n] : null;
+  const row = h('div', {class: 'lq' + (X.cur === q.n ? ' cur' : ''), 'data-qs': q.n, onclick: () => { if(X.cur !== q.n) goQ(q.n, false); }});
+  row.append(h('b', {class: 'ln'}, q.n));
+  if(q.options){
+    const box = h('div', {class: 'lopts'});
+    q.options.forEach(o => {
+      const inp = h('input', {type: 'radio', name: 'lq' + q.n, value: o, checked: ans === o || null, disabled: X.review || null});
+      const corr = rv && q.key && (q.key.group ? q.key.group.items.some(i => i.raw.trim().toUpperCase() === o) : q.key.alts.includes(normAns(o)));
+      const lab = h('label', {class: X.review ? (corr ? 'okopt' : ans === o ? 'badopt' : '') : ''}, inp, o);
+      if(!X.review) radioToggle(lab, inp, q.n, o);
+      box.append(lab);
+    });
+    row.append(box);
+    if(X.review) row.append(reviewMark(q.n));
+  } else row.append(gapInput(q.n));
+  return row;
+}
+
+/* ---------- задание прямо на экране: блоки из теста (test.paper) ---------- */
+function renderPaper(R, p){
+  const wrap = h('div', {class: 'paper'});
+  (T.paper[p] || []).forEach(b => { const el = renderBlock(b); if(el) wrap.append(el); });
+  R.append(wrap);
+}
+function fillGaps(html){
+  const div = h('div', {class: 'pbody', html: html.replace(/\{\{(\d+)(:drag)?\}\}/g,
+    (m, n, d) => '<span class="gapslot" data-n="' + n + '" data-drag="' + (d ? 1 : '') + '"></span>')});
+  div.querySelectorAll('.gapslot').forEach(s => s.replaceWith(s.dataset.drag ? dropGap(+s.dataset.n) : gapInput(+s.dataset.n)));
+  return div;
+}
+function renderBlock(b){
+  if(b.t === 'h') return h('div', {class: 'phead'}, h('h4', null, b.q), b.i ? h('div', {class: 'pinstr', html: b.i}) : null);
+  if(b.t === 'html') return fillGaps(b.html);
+  if(b.t === 'mc') return mcBlock(b);
+  if(b.t === 'multi') return multiBlock(b);
+  if(b.t === 'drag') return dragBlock(b);
+  if(b.t === 'grid') return gridBlock(b);
+  return null;
+}
+function mcBlock(b){
+  const box = h('div', {class: 'mcq' + (b.wide ? ' wide' : '') + (X.cur === b.n ? ' cur' : ''), 'data-qs': b.n,
+    onclick: () => { if(X.cur !== b.n) goQ(b.n, false); }});
+  box.append(h('div', {class: 'qt'}, h('b', null, b.n), h('span', {html: b.q})));
+  const key = T.Q[b.n - 1] && T.Q[b.n - 1].key, ans = X.answers[b.n] || '';
+  b.o.forEach((txt, i) => {
+    const L = LETTERS[i];
+    const inp = h('input', {type: 'radio', name: 'mc' + b.n, value: L, checked: ans === L || null, disabled: X.review || null});
+    const corr = X.review && key && key.alts.includes(normAns(L));
+    const lab = h('label', {class: X.review ? (corr ? 'okopt' : ans === L ? 'badopt' : '') : ''}, inp, h('span', {html: txt}));
+    if(!X.review) radioToggle(lab, inp, b.n, L);
+    box.append(lab);
+  });
+  if(X.review) box.append(reviewMark(b.n));
+  return box;
+}
+function multiBlock(b){
+  const ns = b.n;
+  const box = h('div', {class: 'mcq wide' + (ns.includes(X.cur) ? ' cur' : ''), 'data-qs': ns.join(' '),
+    onclick: () => { if(!ns.includes(X.cur)) goQ(ns[0], false); }});
+  box.append(h('div', {class: 'qt'}, h('b', null, ns[0] + ' – ' + ns[ns.length - 1]), h('span', {html: b.q})));
+  const chosen = () => ns.map(n => X.answers[n]).filter(Boolean);
+  const key = T.Q[ns[0] - 1] && T.Q[ns[0] - 1].key;
+  const good = key && key.group ? key.group.items.map(i => i.raw.trim().toUpperCase()) : [];
+  b.o.forEach((txt, i) => {
+    const L = LETTERS[i], on = chosen().includes(L);
+    const cb = h('input', {type: 'checkbox', value: L, checked: on || null, disabled: X.review || null});
+    cb.addEventListener('change', () => {
+      let s = chosen();
+      if(cb.checked){ if(s.length >= ns.length){ cb.checked = false; return; } s.push(L); } else s = s.filter(x => x !== L);
+      s.sort(); ns.forEach((n, j) => { X.answers[n] = s[j] || ''; });
+      renderNav(); saveAttempt();
+    });
+    box.append(h('label', {class: X.review ? (good.includes(L) ? 'okopt' : on ? 'badopt' : '') : ''}, cb, h('span', {html: txt})));
+  });
+  if(X.review) ns.forEach(n => box.append(h('span', null, h('b', null, n + ': '), reviewMark(n))));
+  return box;
+}
+/* сопоставление: в каждой строке одна буква, повторный щелчок снимает выбор */
+function gridBlock(b){
+  const t = h('table', {class: 'pgrid'});
+  t.append(h('tr', null, h('th', null, ''), ...b.cols.map(c => h('th', null, c))));
+  b.n.forEach((n, i) => {
+    const ans = X.answers[n] || '', key = T.Q[n - 1] && T.Q[n - 1].key;
+    const tr = h('tr', {class: X.cur === n ? 'cur' : '', 'data-qs': n});
+    const first = h('td', {class: 'rq'}, h('b', null, n), h('span', {html: b.rows[i]}));
+    if(X.review) first.append(reviewMark(n));
+    tr.append(first);
+    b.cols.forEach(c => {
+      const corr = X.review && key && key.alts.includes(normAns(c));
+      const td = h('td', {class: 'cell' + (X.review ? (corr ? ' ok' : ans === c ? ' bad' : '') : '')},
+        h('input', {type: 'radio', name: 'g' + n, checked: ans === c || null, disabled: X.review || null, tabindex: -1}));
+      if(!X.review) td.addEventListener('click', () => { setAnswer(n, X.answers[n] === c ? '' : c); renderRight(true); goQ(n, false); });
+      tr.append(td);
+    });
+    t.append(tr);
+  });
+  return h('div', null, b.legend ? h('div', {class: 'pbody', html: b.legend}) : null, t);
+}
+/* перетаскивание: варианты справа, их переносят в пропуски слева (можно и щелчком) */
+let dragSel = null;
+function dropGap(n){
+  const v = X.answers[n] || '', rv = X.review ? X.res[n] : null;
+  const g = h('span', {class: 'gap' + (v ? '' : ' empty') + (rv === 'ok' ? ' ok' : rv === 'bad' || rv === 'empty' ? ' bad' : ''), 'data-qs': n,
+    title: X.review ? '' : (v ? 'Click to remove the answer' : 'Drag an answer here')}, v || String(n));
+  if(!X.review){
+    g.addEventListener('dragover', e => { e.preventDefault(); g.classList.add('over'); });
+    g.addEventListener('dragleave', () => g.classList.remove('over'));
+    g.addEventListener('drop', e => { e.preventDefault(); placeDrag(n, e.dataTransfer.getData('text/plain')); });
+    g.addEventListener('click', () => {
+      if(dragSel){ placeDrag(n, dragSel); return; }
+      if(X.answers[n]){ placeDrag(n, ''); return; }
+      goQ(n, false);
+    });
+  }
+  if(!X.review) return g;
+  const f = document.createDocumentFragment(); f.append(g, reviewMark(n)); return f;
+}
+function placeDrag(n, val){
+  for(const k in X.answers) if(val && X.answers[k] === val && T.paperDragOnce && +k !== n) X.answers[k] = '';
+  X.answers[n] = val; dragSel = null;
+  saveAttempt(); renderRight(true); renderNav(); goQ(n, false);
+}
+function dragBlock(b){
+  T.paperDragOnce = !b.reuse;
+  const used = new Set(b.n.map(n => X.answers[n]).filter(Boolean));
+  const opts = h('div', {class: 'dragopts'}, b.title ? h('h5', null, b.title) : null);
+  b.o.forEach(o => {
+    if(used.has(o) && !b.reuse) return;
+    const c = h('span', {class: 'dragopt' + (dragSel === o ? ' sel' : ''), draggable: X.review ? null : 'true'}, o);
+    if(!X.review){
+      c.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', o); });
+      c.addEventListener('click', () => { dragSel = dragSel === o ? null : o; renderRight(true); });
+    }
+    opts.append(c);
+  });
+  return h('div', {class: 'dragwrap'}, fillGaps(b.html), opts);
+}
+
+function setAnswer(n, v){
+  X.answers[n] = v;
+  renderNav(); saveAttempt();
+}
+
+function goQ(n, focus){
+  if(T.isW){ X.task = n; renderRight(); renderNav(); saveAttempt(); if(focus){ const ta = $('#xRight textarea'); if(ta) ta.focus(); } return; }
+  if(n < 1 || n > T.Q.length) return;
+  X.cur = n;
+  renderRight();
+  $$('#xRight .cur').forEach(e => e.classList.remove('cur'));
+  const el = $('#xRight [data-qs~="' + n + '"]');
+  renderNav();
+  if(el){
+    el.classList.add('cur');
+    el.scrollIntoView({block: 'nearest'});
+    if(focus && el.matches('input.gap') && !el.disabled) el.focus();
+  }
+  saveAttempt();
+}
+
+/* ---------- нижняя полоса: номера вопросов, Review, стрелки ---------- */
+function renderNav(){
+  const ul = $('#xParts'); ul.innerHTML = '';
+  $('#xQNav').classList.toggle('summary', !!X.navSummary);
+  const items = T.isW
+    ? [1, 2].map(k => ({n: k, ans: wordCount(X.writing[k]) > 0, flag: X.flags['t' + k], cur: X.task === k}))
+    : T.Q.map(q => ({n: q.n, ans: !!(X.answers[q.n] || '').trim(), flag: X.flags[q.n], cur: q.n === X.cur, part: q.part}));
+  let lastPart = 0;
+  items.forEach(it => {
+    const c = [];
+    if(it.ans) c.push('answered');
+    if(it.cur) c.push('current');
+    if(it.flag) c.push('review');
+    if(X.review && !T.isW){ const r = X.res[it.n]; if(r === 'ok') c.push('r-ok'); else if(r === 'bad' || r === 'empty') c.push('r-bad'); }
+    if(it.part !== undefined && it.part !== lastPart){ c.push('newpart'); lastPart = it.part; }
+    ul.append(h('li', {class: c.join(' '), title: (T.isW ? 'Part ' : 'Question ') + it.n, onclick: () => goQ(it.n, true)}, h('span', null, it.n)));
+  });
+  const first = T.isW ? X.task === 1 : X.cur === 1, last = T.isW ? X.task === 2 : X.cur === T.Q.length;
+  $('#xPrev').classList.toggle('hidden', first);
+  const nx = $('#xNext');
+  nx.innerHTML = last ? ICO.finish : ICO.next;
+  nx.title = last ? 'Finish the test' : 'Next';
+  nx.classList.toggle('hidden', !!(X.review && last));
+  $('#xReview').checked = !!(T.isW ? X.flags['t' + X.task] : X.flags[X.cur]);
+  $('#xReview').disabled = !!X.review;
+}
+
+/* ---------- Writing ---------- */
+function renderWritingTask(R){
+  const k = X.task;
+  const ta = h('textarea', {class: 'wta', spellcheck: 'false', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off',
+    readonly: X.review || null});
+  ta.value = X.writing[k] || '';
+  const wc = h('div', {class: 'wcount'});
+  const upd = () => { wc.textContent = 'Word count: ' + wordCount(ta.value); };
+  ta.addEventListener('input', () => { X.writing[k] = ta.value; upd(); renderNav(); saveAttempt(); });
+  upd();
+  R.append(h('div', {class: 'wtask'}, ta, wc));
+}
+
+/* ---------- сдача ---------- */
+async function askSubmit(){
+  let html;
+  if(T.isW){
+    html = '<p>Part 1: <b>' + wordCount(X.writing[1]) + '</b> words. Part 2: <b>' + wordCount(X.writing[2]) + '</b> words.</p>';
+  } else {
+    const un = T.Q.filter(q => !(X.answers[q.n] || '').trim()).map(q => q.n);
+    const fl = T.Q.filter(q => X.flags[q.n]).map(q => q.n);
+    html = '<p>You have answered <b>' + (T.Q.length - un.length) + '</b> of <b>' + T.Q.length + '</b> questions.</p>' +
+      (un.length ? '<p>Unanswered: ' + un.join(', ') + '</p>' : '') +
+      (fl.length ? '<p>Marked for review: ' + fl.join(', ') + '</p>' : '');
+  }
+  html += '<p>Once you submit, you cannot change your answers.</p>';
+  const ok = await xDialog('Finish the test', html, [['Return to test', false], ['Submit', true]], {closeValue: false});
+  if(ok) finishAttempt();
+}
+
+/* ---------- Help: вкладки как на экзамене + настройки вида ---------- */
+function openHelp(){
+  const tabs = [
+    ['Information', () => h('div', null,
+      h('p', null, h('b', null, T.test.title)),
+      h('p', null, 'Candidate: ' + candLine()),
+      h('p', null, 'Questions: ' + (T.isW ? 2 : T.Q.length) + (X.mode === 'practice' ? ' · Practice mode' : '')),
+      T.hasAudio && X.mode === 'practice' ? h('p', null, 'Player keys: Space — play / pause, ← → — 3 seconds, Shift + ← → — 10 seconds.') : null)],
+    ['Test help', () => h('ul', null, [
+      'To choose a question, click on the question number at the bottom of the screen or click on the question.',
+      'To go to the next or previous question, click on the arrows at the bottom right of the screen.',
+      'To mark a question you want to come back to, tick the Review box at the bottom left. The question number becomes round.',
+      'An answered question has a white number. An unanswered question has a black number.',
+      'Click on the pencil to make the question numbers smaller or bigger.',
+      'Click on the time at the top of the screen to hide or show it. Click on Hide to hide the screen; the clock does not stop.',
+      'To finish the test, go to the last question and click on the arrow at the bottom right.'].map(x => h('li', null, x)))],
+    ['Task help', () => h('div', null,
+      h('h5', null, 'Gap fill questions'), h('p', null, 'Click in the gap and write your answer. The number in the gap is the question number.'),
+      h('h5', null, 'Drag and drop questions'), h('p', null, 'Move an answer from the list into the gap, or click on the answer and then on the gap. To remove an answer, click on it.'),
+      h('h5', null, 'Multiple choice questions'), h('p', null, 'Click on the answer you think is right. To change it, click on a different answer. To leave the question unanswered, click on your answer again.'),
+      h('h5', null, 'Questions with more than one answer'), h('p', null, 'Some questions ask you to choose two or three answers. Tick the boxes of the answers you think are right.'))],
+    ['Options', () => xOptions()]
+  ];
+  const holder = h('div');
+  const bar = h('div', {class: 'xtabs'});
+  const show = i => { bar.querySelectorAll('button').forEach((b, j) => b.classList.toggle('on', j === i)); holder.innerHTML = ''; holder.append(tabs[i][1]()); };
+  tabs.forEach(([name], i) => bar.append(h('button', {onclick: () => show(i)}, name)));
+  show(2);
+  xDialog('Help', h('div', null, bar, holder), [['OK', true]], {icon: ICO.help});
+}
+function xOptions(){
+  const s = LS.get('ielts_xset', {fs: 14, c: ''});
+  const box = h('div');
+  const mk = (title, opts, key) => {
+    const seg = h('div', {class: 'seg', style: 'margin-bottom:14px'});
+    opts.forEach(([v, lab]) => seg.append(h('button', {class: s[key] === v ? 'on' : '', onclick: e => {
+      s[key] = v; LS.set('ielts_xset', s); applyXSettings();
+      seg.querySelectorAll('button').forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on');
+    }}, lab)));
+    box.append(h('h5', null, title), seg);
+  };
+  mk('Text size', [[14, 'Standard'], [17, 'Large'], [20, 'Extra large']], 'fs');
+  mk('Colours', [['', 'Black on white'], ['c-wb', 'White on black'], ['c-yb', 'Yellow on black']], 'c');
+  box.append(h('div', null, h('button', {class: 'ibtn', onclick: () => {
+    for(const k in X.hl) delete X.hl[k]; XV && XV.redrawAll();
+    $$('#xRight mark.hl').forEach(m => m.replaceWith(document.createTextNode(m.textContent)));
+    saveAttempt(); toast('Highlights cleared');
+  }}, 'Clear all highlights')));
+  return box;
+}
+function applyXSettings(){
+  const s = LS.get('ielts_xset', {fs: 14, c: ''});
+  if(![14, 17, 20].includes(s.fs)) s.fs = 14;
+  const ex = $('#exam');
+  ex.classList.remove('c-wb', 'c-yb'); if(s.c) ex.classList.add(s.c);
+  ex.style.setProperty('--x-fs', s.fs + 'px');
+}
+function hideScreen(){
+  xDialog('Screen hidden', '<p>Your answers have been stored.</p><p>Please note that the clock is still running. The time has not been paused.</p>' +
+    '<p>If you wish to leave the room, please tell your invigilator.</p><p>Click the button below to go back to your test.</p>',
+    [['Resume test', true]], {solid: true, icon: ICO.screen, closeValue: true});
+}
+
+/* разбор: тот же экран экзамена, но с правильными ответами */
+function openReview(){
+  X.review = true;
+  showScreen('exam'); applyXSettings();
+  $('#exam').classList.toggle('full', !!T.paper);
+  $('#xBackRes').classList.remove('hidden'); $('#xHide').classList.add('hidden');
+  $('#xVolBox').classList.toggle('hidden', !T.hasAudio);
+  if(T.hasAudio && !$('#xAudioBar')){                 // в разборе можно переслушать запись с перемоткой
+    $('#xAudioSlot').append(buildAudioBar());
+    playTrack(X.audioIdx && X.audioIdx < audioURLs.length ? X.audioIdx : 0, 0, false);
+  }
+  $('#xTimer').innerHTML = '<span class="xreviewtag">REVIEW</span>';
+  $('#xTimerBox').classList.remove('red', 'flash');
+  shownPart = -1; renderRight(true); renderNav();
+  setTimeout(() => XV && XV.layout(), 50);
+}
+
 
 /* ---------- аудио Listening ---------- */
 let audioURLs = [], audioDur = [];
@@ -1643,7 +2282,8 @@ function playTrack(i, time, autoplay){
   const tl = $('#xTrackLab'); if(tl) tl.textContent = 'Track ' + (i + 1) + ' / ' + audioURLs.length + ': ' + T.test.audio[i].name;
   const sel = $('#xTrackSel'); if(sel) sel.value = i;
   if(autoplay === undefined) autoplay = X.mode === 'strict' || time !== undefined;
-  if(autoplay) au.play().catch(() => {
+  if(autoplay) au.play().catch(err => {
+    if(!err || err.name !== 'NotAllowedError') return;   // запуск прервали паузой — это не ошибка
     modal('Sound', '<p>Click the button to start the recording.</p>', [{text: '▶ Play', cls: 'primary', value: 1}]).then(() => au.play());
   });
 }
@@ -1725,7 +2365,7 @@ function apLoop(){                                    // плавное движ
 document.addEventListener('pointerup', () => { apDragging = false; });
 /* горячие клавиши — только когда курсор не в поле ответа */
 document.addEventListener('keydown', e => {
-  if(!$('#xAudioBar') || $('#exam').classList.contains('hidden') || $('#modalRoot').children.length) return;
+  if(!$('#xAudioBar') || $('#exam').classList.contains('hidden') || $('#modalRoot').children.length || $('.xov')) return;
   if(e.ctrlKey || e.metaKey || e.altKey) return;
   if(e.target.closest && e.target.closest('input,textarea,select,button,[contenteditable]')) return;
   if(e.code === 'Space'){ e.preventDefault(); apToggle(); }
@@ -1733,189 +2373,12 @@ document.addEventListener('keydown', e => {
   else if(e.key === 'ArrowRight'){ e.preventDefault(); apSeek(e.shiftKey ? 10 : 3); }
 });
 
-/* ---------- таймер ---------- */
-function onTick(){
-  if(!X || X.finished || X.review) return;
-  const now = Date.now(), dt = Math.min(5000, now - (X.lastTick || now)); X.lastTick = now;
-  const el = $('#xTimer'), box = $('#xTimerBox');
-  const au = $('#xAudio');
-  if(au && T.hasAudio){ X.audioTime = au.currentTime || 0; }
-  let txt = '', low = false;
-  if(X.mode === 'practice'){
-    X.elapsed += dt;
-    txt = 'Time used: ' + fmtClock(X.elapsed / 1000);
-  } else if(T.hasAudio){
-    X.elapsed += dt;
-    if(X.phase === 'main'){
-      let rest = 0, known = true;
-      for(let i = X.audioIdx; i < audioURLs.length; i++){
-        if(audioDur[i] == null) { known = false; break; }
-        rest += i === X.audioIdx ? audioDur[i] - (au.currentTime || 0) : audioDur[i];
-      }
-      txt = known ? minutesLeft(rest + 120) : 'Listening…';
-    } else {
-      X.checkLeft -= dt; low = true;
-      txt = 'Check your answers: ' + fmtClock(X.checkLeft / 1000);
-      if(X.checkLeft <= 0) return autoSubmit();
-    }
-  } else {
-    X.remaining -= dt; X.elapsed += dt;
-    const sec = X.remaining / 1000;
-    txt = minutesLeft(sec); low = sec < 300;
-    [10, 5].forEach(m => { if(sec <= m * 60 && sec > m * 60 - 30 && !X.alerts[m]){ X.alerts[m] = 1; xAlert(m + ' minutes remaining'); } });
-    if(X.remaining <= 0) return autoSubmit();
-  }
-  el.textContent = txt; box.classList.toggle('low', low);
-  if(!X.saveAt || now - X.saveAt > 2000){ X.saveAt = now; saveAttempt(); }
-}
-function minutesLeft(sec){
-  if(sec < 60) return fmtClock(sec) + ' left';
-  const m = Math.ceil(sec / 60);
-  return m + (m === 1 ? ' minute left' : ' minutes left');
-}
 function xAlert(text){
   const t = h('div', {class: 'toast', style: 'top:64px;bottom:auto;background:#ffd54f;color:#000;font-weight:700'}, text);
   document.body.append(t); setTimeout(() => t.remove(), 6000);
 }
 
-/* ---------- правая панель ---------- */
-let shownPart = -1;
-const curPart = () => T.isW ? X.task - 1 : (T.Q[X.cur - 1] ? T.Q[X.cur - 1].part : 0);
-
-function renderRight(force){
-  const p = curPart();
-  if(!force && p === shownPart) return;
-  const prev = shownPart; shownPart = p;
-  const R = $('#xRight'); R.innerHTML = ''; R.scrollTop = 0;
-  if(T.isW) renderWritingTask(R);
-  else {
-    const qs = T.Q.filter(q => q.part === p);
-    if(qs.length){
-      R.append(h('div', {class: 'qhead'}, 'Part ' + (p + 1)),
-        h('div', {class: 'qsub'}, 'Questions ' + qs[0].n + '–' + qs[qs.length - 1].n +
-          (T.test.module === 'listening' ? '. Listen and answer the questions.' : '. Read the text and answer the questions.') +
-          (X.review ? '' : ' Write or choose your answers below.')));
-      qs.forEach(q => R.append(renderQ(q)));
-    }
-  }
-  if(XV && T.partPages[p] && prev !== p && prev !== -1) XV.scrollToPage(T.partPages[p]);
-}
-
-function renderQ(q){
-  const ans = X.answers[q.n] || '';
-  const rv = X.review ? X.res[q.n] : null;
-  const row = h('div', {class: 'q' + (X.cur === q.n ? ' cur' : '') + (rv === 'ok' ? ' r-ok' : rv === 'bad' || rv === 'empty' ? ' r-bad' : ''),
-    'data-n': q.n, onclick: () => { if(X.cur !== q.n) goQ(q.n, false); }});
-  const body = h('div', {class: 'qbody'});
-  if(q.options){
-    const opts = h('div', {class: 'opts'});
-    q.options.forEach(o => opts.append(h('button', {class: 'opt' + (ans === o ? ' on' : ''), disabled: X.review || null,
-      onclick: e => { e.stopPropagation(); setAnswer(q.n, X.answers[q.n] === o ? '' : o); row.querySelectorAll('.opt').forEach(b => b.classList.toggle('on', b.textContent === X.answers[q.n])); goQ(q.n, false); }}, o)));
-    body.append(opts);
-  } else {
-    body.append(h('input', {class: 'qin', value: ans, disabled: X.review || null, spellcheck: 'false', autocomplete: 'off',
-      autocorrect: 'off', autocapitalize: 'off', maxlength: 80,
-      oninput: e => setAnswer(q.n, e.target.value),
-      onfocus: () => { if(X.cur !== q.n) goQ(q.n, false); }}));
-  }
-  if(X.review){
-    const k = q.key;
-    const corr = !k ? 'no key' : k.group ? k.raw + ' (any order)' : k.raw;
-    body.append(h('div', {class: 'res'},
-      rv === 'ok' ? h('span', {class: 'c-ok'}, '✓ Correct') :
-      h('span', null, h('span', {class: 'c-bad'}, rv === 'empty' ? '✗ No answer' : rv === 'nokey' ? '' : '✗ Wrong'),
-        '  Correct answer: ', h('b', null, corr))));
-  }
-  row.append(h('div', {class: 'qnum'}, q.n), body);
-  if(!X.review) row.append(h('button', {class: 'flagbtn' + (X.flags[q.n] ? ' on' : ''), title: 'Review later',
-    onclick: e => { e.stopPropagation(); X.flags[q.n] = !X.flags[q.n]; e.currentTarget.classList.toggle('on', !!X.flags[q.n]); renderNav(); saveAttempt(); }}, '⚑'));
-  return row;
-}
-
-function setAnswer(n, v){
-  X.answers[n] = v;
-  renderNav(); saveAttempt();
-}
-
-function goQ(n, focus){
-  if(T.isW){ X.task = n; renderRight(); renderNav(); saveAttempt(); if(focus){ const ta = $('#xRight textarea'); if(ta) ta.focus(); } return; }
-  if(n < 1 || n > T.Q.length) return;
-  X.cur = n;
-  renderRight();
-  $$('#xRight .q').forEach(r => r.classList.toggle('cur', +r.dataset.n === n));
-  renderNav();
-  const row = $('#xRight .q[data-n="' + n + '"]');
-  if(row){
-    row.scrollIntoView({block: 'nearest'});
-    if(focus){ const inp = row.querySelector('input'); if(inp && !inp.disabled) inp.focus(); }
-  }
-  saveAttempt();
-}
-
-function renderNav(){
-  const box = $('#xParts'); box.innerHTML = '';
-  const cp = curPart();
-  if(T.isW){
-    [1, 2].forEach(k => {
-      const on = X.task === k;
-      box.append(h('button', {class: 'xpart' + (on ? ' on' : ''), onclick: () => goQ(k, true)},
-        h('span', {class: 'pt'}, 'Part ' + k), h('span', {class: 'cnt'}, wordCount(X.writing[k]) + ' words')));
-    });
-    return;
-  }
-  for(let p = 0; p < T.nParts; p++){
-    const qs = T.Q.filter(q => q.part === p);
-    if(!qs.length) continue;
-    const answered = qs.filter(q => (X.answers[q.n] || '').trim()).length;
-    if(p === cp){
-      const nums = h('div', {class: 'qnums'});
-      qs.forEach(q => {
-        let c = 'qn';
-        if((X.answers[q.n] || '').trim()) c += ' ans';
-        if(X.flags[q.n]) c += ' flag';
-        if(q.n === X.cur) c += ' cur';
-        if(X.review) c += X.res[q.n] === 'ok' ? ' r-ok' : X.res[q.n] === 'nokey' ? '' : ' r-bad';
-        nums.append(h('button', {class: c, onclick: () => goQ(q.n, true)}, q.n));
-      });
-      box.append(h('div', {class: 'xpart on'}, h('span', {class: 'pt'}, 'Part ' + (p + 1)), nums));
-    } else {
-      box.append(h('button', {class: 'xpart', onclick: () => goQ(qs[0].n, true)},
-        h('span', {class: 'pt'}, 'Part ' + (p + 1)), h('span', {class: 'cnt'}, answered + ' of ' + qs.length)));
-    }
-  }
-}
-
-/* ---------- Writing ---------- */
-function renderWritingTask(R){
-  const k = X.task, min = k === 1 ? 150 : 250;
-  const ta = h('textarea', {class: 'wta', spellcheck: 'false', autocomplete: 'off', autocorrect: 'off', autocapitalize: 'off',
-    readonly: X.review || null, placeholder: X.review ? '' : 'Type your answer here'});
-  ta.value = X.writing[k] || '';
-  const wc = h('div', {class: 'wcount'});
-  const upd = () => { wc.textContent = 'Word count: ' + wordCount(ta.value); };
-  ta.addEventListener('input', () => { X.writing[k] = ta.value; upd(); renderNav(); saveAttempt(); });
-  upd();
-  R.append(h('div', {class: 'wtask'},
-    h('div', {class: 'qhead'}, 'Part ' + k),
-    h('div', {class: 'qsub'}, (k === 1 ? 'You should spend about 20 minutes on this task. ' : 'You should spend about 40 minutes on this task. ') +
-      'Write at least ' + min + ' words.'),
-    ta, wc));
-}
-
 /* ---------- сдача ---------- */
-async function askSubmit(){
-  let txt;
-  if(T.isW){
-    const w1 = wordCount(X.writing[1]), w2 = wordCount(X.writing[2]);
-    txt = 'Task 1: ' + w1 + ' words. Task 2: ' + w2 + ' words.';
-  } else {
-    const un = T.Q.filter(q => !(X.answers[q.n] || '').trim()).length;
-    txt = un ? 'You have <b>' + un + '</b> unanswered question' + (un > 1 ? 's' : '') + '.' : 'All questions are answered.';
-  }
-  const ok = await modal('Submit test?', '<p>' + txt + '</p><p>Once you submit, you cannot change your answers.</p>',
-    [{text: 'Cancel', value: false}, {text: 'Submit', cls: 'primary', value: true}]);
-  if(ok) finishAttempt();
-}
 function autoSubmit(){
   clearInterval(tick);
   $('#xTimer').textContent = 'Time is up';
@@ -1965,9 +2428,26 @@ function showPop(x, y, items){
   popEl.style.top = Math.max(4, y - 46) + 'px';
 }
 function onExamMouseUp(e){
-  if(!XV || $('#exam').classList.contains('hidden')) return;
+  if($('#exam').classList.contains('hidden')) return;
   if(popEl && popEl.contains(e.target)) return;
   setTimeout(() => {
+    const sel = window.getSelection();
+    // выделение в тексте задания на экране (внутри одного куска текста)
+    if(sel && !sel.isCollapsed && sel.rangeCount && $('#xRight').contains(sel.anchorNode)){
+      const r = sel.getRangeAt(0), node = r.startContainer;
+      if(node === r.endContainer && node.nodeType === 3 && !node.parentElement.closest('input,textarea,.dragopt,.gap')){
+        showPop(e.clientX, e.clientY, [['Highlight', () => {
+          const m = document.createElement('mark'); m.className = 'hl'; r.surroundContents(m); sel.removeAllRanges();
+        }]]);
+        return;
+      }
+    }
+    if(e.target.matches && e.target.matches('#xRight mark.hl')){
+      const m = e.target;
+      showPop(e.clientX, e.clientY, [['Clear', () => m.replaceWith(document.createTextNode(m.textContent))]]);
+      return;
+    }
+    if(!XV){ hidePop(); return; }
     const rects = XV.selectionRects();
     if(rects){
       showPop(e.clientX, e.clientY, [
@@ -1979,32 +2459,6 @@ function onExamMouseUp(e){
     if(hit) showPop(e.clientX, e.clientY, [['Clear highlight', () => { XV.clearHl(hit); saveAttempt(); }]]);
     else hidePop();
   }, 0);
-}
-
-/* ---------- настройки вида (как на экзамене) ---------- */
-function applyXSettings(){
-  const s = LS.get('ielts_xset', {fs: 16, c: ''});
-  const ex = $('#exam');
-  ex.classList.remove('c-wb', 'c-yb'); if(s.c) ex.classList.add(s.c);
-  ex.style.setProperty('--x-fs', s.fs + 'px');
-}
-function openXSettings(){
-  const s = LS.get('ielts_xset', {fs: 16, c: ''});
-  const box = h('div');
-  const mk = (title, opts, key) => {
-    const seg = h('div', {class: 'seg', style: 'margin-bottom:14px'});
-    opts.forEach(([v, lab]) => seg.append(h('button', {class: s[key] === v ? 'on' : '', onclick: e => {
-      s[key] = v; LS.set('ielts_xset', s); applyXSettings();
-      seg.querySelectorAll('button').forEach(b => b.classList.remove('on')); e.currentTarget.classList.add('on');
-    }}, lab)));
-    box.append(h('div', {style: 'margin:4px 0 6px;font-weight:700'}, title), seg);
-  };
-  mk('Text size', [[16, 'Standard'], [19, 'Large'], [22, 'Extra large']], 'fs');
-  mk('Contrast', [['', 'Black on white'], ['c-wb', 'White on black'], ['c-yb', 'Yellow on black']], 'c');
-  box.append(h('button', {class: 'btn small', onclick: () => {
-    for(const k in X.hl) delete X.hl[k]; XV && XV.redrawAll(); saveAttempt(); toast('Highlights cleared');
-  }}, 'Clear all highlights'));
-  modal('Settings', box, [{text: 'Close', cls: 'primary', value: 1}]);
 }
 
 /* ---------- перетаскивание границы между панелями ---------- */
@@ -2110,22 +2564,6 @@ function answersTable(res){
         r === 'empty' ? h('span', {class: 'c-bad'}, tr('emptyCell')) : '')));
   });
   return h('div', {class: 'card'}, h('h2', null, tr('allAnswers')), h('div', {style: 'overflow-x:auto'}, tb));
-}
-
-/* разбор: тот же экран экзамена, но с правильными ответами */
-function openReview(){
-  X.review = true;
-  showScreen('exam'); applyXSettings();
-  $('#xSubmit').classList.add('hidden'); $('#xBackRes').classList.remove('hidden');
-  $('#xVolBox').classList.toggle('hidden', !T.hasAudio);
-  if(T.hasAudio && !$('#xAudioBar')){                 // в разборе можно переслушать запись с перемоткой
-    $('#xLeft').prepend(buildAudioBar());
-    playTrack(X.audioIdx && X.audioIdx < audioURLs.length ? X.audioIdx : 0, 0, false);
-  }
-  $('#xTimer').innerHTML = '<span class="xreviewtag">REVIEW</span>';
-  $('#xTimerBox').classList.remove('low');
-  shownPart = -1; renderRight(true); renderNav();
-  setTimeout(() => XV && XV.layout(), 50);
 }
 
 /* Writing: тексты, количество слов, оценка по критериям */
@@ -2350,14 +2788,21 @@ function bindUI(){
   $('#inName').onkeydown = e => { if(e.key === 'Enter') startAttempt(); };
 
   // экзамен
-  $('#xHide').onclick = () => { const s = $('#xTimer'); s.style.visibility = s.style.visibility === 'hidden' ? '' : 'hidden';
-    $('#xHide').textContent = s.style.visibility === 'hidden' ? 'Show' : 'Hide'; };
+  [['.ico-person', ICO.person], ['.ico-clock', ICO.clock], ['.ico-speaker', ICO.speaker]].forEach(([c, v]) => $$(c).forEach(e => { e.innerHTML = v; }));
+  $('#xSummary').innerHTML = ICO.pencil; $('#xPrev').innerHTML = ICO.prev; $('#xNext').innerHTML = ICO.next;
+  $('#xHide').onclick = hideScreen;
+  $('#xHelp').onclick = openHelp;
+  $('#xTimerBox').onclick = () => { if(X && !X.review && !X.finished){ X.timerHidden = !X.timerHidden; onTick(); } };
   $('#xVol').oninput = e => { const au = $('#xAudio'); if(au) au.volume = +e.target.value; };
-  $('#xSettings').onclick = openXSettings;
-  $('#xSubmit').onclick = askSubmit;
   $('#xBackRes').onclick = () => { $('#xAudio').pause(); X.review = false; renderResults(); };
+  $('#xReview').onchange = e => { const k = T.isW ? 't' + X.task : X.cur; X.flags[k] = e.target.checked; renderNav(); saveAttempt(); };
+  $('#xSummary').onclick = () => { X.navSummary = !X.navSummary; renderNav(); };
   $('#xPrev').onclick = () => T.isW ? goQ(Math.max(1, X.task - 1), true) : goQ(Math.max(1, X.cur - 1), true);
-  $('#xNext').onclick = () => T.isW ? goQ(Math.min(2, X.task + 1), true) : goQ(Math.min(T.Q.length, X.cur + 1), true);
+  $('#xNext').onclick = () => {
+    const last = T.isW ? X.task === 2 : X.cur === T.Q.length;
+    if(last){ if(!X.review) askSubmit(); return; }
+    T.isW ? goQ(X.task + 1, true) : goQ(X.cur + 1, true);
+  };
   document.addEventListener('mouseup', onExamMouseUp);
   document.addEventListener('mousedown', e => { if(popEl && !popEl.contains(e.target)) hidePop(); });
   initDivider();
