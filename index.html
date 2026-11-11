@@ -50,7 +50,7 @@ input.i,select.i,textarea.i{width:100%;border:1px solid var(--line);border-radiu
 textarea.i{font-family:Consolas,Menlo,monospace;font-size:14px;line-height:1.45}
 input.n{width:80px}
 .pill{display:inline-block;border-radius:20px;padding:2px 10px;font-size:12px;background:#eef1f6;color:#344054}
-.pill.r{background:#e8f0fe;color:#1a56b8}.pill.l{background:#fdf0e1;color:#9a5400}.pill.w{background:#eaf6ec;color:#1d6b33}
+.pill.r{background:#e8f0fe;color:#1a56b8}.pill.l{background:#fdf0e1;color:#9a5400}.pill.m{background:#efe6ff;color:#5b2a9d}.pill.w{background:#eaf6ec;color:#1d6b33}
 .seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
 .seg button{border:0;background:#fff;padding:8px 14px;border-right:1px solid var(--line)}
 .seg button:last-child{border-right:0}
@@ -337,6 +337,7 @@ mark.hl{background:#ffe866;color:inherit}
       <h2 style="margin:0" data-i18n="libTitle"></h2>
       <div class="row">
         <button class="btn" id="btnImport" data-i18n="btnImport"></button>
+        <button class="btn" id="btnNewMock" data-i18n="btnNewMock"></button>
         <button class="btn primary" id="btnNew" data-i18n="btnNew"></button>
       </div>
     </div>
@@ -634,7 +635,8 @@ const LS = {
   del(k){ try{ localStorage.removeItem(k); }catch(e){} }
 };
 const MOD_NAME = {listening:'Listening', reading:'Reading', writing:'Writing'};
-const MOD_PILL = {listening:'l', reading:'r', writing:'w'};
+const MOD_PILL = {listening:'l', reading:'r', writing:'w', mock:'m'};
+MOD_NAME.mock = 'Mock';
 
 /* ---------- языки интерфейса: узбекский, английский, русский ----------
    Каждая строка: [узбекский, английский, русский]. {0}, {1} — подставляемые значения.
@@ -924,6 +926,29 @@ const TR = {
                    'This browser cannot open archives. Use a recent Chrome or Edge, or unzip the archive first.',
                    'Этот браузер не умеет открывать архивы. Используйте свежий Chrome или Edge или сначала распакуйте архив.'],
   zipBad: ['Arxiv buzilgan yoki noma’lum formatda', 'The archive is damaged or in an unknown format', 'Архив повреждён или в неизвестном формате'],
+  btnNewMock: ['+ To‘liq mock', '+ Full mock', '+ Полный mock'],
+  mockEdTitle: ['To‘liq mock test', 'Full mock test', 'Полный mock-тест'],
+  mockHint: ['Listening, Reading va Writing ketma-ket, imtihon kunidagidek. Listening ni bitta to‘liq testdan yoki qismlardan (Part 1–4) yig‘ish mumkin, masalan Section 1 va Section 2 testlaridan.',
+             'Listening, Reading and Writing one after another, like on exam day. Listening can be one full test or put together from parts (Part 1–4), e.g. from Section 1 and Section 2 tests.',
+             'Listening, Reading и Writing подряд, как в день экзамена. Listening можно взять одним полным тестом или собрать из частей (Part 1–4), например из тестов Section 1 и Section 2.'],
+  mockName: ['Nomi', 'Name', 'Название'],
+  mockNoTests: ['Kutubxonada bu modul uchun test yo‘q.', 'There are no tests for this module in the library.', 'В библиотеке нет тестов для этого модуля.'],
+  notUsed: ['— yo‘q —', '— none —', '— нет —'],
+  partsN: ['{0} qism', '{0} parts', 'частей: {0}'],
+  mockNeedOne: ['Kamida bitta modul uchun test tanlang', 'Choose a test for at least one module', 'Выберите тест хотя бы для одного модуля'],
+  mockMissing: ['Mock dagi testlardan biri kutubxonadan o‘chirilgan — mock ni tahrirlang.', 'One of the tests in this mock was deleted from the library — edit the mock.', 'Один из тестов этого mock удалён из библиотеки — измените mock.'],
+  delMockText: ['«{0}» mock test o‘chiriladi. Undagi testlar kutubxonada qoladi.', 'The mock “{0}” will be deleted. Its tests stay in the library.', 'Mock «{0}» будет удалён. Тесты из него останутся в библиотеке.'],
+  mockIntroInfo: ['To‘liq mock: {0}', 'Full mock: {0}', 'Полный mock: {0}'],
+  mockUnfinished: ['Tugallanmagan mock: ', 'Unfinished mock: ', 'Незаконченный mock: '],
+  mockNext: ['keyingisi: {0}', 'next: {0}', 'дальше: {0}'],
+  mockResTitle: ['Mock natijasi', 'Mock test result', 'Результат mock'],
+  mockSummary: ['Umumiy natija', 'Overall result', 'Итог'],
+  notTaken: ['o‘tkazilmadi', 'not taken', 'не было'],
+  assessBelow: ['quyida baholang', 'score it below', 'оцените ниже'],
+  speakingL: ['o‘qituvchi bahosi', 'teacher’s score', 'оценка учителя'],
+  seeAnswers: ['Javoblar: {0}', 'Answers: {0}', 'Ответы: {0}'],
+  overallPart: ['Overall (taxminiy, {1} siz): {0}', 'Overall (estimate, without {1}): {0}', 'Overall (примерно, без {1}): {0}'],
+  mockShortL: ['Listening da 40 savoldan kam — band faqat to‘liq Listening uchun hisoblanadi.', 'Listening has fewer than 40 questions — a band is only given for a full Listening test.', 'В Listening меньше 40 вопросов — band считается только для полного Listening.'],
   loadFail: ['Yuklab bo‘lmadi', 'Could not load', 'Не удалось загрузить']
 };
 function tr(key, ...args){
@@ -1414,6 +1439,7 @@ async function renderHome(){
   const box = $('#testList'); box.innerHTML = '';
   if(!tests.length) box.append(h('div', {class: 'empty'}, tr('libEmpty')));
   tests.forEach(t => {
+    if(t.module === 'mock') return box.append(mockRow(t, tests));
     const nk = t.module === 'writing' ? null : Object.keys(parseKey(t.keyText).byQ).length;
     const info = [];
     info.push(tr('nMin', t.minutes));
@@ -1439,7 +1465,7 @@ async function renderHome(){
 function renderResume(tests){
   const a = LS.get('ielts_attempt', null), box = $('#resumeBox');
   box.classList.add('hidden'); box.innerHTML = '';
-  if(!a || a.finished) return;
+  if(!a || a.finished) return renderMockResume(tests);
   const t = tests.find(x => x.id === a.testId);
   if(!t){ LS.del('ielts_attempt'); return; }
   box.classList.remove('hidden');
@@ -1632,6 +1658,11 @@ async function openIntro(id){
 function fillIntro(){
   const t = INTRO.t;
   $('#inTitle').textContent = t.title;
+  if(t.module === 'mock'){
+    $('#inInfo').textContent = tr('mockIntroInfo', mockStages(t).map(m => MOD_NAME[m]).join(' → '));
+    $('#inSound').classList.toggle('hidden', !(t.L || []).length);
+    return syncIntroMode();
+  }
   const rt = runtimeFor(t);
   const info = [MOD_NAME[t.module]];
   if(t.module === 'writing') info.push(tr('introW'), tr('nMin', t.minutes));
@@ -1646,7 +1677,7 @@ function fillIntro(){
 }
 function syncIntroMode(){
   $$('#inMode button').forEach(b => b.classList.toggle('on', b.dataset.v === INTRO.mode));
-  const L = INTRO.t.module === 'listening';
+  const L = INTRO.t.module === 'listening' || (INTRO.t.module === 'mock' && (INTRO.t.L || []).length > 0);
   $('#inModeHint').textContent = INTRO.mode === 'strict'
     ? tr('hintStrict') + (L ? tr('hintStrictL') : '')
     : tr('hintPractice') + (L ? tr('hintPracticeL') : '');
@@ -1680,7 +1711,11 @@ function runtimeFor(test){
   const partPages = String(test.partPages || '').split(/[,;\s]+/).map(Number).filter(n => n > 0);
   if(isW && partPages.length === 1) partPages.unshift(test.from || 1);
   const paper = !isW && Array.isArray(test.paper) && test.paper.length ? test.paper : null;   // задание прямо на экране
-  return {test, isW, key, hasKey, Q, nParts, partPages, paper,
+  // откуда брать задание для каждой части: с экрана (paper) или из PDF; у mock части бывают из разных тестов
+  const partSrc = test.partSrc || Array.from({length: nParts}, (_, p) => ({
+    paper: paper ? paper[p] || null : null, pdf: test.tasksPdf ? test.tasksPdf.data : null,
+    from: test.from, to: test.to, page: partPages[p] || null, key: 'main'}));
+  return {test, isW, key, hasKey, Q, nParts, partPages, paper, partSrc,
     hasAudio: test.module === 'listening' && (test.audio || []).length > 0};
 }
 function saveAttempt(){ if(X && !X.finished && !X.review) LS.set('ielts_attempt', X); }
@@ -1739,16 +1774,22 @@ function preBox(icon, title, cardKids){
 const preInfo = (text, c) => h('div', {class: 'info' + (c ? ' c' : '')}, h('span', {html: ICO.info}), h('span', {html: text}));
 function preStep(fn){ return new Promise(res => fn(res)); }
 
-async function runPre(t){
+async function runPre(t, opts){
+  opts = opts || {};
   T = runtimeFor(t);
   const L = t.module === 'listening';
-  await preStep(done => preShow('', preBox(ICO.people, 'Confirm your details', [
+  if(opts.after) await preStep(done => preShow([h('span', {html: ICO.person}), h('span', null, candLine())],
+    preBox(ICO.people, 'IELTS ' + opts.after + ' test finished', [
+      h('p', null, 'Your ' + opts.after + ' answers have been saved.'),
+      h('p', null, 'The next part of the test is ', h('b', null, MOD_NAME[t.module]), '.'),
+      h('div', {class: 'center'}, h('button', {class: 'ibtn', id: 'preNext', onclick: done}, 'Continue'))])));
+  if(!opts.skipDetails) await preStep(done => preShow('', preBox(ICO.people, 'Confirm your details', [
     h('p', null, 'Name: ', h('b', null, X.name)),
     h('p', null, 'Date of birth: '),
     h('p', null, 'Candidate number: ', h('b', null, X.cand)),
     preInfo('If your details are not correct, please inform the invigilator.'),
     h('div', {class: 'center'}, h('button', {class: 'ibtn', onclick: done}, 'My details are correct'))])));
-  if(L){
+  if(L && !opts.skipDetails){
     await preStep(done => preShow([h('span', {html: ICO.person}), h('span', null, candLine()), preVol()],
       preBox(ICO.phones, 'Test sound', [
         h('p', null, 'Put on your headphones and click on the ', h('b', null, 'Play sound'), ' button to play a sample sound.'),
@@ -1800,23 +1841,31 @@ async function startAttempt(){
   const name = $('#inName').value.trim();
   if(!name){ toast(tr('enterName')); $('#inName').focus(); return; }
   LS.set('ielts_lastname', name); LS.set('ielts_mode', INTRO.mode);
+  if(INTRO.t.module === 'mock') return startMock(name, INTRO.mode);
   const t = INTRO.t;
-  X = {id: uid(), testId: t.id, name, mode: INTRO.mode, startedAt: Date.now(), answers: {}, flags: {}, hl: {},
-       writing: {1: '', 2: ''}, cur: 1, task: 1, remaining: t.minutes * 60000, elapsed: 0,
-       audioIdx: 0, audioTime: 0, phase: 'main', checkLeft: 120000, alerts: {}, finished: false,
-       cand: String(100000 + Math.floor(Math.random() * 900000))};
+  X = newAttempt(t, name, INTRO.mode, String(100000 + Math.floor(Math.random() * 900000)));
   await runPre(t);
 }
-async function resumeAttempt(a, t){ X = a; await enterExam(t); }
+function newAttempt(t, name, mode, cand){
+  return {id: uid(), testId: t.id, name, mode, startedAt: Date.now(), answers: {}, flags: {}, hl: {},
+    writing: {1: '', 2: ''}, cur: 1, task: 1, remaining: (t.minutes || 60) * 60000, elapsed: 0,
+    audioIdx: 0, audioTime: 0, phase: 'main', checkLeft: 120000, alerts: {}, finished: false, cand};
+}
+async function resumeAttempt(a, t){
+  if(t.module === 'mock' && a.mock){                       // незаконченный модуль mock-теста
+    let tt; try{ tt = await stageTest(t, a.mock.stage); }catch(e){ return modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
+    X = a; return enterExam(tt);
+  }
+  X = a; await enterExam(t);
+}
 
 async function enterExam(t){
   T = runtimeFor(t);
-  if(!T.paper && !pdfReady()) return;
+  if(T.partSrc.some(sr => !sr.paper && sr.pdf) && !pdfReady()) return;
   if(!X.cand) X.cand = String(100000 + Math.floor(Math.random() * 900000));
   X.review = false;
   showScreen('exam');
   applyXSettings();
-  $('#exam').classList.toggle('full', !!T.paper);
   $('#xName').textContent = candLine();
   $('#xMod').textContent = X.mode === 'practice' ? 'Practice' : '';
   $('#xBackRes').classList.add('hidden'); $('#xHelp').classList.remove('hidden'); $('#xHide').classList.remove('hidden');
@@ -1825,17 +1874,8 @@ async function enterExam(t){
   const au0 = $('#xAudio'); au0.pause(); au0.controls = false; $('#exam').append(au0);   // плеер — обратно в скрытое место
   const slot = $('#xAudioSlot'); slot.innerHTML = '';
   if(T.hasAudio && X.mode === 'practice') slot.append(buildAudioBar());
-  const left = $('#xLeft'); left.innerHTML = '';
-  if(XV){ XV.destroy(); XV = null; }
-  if(!T.paper){
-    const pdfHost = h('div', {style: 'flex:1;min-height:0;display:flex;flex-direction:column'});
-    left.append(pdfHost);
-    XV = new PdfView(pdfHost, {highlights: X.hl});
-    try{
-      const doc = await openPdf(t.tasksPdf.data);
-      await XV.open(doc, t.from || 1, t.to || doc.numPages);
-    }catch(e){ pdfHost.textContent = 'PDF error: ' + e.message; }
-  }
+  $('#xLeft').innerHTML = '';
+  if(XV){ XV.destroy(); XV = null; } xvKey = null;
   shownPart = -1; renderRight(true); renderNav();
   setupAudio();
   clearInterval(tick); X.lastTick = Date.now();
@@ -1913,9 +1953,12 @@ function renderRight(force){
   if(!force && p === shownPart) return;
   const prev = shownPart; shownPart = p;
   renderTitle(p);
+  const src = T.partSrc[p] || {};
+  $('#exam').classList.toggle('full', !T.isW && (!!src.paper || !src.pdf));
+  if(!src.paper && src.pdf) ensurePdf(src, prev !== p && prev !== -1);
   const R = $('#xRight'); R.innerHTML = ''; R.scrollTop = 0;
   if(T.isW) renderWritingTask(R);
-  else if(T.paper) renderPaper(R, p);
+  else if(src.paper) renderPaper(R, p);
   else {
     const qs = T.Q.filter(q => q.part === p);
     if(qs.length){
@@ -1924,7 +1967,23 @@ function renderRight(force){
       qs.forEach(q => R.append(renderQ(q)));
     }
   }
-  if(XV && T.partPages[p] && prev !== p && prev !== -1) XV.scrollToPage(T.partPages[p]);
+}
+/* PDF слева для текущей части; если часть из другого теста (mock) — открываем его PDF */
+let xvKey = null;
+async function ensurePdf(src, scroll){
+  if(XV && xvKey === src.key){ if(scroll && src.page) XV.scrollToPage(src.page); return; }
+  if(XV){ XV.destroy(); XV = null; }
+  if(!pdfReady()) return;
+  const host = h('div', {style: 'flex:1;min-height:0;display:flex;flex-direction:column'});
+  $('#xLeft').innerHTML = ''; $('#xLeft').append(host);
+  if(!X.hl || Array.isArray(X.hl)) X.hl = {};
+  X.hl[src.key] = X.hl[src.key] || {};
+  XV = new PdfView(host, {highlights: X.hl[src.key]}); xvKey = src.key;
+  try{
+    const doc = await openPdf(src.pdf);
+    await XV.open(doc, src.from || 1, src.to || doc.numPages);
+    if(src.page) XV.scrollToPage(src.page, true);
+  }catch(e){ host.textContent = 'PDF error: ' + e.message; }
 }
 
 /* поле для ответа: номер вопроса виден внутри, как на экзамене */
@@ -1978,7 +2037,7 @@ function renderQ(q){
 /* ---------- задание прямо на экране: блоки из теста (test.paper) ---------- */
 function renderPaper(R, p){
   const wrap = h('div', {class: 'paper'});
-  (T.paper[p] || []).forEach(b => { const el = renderBlock(b); if(el) wrap.append(el); });
+  ((T.partSrc[p] || {}).paper || []).forEach(b => { const el = renderBlock(b); if(el) wrap.append(el); });
   R.append(wrap);
 }
 function fillGaps(html){
@@ -2240,8 +2299,12 @@ function hideScreen(){
 function openReview(){
   X.review = true;
   showScreen('exam'); applyXSettings();
-  $('#exam').classList.toggle('full', !!T.paper);
-  $('#xBackRes').classList.remove('hidden'); $('#xHide').classList.add('hidden');
+  $('#xBackRes').classList.remove('hidden');
+  if(T.hasAudio){                                    // ссылки на записи именно этого теста (в mock модулей несколько)
+    audioURLs.forEach(u => URL.revokeObjectURL(u)); audioURLs = T.test.audio.map(a => URL.createObjectURL(a.blob));
+  }
+  $('#xLeft').innerHTML = ''; if(XV){ XV.destroy(); XV = null; } xvKey = null;
+  const au0 = $('#xAudio'); au0.pause(); $('#exam').append(au0); $('#xAudioSlot').innerHTML = ''; $('#xHide').classList.add('hidden');
   $('#xVolBox').classList.toggle('hidden', !T.hasAudio);
   if(T.hasAudio && !$('#xAudioBar')){                 // в разборе можно переслушать запись с перемоткой
     $('#xAudioSlot').append(buildAudioBar());
@@ -2400,6 +2463,7 @@ function finishAttempt(){
     rec.band = null;
   } else Object.assign(rec, scoreAttempt());
   Hist.add(rec);
+  if(X.mock) return mockStageDone(rec);
   renderResults();
 }
 function scoreAttempt(){
@@ -2606,6 +2670,254 @@ function renderWritingResults(W){
 }
 
 /* =====================================================================
+   ПОЛНЫЙ MOCK: Listening → Reading → Writing подряд, как в день экзамена
+   Запись в библиотеке: {module:'mock', title, L:[id…до 4], R:[id…до 3], W:[id]}
+   ===================================================================== */
+const MOCK_KEYS = [['L', 'listening', 4], ['R', 'reading', 3], ['W', 'writing', 1]];
+const mockStages = m => MOCK_KEYS.filter(([k]) => (m[k] || []).length).map(([, mod]) => mod);
+const mockKeyOf = mod => MOCK_KEYS.find(x => x[1] === mod)[0];
+
+/* номера вопросов части N сдвигаются: Section 2 из другого теста становится вопросами 11–20 */
+function renumberKey(text, off){
+  if(!off) return text || '';
+  return String(text || '').split(/\r?\n/).map(l => {
+    let m = l.match(/^(\s*)(\d{1,3})(\s*(?:-|–|—|&|and|,)\s*)(\d{1,3})([.):]?\s.*)$/i);
+    if(m && +m[4] > +m[2] && +m[4] - +m[2] <= 4) return m[1] + (+m[2] + off) + m[3] + (+m[4] + off) + m[5];
+    m = l.match(/^(\s*)(\d{1,3})([.):]?\s.*)$/);
+    return m ? m[1] + (+m[2] + off) + m[3] : l;
+  }).join('\n');
+}
+function renumberBlocks(blocks, off){
+  return (blocks || []).map(b => {
+    const c = JSON.parse(JSON.stringify(b));
+    if(!off) return c;
+    if(c.html) c.html = c.html.replace(/\{\{(\d+)(:drag)?\}\}/g, (m, n, d) => '{{' + (+n + off) + (d || '') + '}}');
+    if(c.t === 'h') c.q = c.q.replace(/\d+/g, x => +x + off);
+    if(typeof c.n === 'number') c.n += off; else if(Array.isArray(c.n)) c.n = c.n.map(x => x + off);
+    return c;
+  });
+}
+/* несколько тестов одного модуля → один тест (части идут подряд) */
+function mergeTests(list, title){
+  const first = list[0];
+  let off = 0, minutes = 0;
+  const sizes = [], keys = [], partSrc = [], audio = [];
+  list.forEach((t, i) => {
+    const rt = runtimeFor(t);
+    const sz = partSizesOf(t).slice();
+    const tot = Math.max(sz.reduce((a, b) => a + b, 0), rt.Q.length);
+    if(sz.length) sz[sz.length - 1] += tot - sz.reduce((a, b) => a + b, 0); else sz.push(tot);
+    sizes.push(...sz);
+    keys.push(renumberKey(t.keyText, off));
+    rt.partSrc.forEach(src => partSrc.push(Object.assign({}, src, {paper: src.paper ? renumberBlocks(src.paper, off) : null, key: 't' + i})));
+    audio.push(...(t.audio || []));
+    minutes += t.minutes || 0;
+    off += tot;
+  });
+  if(first.module === 'reading') minutes = Math.min(minutes, 60);
+  if(first.module === 'listening') minutes = Math.min(minutes, 40);
+  return {id: first.id, title, module: first.module, readingType: first.readingType, minutes, parts: sizes.join(','),
+    keyText: keys.filter(Boolean).join('\n'), audio, partSrc, tasksPdf: first.tasksPdf, from: first.from, to: first.to,
+    answersPdf: null, merged: true};
+}
+/* тест для модуля mock: один тест как есть или склейка частей */
+async function stageTest(mock, mod){
+  const list = [];
+  for(const id of (mock[mockKeyOf(mod)] || [])){
+    const t = await DB.get(id);
+    if(!t) throw new Error(tr('mockMissing'));
+    list.push(t);
+  }
+  const title = mock.title + ' — ' + MOD_NAME[mod];
+  return list.length === 1 ? Object.assign({}, list[0], {title}) : mergeTests(list, title);
+}
+
+/* строка mock в библиотеке */
+function mockRow(m, tests){
+  const info = MOCK_KEYS.filter(([k]) => (m[k] || []).length).map(([k, mod]) =>
+    MOD_NAME[mod] + ((m[k].length > 1) ? ' (' + tr('partsN', m[k].length) + ')' : ''));
+  const missing = MOCK_KEYS.some(([k]) => (m[k] || []).some(id => !tests.find(t => t.id === id)));
+  return h('div', {class: 'test'},
+    h('span', {class: 'pill m'}, 'Mock'),
+    h('div', {class: 'grow'}, h('div', {class: 'nm'}, m.title || tr('untitled')),
+      h('div', {class: 'sub'}, info.join(' → ')), missing ? h('div', {class: 'sub c-bad'}, tr('mockMissing')) : null),
+    h('button', {class: 'btn primary', onclick: () => openIntro(m.id)}, tr('start')),
+    h('button', {class: 'btn small', onclick: () => editMock(m.id)}, tr('edit')),
+    h('button', {class: 'btn small danger', onclick: async () => {
+      if(await confirmBox(tr('delQ'), tr('delMockText', esc(m.title)), tr('del'))){ await DB.del(m.id); renderHome(); }
+    }}, tr('del')));
+}
+
+/* создание и изменение mock */
+async function editMock(id){
+  const all = await DB.all();
+  const m = id ? await DB.get(id) : {id: null, title: '', L: [], R: [], W: []};
+  const byMod = mod => all.filter(t => t.module === mod).sort((a, b) => (a.title || '').localeCompare(b.title || '', undefined, {numeric: true}));
+  const box = h('div');
+  const name = h('input', {class: 'i', value: m.title || '', placeholder: 'Mock 1'});
+  box.append(h('p', {class: 'sub', style: 'margin-top:0'}, tr('mockHint')), h('label', {class: 'f'}, tr('mockName')), name);
+  const selects = {};
+  MOCK_KEYS.forEach(([k, mod, max]) => {
+    box.append(h('h3', null, MOD_NAME[mod]));
+    const opts = byMod(mod);
+    if(!opts.length){ box.append(h('p', {class: 'sub'}, tr('mockNoTests'))); selects[k] = []; return; }
+    selects[k] = [];
+    for(let i = 0; i < max; i++){
+      const sel = h('select', {class: 'i', style: 'margin-bottom:6px'}, h('option', {value: ''}, tr('notUsed')),
+        ...opts.map(t => h('option', {value: t.id, selected: (m[k] || [])[i] === t.id || null}, t.title)));
+      selects[k].push(sel);
+      box.append(max > 1 ? h('div', {class: 'row', style: 'flex-wrap:nowrap'}, h('span', {style: 'min-width:58px'}, 'Part ' + (i + 1)), sel) : sel);
+    }
+  });
+  const ok = await modal(id ? tr('edit') : tr('mockEdTitle'), box, [{text: tr('cancel'), value: false}, {text: tr('save'), cls: 'primary', value: true}]);
+  if(!ok) return;
+  const rec = Object.assign({}, m, {module: 'mock', title: name.value.trim() || 'Mock ' + new Date().toLocaleDateString(LOCALES[LANG])});
+  MOCK_KEYS.forEach(([k]) => { rec[k] = (selects[k] || []).map(s => s.value).filter(Boolean); });
+  if(!MOCK_KEYS.some(([k]) => rec[k].length)){ toast(tr('mockNeedOne')); return; }
+  if(!rec.id){ rec.id = uid(); rec.created = Date.now(); }
+  rec.updated = Date.now();
+  await DB.put(rec);
+  toast(tr('saved'));
+  renderHome();
+}
+
+/* прохождение mock: состояние хранится в браузере, чтобы можно было продолжить */
+async function startMock(name, mode){
+  const m = INTRO.t;
+  const run = {mockId: m.id, title: m.title, name, mode, cand: String(100000 + Math.floor(Math.random() * 900000)),
+    stages: mockStages(m), idx: 0, results: {}, startedAt: Date.now()};
+  LS.set('ielts_mock_run', run);
+  await startMockStage(run, null);
+}
+async function startMockStage(run, afterMod){
+  const mod = run.stages[run.idx];
+  const m = await DB.get(run.mockId);
+  let t;
+  try{ if(!m) throw new Error(tr('mockMissing')); t = await stageTest(m, mod); }
+  catch(e){ renderHome(); return modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
+  X = newAttempt(t, run.name, run.mode, run.cand);
+  X.testId = run.mockId; X.mock = {id: run.mockId, stage: mod};
+  await runPre(t, {skipDetails: !!afterMod, after: afterMod ? MOD_NAME[afterMod] : null});
+}
+async function mockStageDone(rec){
+  const run = LS.get('ielts_mock_run', null);
+  if(!run || run.mockId !== X.mock.id) return renderResults();
+  run.results[X.mock.stage] = {rec, X: JSON.parse(JSON.stringify(X))};   // ответы сохраняем — для разбора
+  run.idx++;
+  if(run.idx < run.stages.length){ LS.set('ielts_mock_run', run); return startMockStage(run, X.mock.stage); }
+  run.done = true; run.finishedAt = Date.now();
+  LS.set('ielts_mock_run', run);
+  renderMockResults();
+}
+function renderMockResume(tests){
+  const run = LS.get('ielts_mock_run', null), box = $('#resumeBox');
+  if(!run || run.done || run.idx >= run.stages.length) return;
+  const m = tests.find(t => t.id === run.mockId);
+  if(!m) return;
+  box.classList.remove('hidden');
+  box.append(h('div', {class: 'row', style: 'justify-content:space-between'},
+    h('div', null, h('b', null, tr('mockUnfinished')), esc(run.name) + ' — ' + esc(m.title),
+      h('div', {class: 'sub'}, tr('mockNext', MOD_NAME[run.stages[run.idx]]))),
+    h('div', {class: 'row'},
+      h('button', {class: 'btn', onclick: async () => {
+        if(await confirmBox(tr('resetQ'), tr('resetText'), tr('reset'))){ LS.del('ielts_mock_run'); renderHome(); }
+      }}, tr('reset')),
+      h('button', {class: 'btn primary', onclick: () => startMockStage(run, run.idx ? run.stages[run.idx - 1] : null)}, tr('continue')))));
+}
+
+/* итог mock: баллы модулей, оценка Writing, Speaking от учителя, Overall */
+async function renderMockResults(){
+  const run = LS.get('ielts_mock_run', null);
+  if(!run) return renderHome();
+  showScreen('results');
+  const W = $('#resWrap'); W.innerHTML = '';
+  const m = await DB.get(run.mockId);
+  W.append(h('div', {class: 'topline noprint'},
+    h('button', {class: 'btn', onclick: () => renderHome()}, tr('toHome')),
+    h('button', {class: 'btn', onclick: () => window.print()}, tr('print')),
+    m ? h('button', {class: 'btn', onclick: () => openIntro(m.id)}, tr('again')) : null));
+  W.append(h('div', {class: 'card'},
+    h('div', {class: 'row'}, h('span', {class: 'logo'}, 'IELTS'), h('h1', null, tr('mockResTitle') + ': ' + run.title)),
+    h('p', {class: 'sub', style: 'margin:8px 0 0'}, tr('studentL'), h('b', null, run.name), ' · ' + run.cand + ' · ' +
+      fmtDate(run.finishedAt || Date.now()) + (run.mode === 'practice' ? ' · ' + tr('practiceTag') : ''))));
+  const bands = {};
+  const tb = h('table', {class: 't'});
+  tb.append(h('tr', null, h('th', null, tr('hModule')), h('th', null, tr('hResult')), h('th', null, 'Band'), h('th', null, '')));
+  for(const mod of ['listening', 'reading']){
+    const r = run.results[mod];
+    if(!run.stages.includes(mod)){ tb.append(h('tr', null, h('td', null, MOD_NAME[mod]), h('td', {class: 'sub'}, tr('notTaken')), h('td', null, '—'), h('td'))); continue; }
+    if(!r) continue;
+    bands[mod] = r.rec.band;
+    tb.append(h('tr', null, h('td', null, h('b', null, MOD_NAME[mod])),
+      h('td', null, r.rec.total ? (r.rec.score ?? '—') + ' / ' + r.rec.total : '—'),
+      h('td', null, h('b', {style: 'font-size:18px'}, fmtBand(r.rec.band))),
+      h('td', {class: 'noprint'}, m ? h('button', {class: 'btn small', onclick: () => mockReview(run, mod)}, tr('seeAnswers', MOD_NAME[mod])) : null)));
+  }
+  const wr = run.results.writing;
+  const wBandCell = h('b', {style: 'font-size:18px'}, '—');
+  if(run.stages.includes('writing')) tb.append(h('tr', null, h('td', null, h('b', null, 'Writing')),
+    h('td', {class: 'sub'}, wr ? tr('assessBelow') : '—'), h('td', null, wBandCell), h('td')));
+  const sIn = h('input', {class: 'i', type: 'number', min: 0, max: 9, step: 0.5, style: 'width:80px', value: run.speaking ?? ''});
+  tb.append(h('tr', null, h('td', null, h('b', null, 'Speaking')), h('td', {class: 'sub'}, tr('speakingL')), h('td', null, sIn), h('td')));
+  const overall = h('div', {style: 'margin-top:14px;font-size:18px'});
+  const recalc = () => {
+    if(wr) bands.writing = wr.band ?? null;
+    wBandCell.textContent = fmtBand(bands.writing);
+    const sp = parseFloat(sIn.value);
+    run.speaking = isNaN(sp) ? null : sp; LS.set('ielts_mock_run', run);
+    // Overall — по всем модулям, где есть балл; если какого-то нет, честно пишем, без чего посчитано
+    const all = {Listening: bands.listening, Reading: bands.reading, Writing: bands.writing, Speaking: run.speaking};
+    const have = Object.values(all).filter(v => v != null && !isNaN(v));
+    const miss = Object.keys(all).filter(k => all[k] == null || isNaN(all[k]));
+    const val = have.length ? fmtBand(roundBand(have.reduce((a, b) => a + b, 0) / have.length)) : null;
+    if(!val) overall.textContent = '';
+    else if(!miss.length) overall.innerHTML = 'Overall band: <b style="font-size:30px;color:var(--brand)">' + val + '</b>';
+    else overall.innerHTML = tr('overallPart', '<b>' + val + '</b>', miss.join(', '));
+  };
+  sIn.addEventListener('input', recalc);
+  const shortL = run.results.listening && run.results.listening.rec.total && run.results.listening.rec.band == null;
+  W.append(h('div', {class: 'card'}, h('h2', null, tr('mockSummary')), h('div', {style: 'overflow-x:auto'}, tb), overall,
+    shortL ? h('p', {class: 'sub'}, tr('mockShortL')) : null));
+  // Writing: тексты и оценка по критериям
+  if(wr){
+    const wx = wr.X;
+    [1, 2].forEach(k => {
+      const txt = wx.writing[k] || '', wc = wordCount(txt), min = k === 1 ? 150 : 250;
+      W.append(h('div', {class: 'card'},
+        h('div', {class: 'row', style: 'justify-content:space-between'}, h('h2', {style: 'margin:0'}, 'Writing — Task ' + k),
+          h('span', {class: wc < min ? 'c-bad' : 'c-ok'}, tr('words', wc) + (wc < min ? tr('lessWords', min) : ''))),
+        h('div', {style: 'white-space:pre-wrap;line-height:1.6;margin-top:10px;font-family:Arial'}, txt || h('span', {class: 'c-empty'}, tr('emptyText')))));
+    });
+    const sc = wr.wsc = wr.wsc || {1: [null, null, null, null], 2: [null, null, null, null]};
+    const crit = ['Task Achievement / Response', 'Coherence & Cohesion', 'Lexical Resource', 'Grammar Range & Accuracy'];
+    const out = h('div', {style: 'margin-top:12px;font-size:16px'});
+    const wcalc = () => {
+      const avg = k => sc[k].every(v => v != null) ? sc[k].reduce((a, b) => a + b, 0) / 4 : null;
+      const a1 = avg(1), a2 = avg(2);
+      wr.band = (a1 == null || a2 == null) ? null : roundBand((a1 + 2 * a2) / 3);
+      out.innerHTML = wr.band == null ? tr('needAll8') : 'Writing band: <b style="font-size:22px;color:var(--brand)">' + fmtBand(wr.band) + '</b>';
+      if(wr.band != null) Hist.update(wr.rec.id, {band: wr.band});
+      LS.set('ielts_mock_run', run); recalc();
+    };
+    const ctb = h('table', {class: 't'});
+    ctb.append(h('tr', null, h('th', null, tr('crit')), h('th', null, 'Task 1'), h('th', null, 'Task 2')));
+    crit.forEach((c, i) => ctb.append(h('tr', null, h('td', null, c), ...[1, 2].map(k => h('td', null,
+      h('select', {class: 'i', style: 'width:80px', onchange: e => { sc[k][i] = e.target.value === '' ? null : +e.target.value; wcalc(); }},
+        h('option', {value: ''}, '—'), ...[9, 8, 7, 6, 5, 4, 3, 2, 1, 0].map(v => h('option', {value: v, selected: sc[k][i] === v || null}, v))))))));
+    W.append(h('div', {class: 'card'}, h('h2', null, tr('teacherH')), h('p', {class: 'sub'}, tr('teacherP')), ctb, out));
+    wcalc();
+  }
+  recalc();
+}
+/* разбор модуля mock: тот же экран экзамена с правильными ответами */
+async function mockReview(run, mod){
+  const r = run.results[mod], m = await DB.get(run.mockId);
+  let t; try{ t = await stageTest(m, mod); }catch(e){ return modal(tr('loadFail'), '<p>' + esc(e.message) + '</p>'); }
+  T = runtimeFor(t); X = r.X; X.res = checkAll(T.Q, X.answers);
+  openReview();
+}
+
+/* =====================================================================
    ПЕРЕНОС ТЕСТА НА ДРУГОЙ КОМПЬЮТЕР (один файл .json)
    ===================================================================== */
 const toDataURL = blob => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = () => rej(r.error); r.readAsDataURL(blob); });
@@ -2735,6 +3047,7 @@ async function importFiles(files){
    ===================================================================== */
 function bindUI(){
   $('#btnNew').onclick = () => openEditor(null);
+  $('#btnNewMock').onclick = () => editMock(null);
   $('#btnImport').onclick = () => $('#importFile').click();
   // можно выбрать сразу несколько файлов тестов и архивов .zip — загружаются по очереди
   $('#importFile').onchange = async e => {
@@ -2794,7 +3107,7 @@ function bindUI(){
   $('#xHelp').onclick = openHelp;
   $('#xTimerBox').onclick = () => { if(X && !X.review && !X.finished){ X.timerHidden = !X.timerHidden; onTick(); } };
   $('#xVol').oninput = e => { const au = $('#xAudio'); if(au) au.volume = +e.target.value; };
-  $('#xBackRes').onclick = () => { $('#xAudio').pause(); X.review = false; renderResults(); };
+  $('#xBackRes').onclick = () => { $('#xAudio').pause(); X.review = false; if(X.mock) renderMockResults(); else renderResults(); };
   $('#xReview').onchange = e => { const k = T.isW ? 't' + X.task : X.cur; X.flags[k] = e.target.checked; renderNav(); saveAttempt(); };
   $('#xSummary').onclick = () => { X.navSummary = !X.navSummary; renderNav(); };
   $('#xPrev').onclick = () => T.isW ? goQ(Math.max(1, X.task - 1), true) : goQ(Math.max(1, X.cur - 1), true);
