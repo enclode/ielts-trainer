@@ -930,6 +930,12 @@ const TR = {
   zipUnsupported: ['Bu brauzer arxivni ocha olmaydi. Chrome yoki Edge ning yangi versiyasini ishlating yoki arxivni oldin oching.',
                    'This browser cannot open archives. Use a recent Chrome or Edge, or unzip the archive first.',
                    'Этот браузер не умеет открывать архивы. Используйте свежий Chrome или Edge или сначала распакуйте архив.'],
+  zipBadSize: ['«{0}» fayli arxiv sifatida ochilmadi (hajmi {1} MB). Ehtimol, u oxirigacha yuklab olinmagan — qayta yuklab oling. Yoki arxivni kompyuterda oching va ichidagi .json fayllarni tanlang.',
+               'The file “{0}” could not be opened as an archive (size {1} MB). It was probably not downloaded completely — download it again. Or unzip it on the computer and choose the .json files inside.',
+               'Файл «{0}» не открылся как архив (размер {1} МБ). Скорее всего, он скачался не до конца — скачайте его ещё раз. Или распакуйте архив на компьютере и выберите .json-файлы внутри.'],
+  zipPartial: ['Arxiv to‘liq yuklab olinmagan: {0}. Undagi butun testlar yuklandi, qolganlari uchun arxivni qayta yuklab oling.',
+               'The archive was not downloaded completely: {0}. The complete tests in it were loaded; download the archive again for the rest.',
+               'Архив скачан не полностью: {0}. Целые тесты из него загружены, за остальными скачайте архив ещё раз.'],
   zipBad: ['Arxiv buzilgan yoki noma’lum formatda', 'The archive is damaged or in an unknown format', 'Архив повреждён или в неизвестном формате'],
   btnNewMock: ['+ To‘liq mock', '+ Full mock', '+ Полный mock'],
   mockEdTitle: ['To‘liq mock test', 'Full mock test', 'Полный mock-тест'],
@@ -2963,7 +2969,7 @@ async function readZip(file){
   let eocd = -1;
   for(let i = buf.byteLength - 22; i >= Math.max(0, buf.byteLength - 22 - 65535); i--)
     if(dv.getUint32(i, true) === 0x06054b50){ eocd = i; break; }
-  if(eocd < 0) throw new Error(tr('zipBad'));
+  if(eocd < 0) return readZipLocal(buf, file);
   let count = dv.getUint16(eocd + 10, true), cdOff = dv.getUint32(eocd + 16, true);
   if((cdOff === 0xFFFFFFFF || count === 0xFFFF) && eocd >= 20 && dv.getUint32(eocd - 20, true) === 0x07064b50){   // zip64
     const z = Number(dv.getBigUint64(eocd - 12, true));
@@ -2999,6 +3005,31 @@ async function readZip(file){
   }));
 }
 
+/* запасной путь: идём по записям архива с начала файла; берём все целые (недокачанный хвост пропускаем) */
+function readZipLocal(buf, file){
+  const dv = new DataView(buf), dec = new TextDecoder(), out = [];
+  let p = 0, broken = false;
+  while(p + 30 <= buf.byteLength && dv.getUint32(p, true) === 0x04034b50){
+    const flags = dv.getUint16(p + 6, true), method = dv.getUint16(p + 8, true);
+    const csize = dv.getUint32(p + 18, true), nameLen = dv.getUint16(p + 26, true), extraLen = dv.getUint16(p + 28, true);
+    const start = p + 30 + nameLen + extraLen;
+    if((flags & 8) && !csize){ broken = true; break; }          // размер записан только после данных — дальше не прочитать
+    if(start + csize > buf.byteLength){ broken = true; break; }  // запись обрывается — файл недокачан
+    const name = dec.decode(new Uint8Array(buf, p + 30, nameLen));
+    const data = new Uint8Array(buf, start, csize);
+    out.push({name: name.split('/').pop(), path: name, text: async () => {
+      if(method === 0) return dec.decode(data);
+      if(method === 8) return new Response(new Blob([data]).stream().pipeThrough(new DecompressionStream('deflate-raw'))).text();
+      throw new Error(tr('zipBad'));
+    }});
+    p = start + csize;
+    if(flags & 8) p += (dv.getUint32(p, true) === 0x08074b50) ? 16 : 12;
+  }
+  if(!out.length) throw new Error(tr('zipBadSize', file.name, (file.size / 1e6).toFixed(1)));
+  if(broken || p < buf.byteLength) out.partial = true;
+  return out;
+}
+
 /* один тест из текста файла .ielts.json → в библиотеку. Возвращает 'added' | 'skipped'. */
 async function importTestText(text, batch){
   const j = JSON.parse(text);
@@ -3026,11 +3057,13 @@ async function importTestText(text, batch){
 
 /* загрузка выбранных файлов: тесты .json и архивы .zip с тестами внутри, сколько угодно сразу */
 async function importFiles(files){
-  const items = [];
+  const items = [], partialZips = [];
   try{
     for(const f of files){
       if(/\.zip$/i.test(f.name) || /zip/.test(f.type)){
-        (await readZip(f)).filter(e => /\.json$/i.test(e.name) && !/^__MACOSX\//.test(e.path) && !e.name.startsWith('.'))
+        const entries = await readZip(f);
+        if(entries.partial) partialZips.push(f.name);
+        entries.filter(e => /\.json$/i.test(e.name) && !/^__MACOSX\//.test(e.path) && !e.name.startsWith('.'))
           .sort((a, b) => a.name.localeCompare(b.name, undefined, {numeric: true}))
           .forEach(e => items.push({name: e.name, text: e.text}));
       } else items.push({name: f.name, text: () => f.text()});
@@ -3050,9 +3083,10 @@ async function importFiles(files){
   }
   prog.remove();
   await renderHome();
-  if(!batch && added && !failed.length) return toast(tr('added', names[0] || ''));
+  if(!batch && added && !failed.length && !partialZips.length) return toast(tr('added', names[0] || ''));
   let html = '<p><b>' + tr('importDone', added) + '</b></p>';
   if(skipped) html += '<p>' + tr('importSkipped', skipped) + '</p>';
+  if(partialZips.length) html += '<p class="c-bad">' + tr('zipPartial', partialZips.map(esc).join(', ')) + '</p>';
   if(failed.length) html += '<p class="c-bad">' + tr('importFailed', failed.length) + '</p><ul>' + failed.map(x => '<li>' + esc(x) + '</li>').join('') + '</ul>';
   modal(null, html);
 }
